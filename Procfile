@@ -1,1 +1,1 @@
-web: gunicorn euro-polo.wsgi
+web: gunicorn myapp.wsgi
