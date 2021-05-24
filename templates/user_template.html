@@ -11,19 +11,12 @@
           <div class="card-body">
             <p class="card-text">
                     <img src="{{ item.1 }}" class="rounded float-start" alt="..." width="80" height="80">
+                    {{ item.4 }} - {{ item.5 }}
                     <img src="{{ item.3 }}" class="rounded float-end" alt="..." width="80" height="80">
             </p>
           </div>
       </div>
   {% endfor %}
-{#    {% for local_name in logos %}#}
-{#    <div class="card" style="width: 10rem;">#}
-{#  <img src="{{local_name}}" class="card-img-top">#}
-{#  <div class="card-body">#}
-{#    <p class="card-text">Image.</p>#}
-{#  </div>#}
-{#</div>#}
-{#  {% endfor %}#}
     </body>
 </html>
 

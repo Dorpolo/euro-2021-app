@@ -28,23 +28,22 @@
           <a class="nav-link active" aria-current="page" href={% url 'home' %}>Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href={%url 'home'%}>Add Your Bets</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="https://www.uefa.com/uefaeuro-2020/news/0254-0d41684d1216-06773df7faed-1000--euro-2020-all-the-fixtures/">Uefa.com</a>
-        </li>
-
-        <li class="nav-item dropdown">
+                    <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            More Info
-          </a>
+              Add Your Bets
+              </a>
+
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href={% url 'add_your_bet' %}>Group Stage</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
+            <li><a class="dropdown-item" href="#">Quarter Finals</a></li>
+            <li><a class="dropdown-item" href="#">Semi Finals</a></li>
+              <li><a class="dropdown-item" href="#">Finals</a></li>
           </ul>
         </li>
       </ul>
+            <a class="nav-link" href="https://www.uefa.com/uefaeuro-2020/news/0254-0d41684d1216-06773df7faed-1000--euro-2020-all-the-fixtures/">Uefa.com</a>
+        </li>
     </div>
   </div>
 </nav>
