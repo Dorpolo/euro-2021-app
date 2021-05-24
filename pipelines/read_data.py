@@ -33,8 +33,10 @@ class EuroApi:
                         away_team_id = item2['awayParticipant']['participantID']
                         home_team = item2['homeParticipant']['participantName']
                         away_team = item2['awayParticipant']['participantName']
-                        txt = f'{home_team} - {away_team}'
-                        fixtures_list.append(txt)
+                        home_logo = teams[home_team]['logo']
+                        away_logo = teams[away_team]['logo']
+                        row = [home_team, home_logo, away_team, away_logo]
+                        fixtures_list.append(row)
         return fixtures_list
 
     def main(self):

@@ -8,7 +8,8 @@ from data.teams import teams
 def user_data(request):
     context = {
         'fixtures': EuroApi().main(),
-        'logos': [item['logo'] for item in teams.values()]
+        'logos': [item['logo'] for item in teams.values()],
+        'extra': {'1': 'Hello Maccabi'}
     }
     template_name = "user_template.html"
     return render(request, template_name, context)
