@@ -4,8 +4,8 @@ from django.http import HttpResponse
 from pipelines.read_data import EuroApi
 from data.teams import teams
 from django.views.generic import ListView, DetailView, CreateView
-from .models import Game
-from .forms import PostForm
+from .models import Game, League, User
+from .forms import BetForm, LeagueForm, UserForm
 
 
 def user_data(request):
@@ -16,9 +16,21 @@ def user_data(request):
     return render(request, template_name, context)
 
 
-class AddPostView(CreateView):
+class AddBetsView(CreateView):
     model = Game
-    form_class = PostForm
+    form_class = BetForm
     template_name = 'add_bets.html'
+
+
+class CreateLeagueView(CreateView):
+    model = League
+    form_class = LeagueForm
+    template_name = 'add_league.html'
+
+
+class CreateUserView(CreateView):
+    model = User
+    form_class = UserForm
+    template_name = 'add_user.html'
 
 

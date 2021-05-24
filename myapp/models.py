@@ -42,8 +42,25 @@ class Game(models.Model):
     gid_8220 = models.CharField('Portugal - France', max_length=6)
     gid_19960 = models.CharField('Germany - Hungary', max_length=6)
 
-    def __str__(self):
-        return f"{self.title} | {str(self.author)}"
-
     def get_absolute_url(self):
+        return reverse('home')
+
+
+class League(models.Model):
+    league_name = models.CharField('League Name', max_length=20)
+    league_owner = models.CharField('League Manager', max_length=20)
+    league_owner_email = models.EmailField('League Manager Email')
+
+    @staticmethod
+    def get_absolute_url():
+        return reverse('home')
+
+
+class User(models.Model):
+    first_name = models.CharField('First Name', max_length=20)
+    last_name = models.CharField('Last Name', max_length=20)
+    email = models.EmailField('Email')
+
+    @staticmethod
+    def get_absolute_url():
         return reverse('home')

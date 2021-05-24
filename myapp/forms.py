@@ -1,8 +1,8 @@
 from django import forms
-from .models import Game
+from .models import Game, League, User
 
 
-class PostForm(forms.ModelForm):
+class BetForm(forms.ModelForm):
     class Meta:
         model = Game
         fields = ('user_name', 'gid_8222', 'gid_8198', 'gid_8199', 'gid_8200', 'gid_8201', 'gid_19950',
@@ -51,3 +51,38 @@ class PostForm(forms.ModelForm):
             'gid_8220': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: 0-0'}),
             'gid_19960': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: 0-0'}),
         }
+
+
+class LeagueForm(forms.ModelForm):
+    class Meta:
+        model = League
+        fields = ('league_name',)
+
+        widgets = {
+            'league_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Avi Nimni'}),
+        }
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', )
+
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Avi'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Nimni'}),
+            'email': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: tal_banin@gmail.com'}),
+        }
+
+    def clean_name(self):
+        phone = self.cleaned_data.get("first_name")
+        if len(phone) != 2:
+            raise forms.ValidationError("Invalid phone number")
+        return phone
+
+    def clean(self):
+        first_name = self.cleaned_data.get("first_name")
+        last_name = self.cleaned_data.get("first_name")
+        # Custom Validation Logic
+        # Here
+        return self.cleaned_data
