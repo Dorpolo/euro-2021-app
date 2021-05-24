@@ -7,9 +7,21 @@
     <title>User Information</title>
 </head>
     <body>
-    <p> First Name: {{first_name }}</p>
-    <p> Last Name: {{last_name }}</p>
-    <p> Address: {{address}}</p>
+  {% for local_name in fixtures %}
+<div class="card" style="width: 18rem;">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">{{ local_name}}</li>
+  </ul>
+</div>
+  {% endfor %}
+    {% for local_name in logos %}
+    <div class="card" style="width: 10rem;">
+  <img src="{{local_name}}" class="card-img-top">
+  <div class="card-body">
+    <p class="card-text">Image.</p>
+  </div>
+</div>
+  {% endfor %}
     </body>
 </html>
 

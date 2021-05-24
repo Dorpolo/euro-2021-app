@@ -6,9 +6,10 @@
   <title>Hello World</title>
   <body>
       <h1>Hello World</h1>
-  Hey All {{ data }}
+  {% for local_name in iterable_name %}
+    {{ local_name }}
+  {% endfor %}
   </body>
 </html>
-
 
 {% endblock %}
