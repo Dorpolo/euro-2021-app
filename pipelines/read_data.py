@@ -44,4 +44,3 @@ class EuroApi:
     def main(self):
         output = self.read_fixtures()
         return output
-
