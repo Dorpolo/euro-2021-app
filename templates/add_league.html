@@ -1,15 +1,24 @@
 {% extends 'base.html' %}
 {% block title %} Create League {% endblock %}
+
 {% block content %}
 
 <h1>Create League</h1>
 <br/><br/>
-<div class="form-group">
+<div class="form-control">
     <form method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-warning">Submit</button>
+        {% for field in form %}
+            {{ field.errors }}
+            {{ field.label_tag }} {{ field }}
+        {% endfor %}
+    <br/>
+    <button class="btn btn-warning">Submit</button>
     </form>
+
 </div>
 
 {% endblock %}
+
+
+

@@ -1,15 +1,48 @@
 {% extends 'base.html' %}
-{% block title %} Add Bets Page {% endblock %}
-{% block content %}
+{% block title %}
+    Add Bets Page
+{% endblock %}
 
-<h1>Add Your Bets</h1>
-<br/><br/>
-<div class="form-group">
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-warning">Submit</button>
-    </form>
-</div>
+
+{% block content %}
+    <div class="columns is-mobile">
+        <h3 class="title is-size3">Add Your Bets</h3>
+        <hr>
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}" class="label">{{ field.label }}</label>
+                    {{ field }}
+                {% if forloop.counter == 1%}
+                    </br>
+                    <hr>
+                    <span class="badge bg-warning text-dark">Group A</span>
+                {% endif %}
+                {% if forloop.counter == 7%}
+                    <hr>
+                    <span class="badge bg-warning text-dark">Group B</span>
+                {% endif %}
+                {% if forloop.counter == 13%}
+                    <hr>
+                    <span class="badge bg-warning text-dark">Group C</span>
+                {% endif %}
+                {% if forloop.counter == 19%}
+                    <hr>
+                    <span class="badge bg-warning text-dark">Group D</span>
+                {% endif %}
+                {% if forloop.counter == 25%}
+                    <hr>
+                    <span class="badge bg-warning text-dark">Group E</span>
+                {% endif %}
+                {% if forloop.counter == 31%}
+                    <hr>
+                    <span class="badge bg-warning text-dark">Group F</span>
+                {% endif %}
+                 </div>
+                </br>
+            {% endfor %}
+             <button class="btn btn-warning">Submit</button>
+        </form>
 
 {% endblock %}

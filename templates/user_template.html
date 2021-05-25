@@ -1,23 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<html>
-    <body>
+{% if user.is_authenticated %}
+  <body>
   {% for item in fixtures %}
       <div class="card text-dark bg-warning mb-3" style="max-width: 24rem;">
           <div class="card-header">
-                    {{ item.0 }} - {{ item.2 }}
+                {{ item.0 }} - {{ item.2 }}
           </div>
           <div class="card-body">
             <p class="card-text">
-                    <img src="{{ item.1 }}" class="rounded float-start" alt="..." width="80" height="80">
-                    {{ item.4 }} - {{ item.5 }}
-                    <img src="{{ item.3 }}" class="rounded float-end" alt="..." width="80" height="80">
+                <img src="{{ item.1 }}" class="rounded float-start" alt="..." width="80" height="80">
+                {{ item.4 }} - {{ item.5 }}
+                <img src="{{ item.3 }}" class="rounded float-end" alt="..." width="80" height="80">
             </p>
           </div>
       </div>
   {% endfor %}
-    </body>
-</html>
+  </body>
+{% else %}
+    <h1>Please <span class="badge bg-secondary">Login First!</span></h1>
+{% endif %}
 
 {% endblock %}

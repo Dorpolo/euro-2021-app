@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    {% if user.is_authenticated %}
+      <body>
+          <h1>Hello World</h1>
+      {% for local_name in iterable_name %}
+        {{ local_name }}
+      {% endfor %}
+      </body>
+    {% else %}
+        <h1>Example heading <span class="badge bg-secondary">Login First!</span></h1>
+    {% endif %}
 
-<html>
-  <title>Hello World</title>
-  <body>
-      <h1>Hello World</h1>
-  {% for local_name in iterable_name %}
-    {{ local_name }}
-  {% endfor %}
-  </body>
-</html>
 
 {% endblock %}

@@ -35,7 +35,7 @@
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href={% url 'create_league' %}>Create New League</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href={% url 'create_user' %}>Create New User</a></li>
+                    <li><a class="dropdown-item" href={% url 'create_user' %}>Sign up for a league</a></li>
                   </ul>
                 </li>
             <li class="nav-item dropdown">
@@ -56,15 +56,20 @@
          <li class="nav-item">
             <a class="nav-link" href="https://www.uefa.com/uefaeuro-2020/news/0254-0d41684d1216-06773df7faed-1000--euro-2020-all-the-fixtures/">Uefa.com</a>
          </li>
+        {% if not user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'register' %}">Register</a>
          </li>
-        <li class="nav-item">
+          <li class="nav-item">
             <a class="nav-link" href="{% url 'login' %}">Login</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-        </li>
+            {% else %}
+             <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+             </li>
+      {% endif %}
+
+
     </div>
   </div>
 </nav>
