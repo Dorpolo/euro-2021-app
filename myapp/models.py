@@ -56,7 +56,7 @@ class League(models.Model):
         return reverse('home')
 
 
-class User(models.Model):
+class LeagueUser(models.Model):
     first_name = models.CharField('First Name', max_length=20)
     last_name = models.CharField('Last Name', max_length=20)
     email = models.EmailField('Email')

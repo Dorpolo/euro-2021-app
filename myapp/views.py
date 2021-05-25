@@ -1,10 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.http import HttpResponse
 from pipelines.read_data import EuroApi
-from data.teams import teams
 from django.views.generic import ListView, DetailView, CreateView
-from .models import Game, League, User
+from .models import Game, League, LeagueUser
 from .forms import BetForm, LeagueForm, UserForm
 
 
@@ -29,7 +27,7 @@ class CreateLeagueView(CreateView):
 
 
 class CreateUserView(CreateView):
-    model = User
+    model = LeagueUser
     form_class = UserForm
     template_name = 'add_user.html'
 

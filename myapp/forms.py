@@ -1,5 +1,5 @@
 from django import forms
-from .models import Game, League, User
+from .models import Game, League, LeagueUser
 
 
 class BetForm(forms.ModelForm):
@@ -65,7 +65,7 @@ class LeagueForm(forms.ModelForm):
 
 class UserForm(forms.ModelForm):
     class Meta:
-        model = User
+        model = LeagueUser
         fields = ('first_name', 'last_name', 'email', )
 
         widgets = {

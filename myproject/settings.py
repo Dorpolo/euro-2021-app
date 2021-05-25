@@ -11,6 +11,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DJANGO_DEBUG')
 ALLOWED_HOSTS = [env('DJANGO_ALLOWED_HOSTS')]
+POSTGRES_PASS = env('POSTGRES_PASS')
 
 DEBUG = True
 
@@ -69,16 +70,16 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'default2': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
         },
-    'postgres': {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'database_name',
-        'USER': 'database_user',
-        'PASSWORD': 'secret',
-        'HOST': '127.0.0.1',
+        'NAME': 'dktq534bum4hj',
+        'USER': 'wwpnsvztdmbvwd',
+        'PASSWORD': POSTGRES_PASS,
+        'HOST': 'ec2-52-22-216-69.compute-1.amazonaws.com',
         'PORT': '5432',
         }
 }
