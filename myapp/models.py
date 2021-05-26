@@ -4,7 +4,7 @@ from django.urls import reverse
 
 
 class Game(models.Model):
-    user_name = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_name = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     gid_8222 = models.CharField('Turkey - Italy', max_length=3)
     gid_8198 = models.CharField('Wales - Switzerland', max_length=3)
     gid_8206 = models.CharField('Turkey - Wales', max_length=3)
