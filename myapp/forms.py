@@ -2,6 +2,8 @@ from django import forms
 from .models import Game, League, LeagueUser
 from pipelines.read_data import EuroApi
 
+logos = EuroApi().main()
+
 class BetForm(forms.ModelForm):
     class Meta:
         model = Game
@@ -198,7 +200,7 @@ class BetForm(forms.ModelForm):
         ]
 
     def more_data(self):
-        sorted_fixtures = EuroApi().main()
+        sorted_fixtures = logos
         data = [
             list(
                 set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
