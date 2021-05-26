@@ -48,7 +48,7 @@ class EuroApi:
 
     @staticmethod
     def dynamic_sort(sub_li):
-        sub_li.sort(key = lambda x: [x[2], x[3], x[4], x[5], x[1], x[0]])
+        sub_li.sort(key=lambda x: [x[2], x[3], x[4], x[5], x[1], x[0]])
         return sub_li
 
     def main(self):

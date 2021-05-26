@@ -3,17 +3,15 @@
 {% block content %}
 {% if user.is_authenticated %}
   <body>
-  {{ fixtures.1.1 }}
   {% for item in fixtures %}
       <div class="card text-dark bg-warning mb-3" style="max-width: 24rem;">
           <div class="card-header">
-            {{ item.0 }} - {{ item.2 }}
+            {{ item.7 }}
           </div>
             <div class="card-body">
                 <p class="card-text">
-                    <img src="{{ item.1 }}" class="rounded float-start" alt="..." width="80" height="80">
-                    {{ item.4 }} - {{ item.5 }}
-                    <img src="{{ item.3 }}" class="rounded float-end" alt="..." width="80" height="80">
+                    <img src="{{ item.8 }}" class="rounded float-start" alt="..." width="80" height="80">
+                    {{ item.7 }}
                 </p>
           </div>
       </div>
