@@ -5,6 +5,7 @@
 
 <h1>Create League</h1>
 <br/><br/>
+    {{ todo_list }}
 <div class="form-control">
     <form method="POST">
         {% csrf_token %}
@@ -19,6 +20,4 @@
 </div>
 
 {% endblock %}
-
-
 

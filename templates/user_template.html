@@ -3,6 +3,7 @@
 {% block content %}
 {% if user.is_authenticated %}
   <body>
+  {{ fixtures.1.1 }}
   {% for item in fixtures %}
       <div class="card text-dark bg-warning mb-3" style="max-width: 24rem;">
           <div class="card-header">

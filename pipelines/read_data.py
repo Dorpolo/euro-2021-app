@@ -40,13 +40,15 @@ class EuroApi:
                 match_day = item['matchdayName']
                 match_date = sub_item['matchDate']
                 match_time = sub_item['matchTime']
-                row = [home_team, home_logo, away_team, away_logo, home_score, away_score, match_day, match_date, match_time]
-                fixtures_list.append(row)
+                home_row = [0, game_id, group, match_day, match_date, match_time, home_team_id, home_team, home_logo, home_score]
+                away_row = [1, game_id, group, match_day, match_date, match_time, away_team_id, away_team, away_logo, away_score]
+                fixtures_list.append(home_row)
+                fixtures_list.append(away_row)
         return fixtures_list
 
     @staticmethod
     def dynamic_sort(sub_li):
-        sub_li.sort(key = lambda x: [x[7], x[8]])
+        sub_li.sort(key = lambda x: [x[2], x[3], x[4], x[5], x[1], x[0]])
         return sub_li
 
     def main(self):
