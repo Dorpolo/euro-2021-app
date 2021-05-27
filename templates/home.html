@@ -22,9 +22,9 @@
             <tbody>
             <tr>
                   {% for league_user in league_users %}
-                     <th scope="row">{{ forloop.counter	 }}</th>
-                     <th scope="row">{{ league_user.user_name }}</th>
-                     <th scope="row">{{ league_user.league_name }}</th>
+                     <td scope="row">{{ forloop.counter	 }}</td>
+                     <td scope="row">{{ league_user.user_name }}</td>
+                     <td scope="row">{{ league_user.league_name }}</td>
                   {% endfor %}
             </tr>
             </tbody>
