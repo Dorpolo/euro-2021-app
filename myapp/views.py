@@ -34,12 +34,6 @@ def bet_index(request):
     return render(request, template_name, context)
 
 
-def add_bet_from_submission(request):
-    print("Hello, form is submitted!")
-    template_name = 'add_bets.html'
-    return render(request, template_name)
-
-
 class AddBetsView(CreateView):
     model = Game
     form_class = BetForm
@@ -60,30 +54,5 @@ class CreateUserView(CreateView):
 
 class UpdateBetView(UpdateView):
     model = Game
+    form_class = BetForm
     template_name = 'update_bets.html'
-    fields = '__all__'
-
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from .forms import NameForm
-
-
-def get_name(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = NameForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = NameForm()
-    context = {
-            'form': form
-        }
-    return render(request, 'name.html', context)

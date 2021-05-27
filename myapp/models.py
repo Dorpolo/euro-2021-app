@@ -4,7 +4,7 @@ from django.urls import reverse
 
 
 class Game(models.Model):
-    user_name = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    user_name = models.OneToOneField(User, on_delete=models.CASCADE)
     gid_8222_0 = models.IntegerField('Turkey')
     gid_8222_1 = models.IntegerField('Italy')
     gid_8198_0 = models.IntegerField('Wales')
@@ -85,7 +85,7 @@ class Game(models.Model):
 
 class League(models.Model):
     league_name = models.CharField('League Name', max_length=20, unique=True)
-    league_owner = models.CharField('League Manager', max_length=20, blank=True)
+    league_owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     league_owner_email = models.EmailField('League Manager Email', blank=True)
 
     @staticmethod

@@ -12,9 +12,9 @@ urlpatterns = [
     path('update_your_bet/<int:pk>', views.UpdateBetView.as_view(), name='update_your_bet'),
     path('create_league/', views.CreateLeagueView.as_view(), name='create_league'),
     path('create_user/', views.CreateUserView.as_view(), name='create_user'),
-    path('members/', include('django.contrib.auth.urls')),
-    path('members/', include('members.urls')),
-    path('add_your_bet/', views.add_bet_from_submission, name='add_your_bet')
+    path('members/', include('django.contrib.auth.urls'), name='register'),
+    path('members/', include('members.urls'), name='login'),
+    path('add_your_bet/', views.UpdateBetView.as_view(), name='add_your_bet')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 #views.bet_index

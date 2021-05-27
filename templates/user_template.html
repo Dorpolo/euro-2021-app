@@ -18,7 +18,25 @@
   {% endfor %}
   </body>
 {% else %}
-    <h1>Please <span class="badge bg-secondary">Login First!</span></h1>
+    <div>
+        <h3>Welcome Home Dear Friend!</h3>
+        <h6>Euro 2021 - Friends Zone Platform.</h6>
+        <br/>
+        <p>For quick start, please follow the following steps:</p>
+        <ul class="list-group">
+          <li class="list-group-item">1. Register</li>
+          <li class="list-group-item">2. Login with your user credentials</li>
+          <li class="list-group-item">3. Create a new league (if required)</li>
+          <li class="list-group-item">4. Get your league name.</li>
+          <li class="list-group-item">5. Join your league (via setup tab)</li>
+        </ul>
+        <br/>
+        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+            <a href="{% url 'register' %}"><button type="button" class="btn btn-danger">Register</button></a>
+            <a href="{% url 'login' %}"><button type="button" class="btn btn-warning">Login</button></a>
+        </div>
+        <p></p>
+    </div>
 {% endif %}
 
 {% endblock %}
