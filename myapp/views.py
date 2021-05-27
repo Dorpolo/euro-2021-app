@@ -1,27 +1,33 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from pipelines.read_data import EuroApi
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
 from .models import Game, League, LeagueUser
 from .forms import BetForm, LeagueForm, UserForm
 
 
-def user_data(request):
-    context = {
-        'fixtures': EuroApi().main()
-    }
-    template_name = "user_template.html"
-    return render(request, template_name, context)
+class HomeView(TemplateView):
+    template_name = "home.html"
+    get_api_data = EuroApi()
 
+    def get(self, request):
+        league_users = LeagueUser.objects.all()
+        context = {
+            'league_users': league_users,
+            'fixtures': self.get_api_data.main(),
+            'teams': self.get_api_data.get_unique_teams()
+        }
+        return render(request, self.template_name, context)
 
-def index(request):
-    form = LeagueForm()
-    template_name = 'add_league.html'
-    context = {
-        'form': form,
-        'fixtures': EuroApi().main()
-    }
-    return render(request, template_name, context)
+# def user_data(request):
+#     init = EuroApi()
+#     context = {
+#         'fixtures': init.main(),
+#         'teams': init.get_unique_teams(),
+#         'league_users': LeagueUser.objects.all()
+#     }
+#     template_name = 'home.html'
+#     return render(request, template_name, context)
 
 
 def bet_index(request):

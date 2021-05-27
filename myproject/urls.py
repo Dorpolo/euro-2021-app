@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', views.user_data, name='home'),
+    path('', views.HomeView().get, name='home'),
     path('admin/', admin.site.urls),
     path('add_your_bet/', views.AddBetsView.as_view(), name='add_your_bet'),
     path('update_your_bet/<int:pk>', views.UpdateBetView.as_view(), name='update_your_bet'),
@@ -16,5 +16,3 @@ urlpatterns = [
     path('members/', include('members.urls'), name='login'),
     path('add_your_bet/', views.UpdateBetView.as_view(), name='add_your_bet')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-#views.bet_index

@@ -51,6 +51,11 @@ class EuroApi:
         sub_li.sort(key=lambda x: [x[2], x[3], x[4], x[5], x[1], x[0]])
         return sub_li
 
+    def get_unique_teams(self):
+        output = self.read_fixtures()
+        team_list = [item[8] for item in output]
+        return set(team_list)
+
     def main(self):
         output = self.read_fixtures()
         return self.dynamic_sort(output)
