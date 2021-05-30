@@ -40,28 +40,37 @@ def get_league_user_email(user) -> str:
     return data[0].email
 
 
-def extract_user_league_name_id(user) -> str:
+def extract_user_league_name_id(user) -> tuple:
     data = LeagueUser.objects.filter(user_name_id=user)
-    league_name_id = data[0].league_name_id
-    return league_name_id
+    if len(data) > 0:
+        league_name_id = data[0].league_name_id
+        return True, league_name_id
+    else:
+        return False, None
 
 
-def extract_league_users(user) -> dict:
+def extract_league_users(user) -> tuple:
     l_name_id = extract_user_league_name_id(user)
-    data = LeagueUser.objects.filter(league_name_id=l_name_id)
-    user_list = {item.user_name_id:
-                     {'first_name': item.first_name,
-                      'last_name': item.last_name
-                      } for item in data}
-    return user_list
+    if l_name_id[0]:
+        data = LeagueUser.objects.filter(league_name_id=l_name_id[1])
+        user_list = {item.user_name_id:
+                         {'first_name': item.first_name,
+                          'last_name': item.last_name
+                          } for item in data}
+        return True, user_list
+    else:
+        return False, None
 
 
-def extract_league_bets(user) -> dict:
+def extract_league_bets(user):
     league_users = extract_league_users(user)
-    unique_users = [item for item in league_users.keys()]
-    data = list(Game.objects.all().values())
-    filtered_data = [item for item in data if item['user_name_id'] in unique_users]
-    return filtered_data
+    if league_users[0]:
+        unique_users = [item for item in league_users[1].keys()]
+        data = list(Game.objects.all().values())
+        filtered_data = [item for item in data if item['user_name_id'] in unique_users]
+        return filtered_data
+    else:
+        return None
 
 
 

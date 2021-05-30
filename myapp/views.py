@@ -17,7 +17,10 @@ class HomeView(TemplateView):
     def get(self, request):
         if request.user.is_authenticated:
             league_name_id = extract_user_league_name_id(request.user.id)
-            league_users = LeagueUser.objects.filter(league_name_id=league_name_id)
+            if league_name_id[0]:
+                league_users = LeagueUser.objects.filter(league_name_id=league_name_id[1])
+            else:
+                league_users = None
         else:
             league_users = None
         context = {
