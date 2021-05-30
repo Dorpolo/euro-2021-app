@@ -15,8 +15,11 @@ class HomeView(TemplateView):
     get_api_data = EuroApi()
 
     def get(self, request):
-        league_name_id = extract_user_league_name_id(request.user.id)
-        league_users = LeagueUser.objects.filter(league_name_id=league_name_id)
+        if request.user.is_authenticated():
+            league_name_id = extract_user_league_name_id(request.user.id)
+            league_users = LeagueUser.objects.filter(league_name_id=league_name_id)
+        else:
+            league_users = None
         context = {
             'league_users': league_users,
             'fixtures': self.get_api_data.main(),
