@@ -129,5 +129,14 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"),]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'dorpolo@gmail.com'
+EMAIL_HOST_PASSWORD = 'dorpolo444'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
 
 django_heroku.settings(locals())

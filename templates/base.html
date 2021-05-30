@@ -57,6 +57,9 @@
          <li class="nav-item">
             <a class="nav-link" href="https://www.uefa.com/uefaeuro-2020/news/0254-0d41684d1216-06773df7faed-1000--euro-2020-all-the-fixtures/">Uefa.com</a>
          </li>
+           <li class="nav-item">
+            <a class="nav-link" href={% url 'the_post' %}>Test</a>
+         </li>
         {% if not user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'register' %}">Register</a>

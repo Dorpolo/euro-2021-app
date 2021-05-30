@@ -4,28 +4,31 @@
 {% if user.is_authenticated %}
   <body>
   <h1>Welcome {{ user.username }}</h1>
-  <p> The following users already signed up: <p/>
   {% for item in teams %}
             <img src="{{ item }}" class="rounded" alt="..." width="50" height="50">
   {% endfor %}
   <br/>
-  <br/>
+   <p> The following users have been already signed up to your league: <p/>
   <div>
-      <table class="table">
+      <table class="table table-striped">
             <thead>
                 <tr>
-                <th class="table-warning" scope="col">#</th>
-                <th class="table-warning" scope="col">Name</th>
-                <th class="table-warning" scope="col">League</th>
+                <th class="table-dark" scope="col">#</th>
+                <th class="table-dark" scope="col">Name</th>
+                <th class="table-dark" scope="col">League</th>
                </tr>
           <thead/>
             <tbody>
               {% for league_user in league_users %}
+                  {% if league_user.user_name == user.username %}
+                      Something
+                  {% else %}
                   <tr>
                      <td scope="row">{{ forloop.counter	 }}</td>
                      <td scope="row">{{ league_user.user_name }}</td>
-                     <td scope="row">{{ league_user.league_name }}</td>
+                     <td scope="row">{{ league_user.league_name_id }}</td>
                   </tr>
+                  {% endif %}
               {% endfor %}
             </tbody>
       </table>

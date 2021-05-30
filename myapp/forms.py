@@ -1,7 +1,8 @@
 from django import forms
 from django.db import models
-from .models import Game, League, LeagueUser
+from .models import Game, League, LeagueUser, Post
 from pipelines.read_data import EuroApi
+from data.teams import team_game_map
 
 logos = EuroApi().main()
 
@@ -10,7 +11,6 @@ class BetForm(forms.ModelForm):
     class Meta:
         model = Game
         fields = (
-            'user_name',
             'gid_8222_0', 'gid_8222_1',
             'gid_8198_0', 'gid_8198_1',
             'gid_8206_0', 'gid_8206_1',
@@ -50,7 +50,6 @@ class BetForm(forms.ModelForm):
         )
 
         widgets = {
-            'user_name': forms.Select(attrs={'class': 'form-select', 'placeholder': 'e.g: Avi Nimni'}),
             'gid_8222_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
             'gid_8222_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
             'gid_8198_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
@@ -130,46 +129,6 @@ class BetForm(forms.ModelForm):
             'gid_8220_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
         }
 
-    def paired_teams(self):
-        return [
-            [field for field in self if 'gid_8222' in field.name],
-            [field for field in self if 'gid_8198' in field.name],
-            [field for field in self if 'gid_8206' in field.name],
-            [field for field in self if 'gid_8207' in field.name],
-            [field for field in self if 'gid_8213' in field.name],
-            [field for field in self if 'gid_8214' in field.name],
-            [field for field in self if 'gid_8199' in field.name],
-            [field for field in self if 'gid_8200' in field.name],
-            [field for field in self if 'gid_8205' in field.name],
-            [field for field in self if 'gid_8208' in field.name],
-            [field for field in self if 'gid_8216' in field.name],
-            [field for field in self if 'gid_8217' in field.name],
-            [field for field in self if 'gid_19950' in field.name],
-            [field for field in self if 'gid_8202' in field.name],
-            [field for field in self if 'gid_19953' in field.name],
-            [field for field in self if 'gid_8209' in field.name],
-            [field for field in self if 'gid_19957' in field.name],
-            [field for field in self if 'gid_8215' in field.name],
-            [field for field in self if 'gid_8201' in field.name],
-            [field for field in self if 'gid_19951' in field.name],
-            [field for field in self if 'gid_8210' in field.name],
-            [field for field in self if 'gid_19955' in field.name],
-            [field for field in self if 'gid_19958' in field.name],
-            [field for field in self if 'gid_8218' in field.name],
-            [field for field in self if 'gid_19952' in field.name],
-            [field for field in self if 'gid_8203' in field.name],
-            [field for field in self if 'gid_19954' in field.name],
-            [field for field in self if 'gid_8212' in field.name],
-            [field for field in self if 'gid_19959' in field.name],
-            [field for field in self if 'gid_8219' in field.name],
-            [field for field in self if 'gid_19949' in field.name],
-            [field for field in self if 'gid_8204' in field.name],
-            [field for field in self if 'gid_19956' in field.name],
-            [field for field in self if 'gid_8211' in field.name],
-            [field for field in self if 'gid_19960' in field.name],
-            [field for field in self if 'gid_8220' in field.name],
-        ]
-
     def more_data(self):
         sorted_fixtures = logos
         data = [
@@ -194,12 +153,29 @@ class LeagueForm(forms.ModelForm):
 class UserForm(forms.ModelForm):
     class Meta:
         model = LeagueUser
-        fields = ('user_name', 'league_name', 'first_name', 'last_name', 'email', )
+        fields = ('league_name', 'first_name', 'last_name', 'email', )
 
         widgets = {
-            'user_name': forms.Select(attrs={'class': 'form-select', 'placeholder': 'e.g: Avi Nimni'}),
             'league_name': forms.Select(attrs={'class': 'form-select', 'placeholder': 'e.g: Avi Nimni'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Avi'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Nimni'}),
             'email': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: tal_banin@gmail.com'}),
+        }
+
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['text', 'author']
+        widgets = {
+            'text': forms.TextInput(attrs={
+                'id': 'post-text',
+                'required': True,
+                'placeholder': 'Say something...'
+            }),
+            'author': forms.Select(attrs={
+                'id': 'post-text',
+                'required': True,
+                'placeholder': 'Say something...'
+            })
         }

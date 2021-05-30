@@ -77,6 +77,8 @@ class Game(models.Model):
     gid_19960_1 = models.IntegerField('Hungary')
     gid_8220_0 = models.IntegerField('Portugal')
     gid_8220_1 = models.IntegerField('France')
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
     def get_absolute_url():
@@ -87,6 +89,8 @@ class League(models.Model):
     league_name = models.CharField('League Name', max_length=20, unique=True)
     league_owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     league_owner_email = models.EmailField('League Manager Email', blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
     def get_absolute_url():
@@ -99,6 +103,19 @@ class LeagueUser(models.Model):
     first_name = models.CharField('First Name', max_length=20)
     last_name = models.CharField('Last Name', max_length=20)
     email = models.EmailField('Email')
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def get_absolute_url():
+        return reverse('home')
+
+
+class Post(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
     def get_absolute_url():
