@@ -28,15 +28,14 @@
       <ll class="navbar-nav me-auto mb-2 mb-lg-0">
       <li class="nav-item"> <a class="nav-link active" aria-current="page" href={% url 'home' %}>Home</a></li>
           {% if user.is_authenticated %}
-
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Setup
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href={% url 'create_league' %}>Create New League</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href={% url 'create_user' %}>Sign up for a league</a></li>
+                        <li><a class="dropdown-item" href={% url 'create_league' %}>Create New League</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href={% url 'create_user' %}>Sign up for a league</a></li>
                   </ul>
                 </li>
             <li class="nav-item dropdown">
@@ -56,9 +55,6 @@
           {% endif %}
          <li class="nav-item">
             <a class="nav-link" href="https://www.uefa.com/uefaeuro-2020/news/0254-0d41684d1216-06773df7faed-1000--euro-2020-all-the-fixtures/">Uefa.com</a>
-         </li>
-           <li class="nav-item">
-            <a class="nav-link" href={% url 'the_post' %}>Test</a>
          </li>
         {% if not user.is_authenticated %}
           <li class="nav-item">

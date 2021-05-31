@@ -4,10 +4,11 @@ from django.http import HttpResponse
 from pipelines.read_data import EuroApi
 from pipelines.data_prep import *
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
-from .models import Game, League, LeagueUser, Post
-from .forms import BetForm, LeagueForm, UserForm, PostForm
+from .models import Game, League, LeagueUser
+from .forms import BetForm, LeagueForm, UserForm
 from data.teams import team_game_map
 import json
+from django.urls import reverse
 
 
 class HomeView(TemplateView):
@@ -23,10 +24,27 @@ class HomeView(TemplateView):
                 league_users = None
         else:
             league_users = None
+        onboarding = user_onboarding(request.user.id)
+        bet_id = user_game_bet_id(request.user.id)
         context = {
             'league_users': league_users,
             'fixtures': self.get_api_data.main(),
             'teams': self.get_api_data.get_unique_teams(),
+            'league_signup': onboarding['league'],
+            'committed_a_bet': onboarding['bet'],
+            'bet_id': bet_id
+        }
+        return render(request, self.template_name, context)
+
+
+class BaseView(TemplateView):
+    template_name = "base.html"
+
+    def get(self, request):
+        onboarding = user_onboarding(request.user.id)
+        context = {
+            'league_signup': onboarding['league'],
+            'committed_a_bet': onboarding['bet']
         }
         return render(request, self.template_name, context)
 
@@ -52,7 +70,7 @@ class AddBetsView(TemplateView):
         form = BetForm(request.POST)
         if form.is_valid():
             obj = Game(
-                    user_name=request.user,
+                    user_name=form.cleaned_data['user_name'],
                     gid_8222_0=form.cleaned_data['gid_8222_0'],
                     gid_8222_1=form.cleaned_data['gid_8222_1'],
                     gid_8198_0=form.cleaned_data['gid_8198_0'],
@@ -157,6 +175,34 @@ class UpdateBetView(UpdateView):
     form_class = BetForm
     template_name = 'update_bets.html'
 
+    # def get_absolute_url(self):
+    #     return reverse('')
+    # def get(self, request, pk):
+    #     data = Game.objects.filter(id=2)
+    #     form = BetForm(data)
+    #     return render(request, self.template_name, {'form': form})
+    #
+    # def post(self, request, pk):
+    #     form = BetForm(request.POST)
+    #     if form.is_valid():
+    #         try:
+    #             league_user_email = [get_league_user_email(request.user.id)]
+    #             if league_user_email[0] != 'dorpolo@gmail.com':
+    #                 league_user_email.append('dorpolo@gmail.com')
+    #             email_data = prepare_bet_submission_email(request, form)
+    #             send_mail(
+    #                  subject=email_data[0],
+    #                  message=email_data[1],
+    #                  from_email='dorpolo@gmail.com',
+    #                  to_email=[league_user_email],
+    #                  fail_silently=False
+    #             )
+    #             redirect('home')
+    #         except Exception as exc:
+    #                 print(exc)
+    #     else:
+    #         print('What?')
+
 
 class CreateUserView(CreateView):
     template_name = "add_user.html"
@@ -188,30 +234,6 @@ class CreateUserView(CreateView):
             return redirect('home')
         else:
             form = UserForm()
-            print("Not Valid!")
-            print(form.errors)
-
-        return render(request, self.template_name, {'form': form})
-
-
-class TestView(TemplateView):
-    template_name = "test.html"
-
-    def get(self, request):
-        form = PostForm()
-        get_api_data = ['Dor', 'Polo']
-        return render(request, self.template_name, {'form': form, 'data': get_api_data})
-
-    def post(self, request):
-        form = PostForm(request.POST)
-        if form.is_valid():
-            text = form.cleaned_data['text']
-            print(text)
-            form = PostForm()
-            obj1 = Post(text='Hello World', author=request.user)
-            obj1.save()
-            return redirect('home')
-        else:
             print("Not Valid!")
             print(form.errors)
 

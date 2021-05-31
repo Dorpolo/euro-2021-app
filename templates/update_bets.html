@@ -2,610 +2,618 @@
 {% block title %} Update Your Bets {% endblock %}
 
 {% block content %}
+{% if user.is_authenticated %}
+    <h1>Update Your Bets</h1>
 
-<h1>Update Your Bets</h1>
-
-<div class="form-group">
-    <form method="POST">
-        {% csrf_token %}
-            <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="fieldWrapper">
-                {{ form.user_name.label_tag }}
+    <div class="form-group">
+        <form method="POST">
+            {% csrf_token %}
+                <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="fieldWrapper">
+                    {{ user.username }}
+                </div>
                 {{ form.user_name }}
-            </div>
+                <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <p>GROUP A</p>
+                <div>
+                    {% for item in form.more_data.0 %}
+                        <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
+                    {% endfor %}
+                </div>
+                <br/>
+                <br/>
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8222_0.label_tag }}
+                        {{ form.gid_8222_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8222_1.label_tag }}
+                        {{ form.gid_8222_1 }}
+                      </div>
+                  </div>
+                </div>
+                 <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8198_0.label_tag }}
+                        {{ form.gid_8198_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8198_1.label_tag }}
+                        {{ form.gid_8198_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8206_0.label_tag }}
+                        {{ form.gid_8206_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8206_1.label_tag }}
+                        {{ form.gid_8206_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8207_0.label_tag }}
+                        {{ form.gid_8207_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8207_1.label_tag }}
+                        {{ form.gid_8207_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8213_0.label_tag }}
+                        {{ form.gid_8213_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8213_1.label_tag }}
+                        {{ form.gid_8213_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8214_0.label_tag }}
+                        {{ form.gid_8214_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8214_1.label_tag }}
+                        {{ form.gid_8214_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <p>GROUP B</p>
+                <div>
+                    {% for item in form.more_data.1 %}
+                        <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
+                    {% endfor %}
+                </div>
+                <br/>
+                <br/>
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8199_0.label_tag }}
+                        {{ form.gid_8199_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8199_1.label_tag }}
+                        {{ form.gid_8199_1 }}
+                      </div>
+                  </div>
+                </div>
+                 <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8200_0.label_tag }}
+                        {{ form.gid_8200_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8200_1.label_tag }}
+                        {{ form.gid_8200_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8205_0.label_tag }}
+                        {{ form.gid_8205_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8205_1.label_tag }}
+                        {{ form.gid_8205_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8208_0.label_tag }}
+                        {{ form.gid_8208_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8208_1.label_tag }}
+                        {{ form.gid_8208_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8216_0.label_tag }}
+                        {{ form.gid_8216_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8216_1.label_tag }}
+                        {{ form.gid_8216_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8217_0.label_tag }}
+                        {{ form.gid_8217_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8217_1.label_tag }}
+                        {{ form.gid_8217_1 }}
+                      </div>
+                  </div>
+                </div>
+         <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <p>GROUP C</p>
+                <div>
+                    {% for item in form.more_data.2 %}
+                        <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
+                    {% endfor %}
+                </div>
+                <br/>
+                <br/>
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19950_0.label_tag }}
+                        {{ form.gid_19950_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19950_1.label_tag }}
+                        {{ form.gid_19950_1 }}
+                      </div>
+                  </div>
+                </div>
+                 <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8202_0.label_tag }}
+                        {{ form.gid_8202_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8202_1.label_tag }}
+                        {{ form.gid_8202_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19953_0.label_tag }}
+                        {{ form.gid_19953_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19953_1.label_tag }}
+                        {{ form.gid_19953_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8209_0.label_tag }}
+                        {{ form.gid_8209_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8209_1.label_tag }}
+                        {{ form.gid_8209_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19957_0.label_tag }}
+                        {{ form.gid_19957_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19957_1.label_tag }}
+                        {{ form.gid_19957_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8215_0.label_tag }}
+                        {{ form.gid_8215_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8215_1.label_tag }}
+                        {{ form.gid_8215_1 }}
+                      </div>
+                  </div>
+                </div>
+         <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <p>GROUP D</p>
+                <div>
+                    {% for item in form.more_data.3 %}
+                        <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
+                    {% endfor %}
+                </div>
+                <br/>
+                <br/>
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8201_0.label_tag }}
+                        {{ form.gid_8201_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8201_1.label_tag }}
+                        {{ form.gid_8201_1 }}
+                      </div>
+                  </div>
+                </div>
+                 <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19951_0.label_tag }}
+                        {{ form.gid_19951_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19951_1.label_tag }}
+                        {{ form.gid_19951_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8210_0.label_tag }}
+                        {{ form.gid_8210_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8210_1.label_tag }}
+                        {{ form.gid_8210_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19955_0.label_tag }}
+                        {{ form.gid_19955_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19955_1.label_tag }}
+                        {{ form.gid_19955_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19958_0.label_tag }}
+                        {{ form.gid_19958_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19958_1.label_tag }}
+                        {{ form.gid_19958_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8218_0.label_tag }}
+                        {{ form.gid_8218_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8218_1.label_tag }}
+                        {{ form.gid_8218_1 }}
+                      </div>
+                  </div>
+                </div>
+         <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <p>GROUP E</p>
+                <div>
+                    {% for item in form.more_data.4 %}
+                        <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
+                    {% endfor %}
+                </div>
+                <br/>
+                <br/>
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19952_0.label_tag }}
+                        {{ form.gid_19952_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19952_1.label_tag }}
+                        {{ form.gid_19952_1 }}
+                      </div>
+                  </div>
+                </div>
+                 <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8203_0.label_tag }}
+                        {{ form.gid_8203_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8203_1.label_tag }}
+                        {{ form.gid_8203_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19954_0.label_tag }}
+                        {{ form.gid_19954_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19954_1.label_tag }}
+                        {{ form.gid_19954_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8212_0.label_tag }}
+                        {{ form.gid_8212_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8212_1.label_tag }}
+                        {{ form.gid_8212_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19959_0.label_tag }}
+                        {{ form.gid_19959_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19959_1.label_tag }}
+                        {{ form.gid_19959_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8219_0.label_tag }}
+                        {{ form.gid_8219_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8219_1.label_tag }}
+                        {{ form.gid_8219_1 }}
+                      </div>
+                  </div>
+                </div>
+         <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <p>GROUP F</p>
+                <div>
+                    {% for item in form.more_data.5 %}
+                        <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
+                    {% endfor %}
+                </div>
+                <br/>
+                <br/>
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19949_0.label_tag }}
+                        {{ form.gid_19949_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19949_1.label_tag }}
+                        {{ form.gid_19949_1 }}
+                      </div>
+                  </div>
+                </div>
+                 <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8204_0.label_tag }}
+                        {{ form.gid_8204_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8204_1.label_tag }}
+                        {{ form.gid_8204_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19956_0.label_tag }}
+                        {{ form.gid_19956_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19956_1.label_tag }}
+                        {{ form.gid_19956_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8211_0.label_tag }}
+                        {{ form.gid_8211_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8211_1.label_tag }}
+                        {{ form.gid_8211_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19960_0.label_tag }}
+                        {{ form.gid_19960_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_19960_1.label_tag }}
+                        {{ form.gid_19960_1 }}
+                      </div>
+                  </div>
+                </div>
+                <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
+                <div class="row g-3">
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8220_0.label_tag }}
+                        {{ form.gid_8220_0 }}
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="fieldWrapper">
+                        {{ form.gid_8220_1.label_tag }}
+                        {{ form.gid_8220_1 }}
+                      </div>
+                  </div>
+                </div>
             <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <p>GROUP A</p>
-            <div>
-                {% for item in form.more_data.0 %}
-                    <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
-                {% endfor %}
-            </div>
-            <br/>
-            <br/>
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8222_0.label_tag }}
-                    {{ form.gid_8222_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8222_1.label_tag }}
-                    {{ form.gid_8222_1 }}
-                  </div>
-              </div>
-            </div>
-             <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8198_0.label_tag }}
-                    {{ form.gid_8198_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8198_1.label_tag }}
-                    {{ form.gid_8198_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8206_0.label_tag }}
-                    {{ form.gid_8206_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8206_1.label_tag }}
-                    {{ form.gid_8206_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8207_0.label_tag }}
-                    {{ form.gid_8207_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8207_1.label_tag }}
-                    {{ form.gid_8207_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8213_0.label_tag }}
-                    {{ form.gid_8213_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8213_1.label_tag }}
-                    {{ form.gid_8213_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8214_0.label_tag }}
-                    {{ form.gid_8214_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8214_1.label_tag }}
-                    {{ form.gid_8214_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <p>GROUP B</p>
-            <div>
-                {% for item in form.more_data.1 %}
-                    <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
-                {% endfor %}
-            </div>
-            <br/>
-            <br/>
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8199_0.label_tag }}
-                    {{ form.gid_8199_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8199_1.label_tag }}
-                    {{ form.gid_8199_1 }}
-                  </div>
-              </div>
-            </div>
-             <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8200_0.label_tag }}
-                    {{ form.gid_8200_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8200_1.label_tag }}
-                    {{ form.gid_8200_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8205_0.label_tag }}
-                    {{ form.gid_8205_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8205_1.label_tag }}
-                    {{ form.gid_8205_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8208_0.label_tag }}
-                    {{ form.gid_8208_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8208_1.label_tag }}
-                    {{ form.gid_8208_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8216_0.label_tag }}
-                    {{ form.gid_8216_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8216_1.label_tag }}
-                    {{ form.gid_8216_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8217_0.label_tag }}
-                    {{ form.gid_8217_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8217_1.label_tag }}
-                    {{ form.gid_8217_1 }}
-                  </div>
-              </div>
-            </div>
-     <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <p>GROUP C</p>
-            <div>
-                {% for item in form.more_data.2 %}
-                    <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
-                {% endfor %}
-            </div>
-            <br/>
-            <br/>
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19950_0.label_tag }}
-                    {{ form.gid_19950_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19950_1.label_tag }}
-                    {{ form.gid_19950_1 }}
-                  </div>
-              </div>
-            </div>
-             <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8202_0.label_tag }}
-                    {{ form.gid_8202_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8202_1.label_tag }}
-                    {{ form.gid_8202_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19953_0.label_tag }}
-                    {{ form.gid_19953_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19953_1.label_tag }}
-                    {{ form.gid_19953_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8209_0.label_tag }}
-                    {{ form.gid_8209_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8209_1.label_tag }}
-                    {{ form.gid_8209_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19957_0.label_tag }}
-                    {{ form.gid_19957_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19957_1.label_tag }}
-                    {{ form.gid_19957_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8215_0.label_tag }}
-                    {{ form.gid_8215_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8215_1.label_tag }}
-                    {{ form.gid_8215_1 }}
-                  </div>
-              </div>
-            </div>
-     <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <p>GROUP D</p>
-            <div>
-                {% for item in form.more_data.3 %}
-                    <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
-                {% endfor %}
-            </div>
-            <br/>
-            <br/>
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8201_0.label_tag }}
-                    {{ form.gid_8201_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8201_1.label_tag }}
-                    {{ form.gid_8201_1 }}
-                  </div>
-              </div>
-            </div>
-             <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19951_0.label_tag }}
-                    {{ form.gid_19951_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19951_1.label_tag }}
-                    {{ form.gid_19951_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8210_0.label_tag }}
-                    {{ form.gid_8210_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8210_1.label_tag }}
-                    {{ form.gid_8210_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19955_0.label_tag }}
-                    {{ form.gid_19955_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19955_1.label_tag }}
-                    {{ form.gid_19955_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19958_0.label_tag }}
-                    {{ form.gid_19958_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19958_1.label_tag }}
-                    {{ form.gid_19958_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8218_0.label_tag }}
-                    {{ form.gid_8218_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8218_1.label_tag }}
-                    {{ form.gid_8218_1 }}
-                  </div>
-              </div>
-            </div>
-     <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <p>GROUP E</p>
-            <div>
-                {% for item in form.more_data.4 %}
-                    <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
-                {% endfor %}
-            </div>
-            <br/>
-            <br/>
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19952_0.label_tag }}
-                    {{ form.gid_19952_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19952_1.label_tag }}
-                    {{ form.gid_19952_1 }}
-                  </div>
-              </div>
-            </div>
-             <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8203_0.label_tag }}
-                    {{ form.gid_8203_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8203_1.label_tag }}
-                    {{ form.gid_8203_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19954_0.label_tag }}
-                    {{ form.gid_19954_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19954_1.label_tag }}
-                    {{ form.gid_19954_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8212_0.label_tag }}
-                    {{ form.gid_8212_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8212_1.label_tag }}
-                    {{ form.gid_8212_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19959_0.label_tag }}
-                    {{ form.gid_19959_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19959_1.label_tag }}
-                    {{ form.gid_19959_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8219_0.label_tag }}
-                    {{ form.gid_8219_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8219_1.label_tag }}
-                    {{ form.gid_8219_1 }}
-                  </div>
-              </div>
-            </div>
-     <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <p>GROUP F</p>
-            <div>
-                {% for item in form.more_data.5 %}
-                    <img src="{{ item }}" class="rounded float-start" alt="..." width="40" height="40">
-                {% endfor %}
-            </div>
-            <br/>
-            <br/>
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19949_0.label_tag }}
-                    {{ form.gid_19949_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19949_1.label_tag }}
-                    {{ form.gid_19949_1 }}
-                  </div>
-              </div>
-            </div>
-             <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8204_0.label_tag }}
-                    {{ form.gid_8204_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8204_1.label_tag }}
-                    {{ form.gid_8204_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19956_0.label_tag }}
-                    {{ form.gid_19956_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19956_1.label_tag }}
-                    {{ form.gid_19956_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8211_0.label_tag }}
-                    {{ form.gid_8211_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8211_1.label_tag }}
-                    {{ form.gid_8211_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19960_0.label_tag }}
-                    {{ form.gid_19960_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_19960_1.label_tag }}
-                    {{ form.gid_19960_1 }}
-                  </div>
-              </div>
-            </div>
-            <hr style="height:1px;border-width:1px;color:#1C2833;background-color:#1C2833">
-            <div class="row g-3">
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8220_0.label_tag }}
-                    {{ form.gid_8220_0 }}
-                  </div>
-              </div>
-              <div class="col">
-                  <div class="fieldWrapper">
-                    {{ form.gid_8220_1.label_tag }}
-                    {{ form.gid_8220_1 }}
-                  </div>
-              </div>
-            </div>
-        <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
-        <button class="btn btn-warning">Submit</button>
-    </form>
-</div>
+            <button class="btn btn-warning">Submit</button>
+        </form>
+    </div>
+    </div>
 
-</div>
 
+    <script>
+        var name = "{{ user.id }}";
+        document.getElementById('user-name').value = name
+    </script>
+
+{% else %}
+    You're not allowed here! Please log in first.
+{% endif %}
 {% endblock %}

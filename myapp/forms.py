@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from .models import Game, League, LeagueUser, Post
+from .models import Game, League, LeagueUser
 from pipelines.read_data import EuroApi
 from data.teams import team_game_map
 
@@ -11,6 +11,7 @@ class BetForm(forms.ModelForm):
     class Meta:
         model = Game
         fields = (
+            'user_name',
             'gid_8222_0', 'gid_8222_1',
             'gid_8198_0', 'gid_8198_1',
             'gid_8206_0', 'gid_8206_1',
@@ -50,6 +51,7 @@ class BetForm(forms.ModelForm):
         )
 
         widgets = {
+            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
             'gid_8222_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
             'gid_8222_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
             'gid_8198_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
@@ -153,29 +155,11 @@ class LeagueForm(forms.ModelForm):
 class UserForm(forms.ModelForm):
     class Meta:
         model = LeagueUser
-        fields = ('league_name', 'first_name', 'last_name', 'email', )
+        fields = ('league_name', 'first_name', 'last_name', 'email', 'image')
 
         widgets = {
             'league_name': forms.Select(attrs={'class': 'form-select', 'placeholder': 'e.g: Avi Nimni'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Avi'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Nimni'}),
             'email': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: tal_banin@gmail.com'}),
-        }
-
-
-class PostForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        fields = ['text', 'author']
-        widgets = {
-            'text': forms.TextInput(attrs={
-                'id': 'post-text',
-                'required': True,
-                'placeholder': 'Say something...'
-            }),
-            'author': forms.Select(attrs={
-                'id': 'post-text',
-                'required': True,
-                'placeholder': 'Say something...'
-            })
         }

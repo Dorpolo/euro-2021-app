@@ -1,5 +1,5 @@
 from data.teams import team_game_map
-from myapp.models import Game, League, LeagueUser, Post
+from myapp.models import Game, League, LeagueUser
 
 
 def prepare_bet_submission_email(request, form) -> dict:
@@ -71,6 +71,25 @@ def extract_league_bets(user):
         return filtered_data
     else:
         return None
+
+
+def user_onboarding(user) -> dict:
+    league_data = LeagueUser.objects.filter(user_name_id=user)
+    bet_data = Game.objects.filter(user_name_id=user)
+    league_assigned = True if len(league_data) > 0 else False
+    bet_assigned = True if len(bet_data) > 0 else False
+    return {'league': league_assigned, 'bet': bet_assigned}
+
+
+def user_game_bet_id(user) -> dict:
+    data = Game.objects.filter(user_name_id=user)
+    if len(data) > 0:
+        return data[0].id
+    else:
+        return None
+
+def user_leagues(user) -> dict:
+   pass
 
 
 

@@ -103,17 +103,7 @@ class LeagueUser(models.Model):
     first_name = models.CharField('First Name', max_length=20)
     last_name = models.CharField('Last Name', max_length=20)
     email = models.EmailField('Email')
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    @staticmethod
-    def get_absolute_url():
-        return reverse('home')
-
-
-class Post(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField()
+    image = models.ImageField(upload_to='images', blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
