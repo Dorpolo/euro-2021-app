@@ -38,5 +38,3 @@ wh==1.2.0
 whitenoise==5.2.0
 environ~=1.0
 Pillow
-numpy
-pandas
