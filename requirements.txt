@@ -40,3 +40,4 @@ environ~=1.0
 Pillow
 django_tables2
 django_filter
+plotly
