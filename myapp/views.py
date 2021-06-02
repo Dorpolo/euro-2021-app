@@ -156,7 +156,13 @@ class AddBetsView(TemplateView):
                     gid_19960_0=form.cleaned_data['gid_19960_0'],
                     gid_19960_1=form.cleaned_data['gid_19960_1'],
                     gid_8220_0=form.cleaned_data['gid_8220_0'],
-                    gid_8220_1=form.cleaned_data['gid_8220_1'],)
+                    gid_8220_1=form.cleaned_data['gid_8220_1'],
+                    top_scorer_1=form.cleaned_data['top_scorer_1'],
+                    top_scorer_2=form.cleaned_data['top_scorer_2'],
+                    top_scorer_3=form.cleaned_data['top_scorer_3'],
+                    top_assist_1=form.cleaned_data['top_assist_1'],
+                    top_assist_2=form.cleaned_data['top_assist_2'],
+                    top_assist_3=form.cleaned_data['top_assist_3'],)
             obj.save()
             try:
                 league_user_email = [get_league_user_email(request.user.id)]
