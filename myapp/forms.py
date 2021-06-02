@@ -140,6 +140,7 @@ class BetForm(forms.ModelForm):
             'top_assist_3': forms.Select(attrs={'class': 'form-select'}),
         }
 
+
     def more_data(self):
         sorted_fixtures = logos
         data = [
@@ -163,11 +164,12 @@ class LeagueForm(forms.ModelForm):
 class UserForm(forms.ModelForm):
     class Meta:
         model = LeagueUser
-        fields = ('league_name', 'first_name', 'last_name', 'email', 'image')
+        fields = ('league_name', 'first_name', 'last_name', 'nick_name', 'email', 'image',)
 
         widgets = {
             'league_name': forms.Select(attrs={'class': 'form-select', 'placeholder': 'e.g: Avi Nimni'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Avi'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Nimni'}),
+            'nick_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Nikita'}),
             'email': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: tal_banin@gmail.com'}),
         }

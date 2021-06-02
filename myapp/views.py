@@ -164,12 +164,12 @@ class AddBetsView(TemplateView):
                     league_user_email.append('dorpolo@gmail.com')
                 email_data = prepare_bet_submission_email(request, form)
                 send_mail(
-                     subject=email_data[0],
-                     message=email_data[1],
-                     from_email='dorpolo@gmail.com',
-                     to_email=league_user_email,
+                     email_data['subject'],
+                     email_data['message'],
+                     'dorpolo@gmail.com',
+                     ['dorpolo@gmail.com'],
                      fail_silently=False
-                )
+                    )
             except Exception as exc:
                 print(exc)
             return redirect('home')
@@ -208,13 +208,15 @@ class CreateUserView(CreateView):
                     email=form.cleaned_data['email'],)
             obj.save()
             email_data = prepare_league_user_email(request, form)
+            print(email_data)
             try:
                send_mail(
-                     subject=email_data[0],
-                     message=email_data[1],
-                     from_email='dorpolo@gmail.com',
-                     to_email=['dorpolo@gmail.com'],
-                     fail_silently=False)
+                 email_data['subject'],
+                 email_data['message'],
+                 'dorpolo@gmail.com',
+                 ['dorpolo@gmail.com'],
+                 fail_silently=False
+                )
             except Exception as exc:
                 print(exc)
             return redirect('home')

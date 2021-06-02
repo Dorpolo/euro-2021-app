@@ -44,10 +44,12 @@
           {% endif %}
   </div>
   <hr>
-  <h3>Second Thoughts?</h3>
-      <p>You can easily <a href= {% url 'update_your_bet' bet_id %} > edit your bet form.</a></p>
-  * Available until 06-10-2021 23:59
-  <hr>
+{% if committed_a_bet %}
+      <h3>Second Thoughts?</h3>
+          <p>You can easily <a href= {% url 'update_your_bet' bet_id %} > edit your bet form.</a></p>
+      * Available until 06-10-2021 23:59
+      <hr>
+{% endif %}
   <h3>League Details</h3>
    <p> The following users have been already signed up to your league: <p/>
   <div>
