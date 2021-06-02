@@ -140,7 +140,6 @@ class BetForm(forms.ModelForm):
             'top_assist_3': forms.Select(attrs={'class': 'form-select'}),
         }
 
-
     def more_data(self):
         sorted_fixtures = logos
         data = [
