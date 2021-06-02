@@ -48,6 +48,8 @@ class BetForm(forms.ModelForm):
             'gid_8211_0', 'gid_8211_1',
             'gid_19960_0', 'gid_19960_1',
             'gid_8220_0', 'gid_8220_1',
+            'top_scorer_1', 'top_scorer_2', 'top_scorer_3',
+            'top_assist_1', 'top_assist_2', 'top_assist_3'
         )
 
         widgets = {
@@ -129,6 +131,13 @@ class BetForm(forms.ModelForm):
             'gid_19960_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
             'gid_8220_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
             'gid_8220_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+
+            'top_scorer_1': forms.Select(attrs={'class': 'form-select'}),
+            'top_scorer_2': forms.Select(attrs={'class': 'form-select'}),
+            'top_scorer_3': forms.Select(attrs={'class': 'form-select'}),
+            'top_assist_1': forms.Select(attrs={'class': 'form-select'}),
+            'top_assist_2': forms.Select(attrs={'class': 'form-select'}),
+            'top_assist_3': forms.Select(attrs={'class': 'form-select'}),
         }
 
     def more_data(self):
@@ -143,12 +152,11 @@ class BetForm(forms.ModelForm):
 class LeagueForm(forms.ModelForm):
     class Meta:
         model = League
-        fields = ('league_name', 'league_owner', 'league_owner_email')
+        fields = ('league_name', 'league_owner',)
 
         widgets = {
             'league_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Avi Nimni'}),
             'league_owner': forms.Select(attrs={'class': 'form-select', 'placeholder': 'e.g: Avi Nimni'}),
-            'league_owner_email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
 

@@ -19,10 +19,14 @@
 </div>
 <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
 <div class="form-group">
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button class="btn btn-warning">Submit</button>
+        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+            <a href="{% url 'terms' %}"><button type="button" class="btn btn-danger">League Terms</button></a>
+            <button class="btn btn-warning">Submit</button>
+        </div>
+
     </form>
 </div>
 <br/>

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+	<div class="col">
+		<div class="card card-body">
+
+			<form method="get">
+				{{myFilter.form}}
+
+		    <button class="btn btn-primary" type="submit">Search</button>
+		  </form>
+
+		</div>
+	</div>
+
+</div>
+
+        <div class="row">
+        <div class="col-md">
+            <div class="card card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <th>User</th>
+                        <th>League</th>
+                        <th>Match</th>
+                        <th>Predicted Score</th>
+                    </tr>
+
+                    {% for pred in bets %}
+
+                    <tr>
+                        <td>{{pred.user_full_name}}</td>
+                        <td>{{pred.league_name}}</td>
+                        <td>{{pred.match_label}}</td>
+                        <td>{{pred.predicted_score}}</td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -88,8 +88,15 @@ def user_game_bet_id(user) -> dict:
     else:
         return None
 
-def user_leagues(user) -> dict:
-   pass
+
+def get_league_name() -> tuple:
+   data = League.objects.all()
+   leagues = []
+   for j in range(len(data)):
+       leagues.append(data[j].league_name)
+   unique_leagues = set(leagues)
+   league_list = [(item, item) for item in unique_leagues]
+   return tuple(league_list)
 
 
 

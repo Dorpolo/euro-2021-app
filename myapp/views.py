@@ -4,11 +4,17 @@ from django.http import HttpResponse
 from pipelines.read_data import EuroApi
 from pipelines.data_prep import *
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
-from .models import Game, League, LeagueUser
+from .models import Game, League, LeagueUser, CleanPredictions
 from .forms import BetForm, LeagueForm, UserForm
 from data.teams import team_game_map
 import json
 from django.urls import reverse
+from django_tables2 import SingleTableView
+from .tables import PredictionTable
+from .filters import OrderFilter
+from django.shortcuts import render
+from plotly.offline import plot
+from plotly.graph_objs import Scatter
 
 
 class HomeView(TemplateView):
@@ -34,6 +40,14 @@ class HomeView(TemplateView):
             'committed_a_bet': onboarding['bet'],
             'bet_id': bet_id
         }
+        return render(request, self.template_name, context)
+
+
+class TermsView(TemplateView):
+    template_name = "terms.html"
+
+    def get(self, request):
+        context = {}
         return render(request, self.template_name, context)
 
 
@@ -153,7 +167,7 @@ class AddBetsView(TemplateView):
                      subject=email_data[0],
                      message=email_data[1],
                      from_email='dorpolo@gmail.com',
-                     to_email=[league_user_email],
+                     to_email=league_user_email,
                      fail_silently=False
                 )
             except Exception as exc:
@@ -174,34 +188,6 @@ class UpdateBetView(UpdateView):
     model = Game
     form_class = BetForm
     template_name = 'update_bets.html'
-
-    # def get_absolute_url(self):
-    #     return reverse('')
-    # def get(self, request, pk):
-    #     data = Game.objects.filter(id=2)
-    #     form = BetForm(data)
-    #     return render(request, self.template_name, {'form': form})
-    #
-    # def post(self, request, pk):
-    #     form = BetForm(request.POST)
-    #     if form.is_valid():
-    #         try:
-    #             league_user_email = [get_league_user_email(request.user.id)]
-    #             if league_user_email[0] != 'dorpolo@gmail.com':
-    #                 league_user_email.append('dorpolo@gmail.com')
-    #             email_data = prepare_bet_submission_email(request, form)
-    #             send_mail(
-    #                  subject=email_data[0],
-    #                  message=email_data[1],
-    #                  from_email='dorpolo@gmail.com',
-    #                  to_email=[league_user_email],
-    #                  fail_silently=False
-    #             )
-    #             redirect('home')
-    #         except Exception as exc:
-    #                 print(exc)
-    #     else:
-    #         print('What?')
 
 
 class CreateUserView(CreateView):
@@ -238,3 +224,73 @@ class CreateUserView(CreateView):
             print(form.errors)
 
         return render(request, self.template_name, {'form': form})
+
+
+# class GameListView(SingleTableView):
+#     model = LeagueUser
+#     table_class = PredictionTable
+#     template_name = 'score_predictions.html'
+
+
+def predictions(request, pk):
+    data = LeagueUser.objects.filter(user_name_id=pk)
+    league = data[0].league_name_id
+    bets = CleanPredictions.objects.filter(league_name_id=league)
+    myFilter = OrderFilter(request.GET, queryset=bets)
+    bets = myFilter.qs
+    context = {
+        'bets': bets,
+        'myFilter': myFilter
+    }
+    return render(request, 'score_predictions.html', context)
+
+
+
+
+def index(request):
+    import plotly.graph_objects as go
+    import numpy as np
+    np.random.seed(42)
+
+    # Simulate data
+    returns = np.random.normal(0.01, 0.2, 100)
+    price = 100 * np.exp(returns.cumsum())
+    time = np.arange(100)
+
+    layout = go.Layout(
+        title="Historic Prices",
+        plot_bgcolor="#FFF",  # Sets background color to white
+        xaxis=dict(
+            title="time",
+            linecolor="#BCCCDC",  # Sets color of X-axis line
+            showgrid=False  # Removes X-axis grid lines
+        ),
+        yaxis=dict(
+            title="price",
+            linecolor="#BCCCDC",  # Sets color of Y-axis line
+            showgrid=False,  # Removes Y-axis grid lines
+        )
+    )
+
+    fig = go.Figure(
+        data=go.Scatter(x=time, y=price),
+        layout=layout
+    )
+    # fig.update_layout(
+    #     autosize=False,
+    #     width=320,
+    #     height=500,
+    #     margin=dict(
+    #         l=10,
+    #         r=10,
+    #         b=50,
+    #         t=50,
+    #         pad=2
+    #     ),
+    # )
+
+    plt_div = plot(fig, output_type='div', include_plotlyjs=False)
+
+    context = {'plot_div': plt_div}
+
+    return render(request, "stats.html", context)

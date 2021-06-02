@@ -4,6 +4,8 @@ from django.urls import path, include
 from myapp import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.HomeView().get, name='home'),
@@ -14,4 +16,11 @@ urlpatterns = [
     path('create_user/', views.CreateUserView.as_view(), name='create_user'),
     path('members/', include('django.contrib.auth.urls'), name='register'),
     path('members/', include('members.urls'), name='login'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('score_predictions/<int:pk>', views.predictions, name='predictions'),
+    path('stats/', views.index, name='stats'),
+    path('terms/', views.TermsView.as_view(), name='terms')
+]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

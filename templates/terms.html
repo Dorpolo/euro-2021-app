@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3>Euro 2021 - Terms of Use</h3>
+<hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+<body>
+
+<h3>Group Stage</h3>
+<hr>
+<ul>
+  <li>Includes 36 matches.</li>
+    <li>Participants to place bets on match results (90 minutes).</li>
+  <li>Points to be calculated as follows:
+    <ul>
+      <li>1 pts for ‘direction’ (1, X, or 2)</li>
+      <li>3 pts for ‘BOOM’ (accurate match result)</li>
+        <p>*No more than 3 points can be given per game.</p>
+    </ul>
+  </li>
+</ul>
+
+</body>
+
+<hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+
+<body>
+
+<h3>Knockout</h3>
+<hr>
+<ul>
+  <li>Includes 15 matches.</li>
+    <li>Participants to place bets on match results (90 minutes).</li>
+    <li>When placing a bet on a draw, one must also place a bet on ‘direction’ (e.g: winner of extra time / penalties).</li>
+  <li>Points to be calculated as follows:
+    <ul>
+      <li>1 pts for ‘direction’ (1, or 2).</li>
+      <li>4 points for ‘BOOM’ (accurate match result after 90 minutes).</li>
+        <p>*No more than 4 points can be given per game.</p>
+    </ul>
+  </li>
+</ul>
+
+</body>
+
+<hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+
+<body>
+
+<h3>Top Scorer/ Assists</h3>
+<hr>
+<ul>
+  <li>Prior to the group stage, each participant will place a bet on the top 3 goalscorers + top 3 ‘Chefs’ for the entire tournament
+       For each of those players entering into the final top 3 (regardless of where in the top 3), participants will gain 3 points.</li>
+    <li>Example: one’s bet - 3 top goalscorers: Kane, Griezmann, Fred. If only Fred and Kane enters the top 3 goalscorers, one will gain 6 points total, regardless if they are 1st, 2nd or 3rd.
+</li>
+</ul>
+
+</body>
+
+<hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+
+<body>
+
+<h3>Tie Breakers </h3>
+<hr>
+<ul>
+  <li>1. Total points.</li>
+  <li>2. Total # of BOOMs.</li>
+  <li>3. Total # of goals scored in one’s BOOMs.</li>
+  <li>4. The success rate in the tournament.</li>
+  <li>5. Group stage ranking.</li>
+</ul>
+
+</body>
+
+
+<hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
+
+<body>
+
+<h3>Prize Distribution</h3>
+<hr>
+<ul>
+  <li>1. 65%</li>
+  <li>2. 25%</li>
+  <li>3. 10%</li>
+  <p>**Please Note - In case that we will also play the EU21 PoloCup, 25% of the total prize goes to the CUP winner, and the rest splits as stated above.
+</p>
+</ul>
+
+</body>
+
+<hr>
+
+<div class="btn-group" role="group" aria-label="Basic mixed styles example">
+    <a href="{% url 'create_user' %}"><button type="button" class="btn btn-warning">Join a League</button></a>
+</div>
+
+
+{% endblock %}

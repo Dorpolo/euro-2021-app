@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>test</title>
+ <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+    <h2>Prediction Distributions</h2>
+<body>
+<center>
+    <body>
+      {% autoescape off %}
+      {{ plot_div }}
+      {% endautoescape %}
+    </body>
+</center>
+</body>
+<hr>
+    <h2>Prediction Distributions 2</h2>
+<center>
+    <body>
+      {% autoescape off %}
+      {{ plot_div2 }}
+      {% endautoescape %}
+    </body>
+</center>
+{% endblock %}

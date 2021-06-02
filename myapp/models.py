@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from data import players
 
 
 class Game(models.Model):
@@ -77,18 +78,24 @@ class Game(models.Model):
     gid_19960_1 = models.IntegerField('Hungary')
     gid_8220_0 = models.IntegerField('Portugal')
     gid_8220_1 = models.IntegerField('France')
+    top_scorer_1 = models.CharField('Scorer I', max_length=100, choices=players.PLAYER_LIST, blank=True)
+    top_scorer_2 = models.CharField('Scorer II', max_length=100, choices=players.PLAYER_LIST, blank=True)
+    top_scorer_3 = models.CharField('Scorer III', max_length=100, choices=players.PLAYER_LIST, blank=True)
+    top_assist_1 = models.CharField('Assists I', max_length=100, choices=players.PLAYER_LIST, blank=True)
+    top_assist_2 = models.CharField('Assists II', max_length=100, choices=players.PLAYER_LIST, blank=True)
+    top_assist_3 = models.CharField('Assists III', max_length=100, choices=players.PLAYER_LIST, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
-    @staticmethod
-    def get_absolute_url():
-        return reverse('home')
+
+    # @staticmethod
+    # def get_absolute_url():
+    #     return reverse('home')
 
 
 class League(models.Model):
     league_name = models.CharField('League Name', max_length=20, unique=True)
     league_owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
-    league_owner_email = models.EmailField('League Manager Email', blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -103,10 +110,30 @@ class LeagueUser(models.Model):
     first_name = models.CharField('First Name', max_length=20)
     last_name = models.CharField('Last Name', max_length=20)
     email = models.EmailField('Email')
-    image = models.ImageField(upload_to='images', blank=True)
+    image = models.ImageField(null=True, blank=True, upload_to="images")
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
     def get_absolute_url():
         return reverse('home')
+
+
+class CleanPredictions(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_full_name = models.CharField('User', max_length=100)
+    league_name = models.ForeignKey(League, to_field='league_name', on_delete=models.CASCADE)
+    match_label = models.CharField('Match', max_length=100)
+    predicted_score = models.CharField('Predicted Score', max_length=100)
+    real_score = models.CharField('Real Score', max_length=100)
+    game_status = models.CharField('Game Status', max_length=100)
+    date = models.DateField('Date', max_length=100)
+    hour = models.TimeField('Hour', max_length=100)
+    pred_score_home = models.IntegerField('Predicted Score Home')
+    pred_score_away = models.IntegerField('Predicted Score Away')
+    real_score_home = models.IntegerField('Real Score Home')
+    real_score_away = models.IntegerField('Real Score Away')
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+
