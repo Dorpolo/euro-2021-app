@@ -21,6 +21,7 @@
 <div class="form-group">
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
+        {{ form.media }}
         {{ form.as_p }}
         <div class="btn-group" role="group" aria-label="Basic mixed styles example">
             <a href="{% url 'terms' %}"><button type="button" class="btn btn-danger">League Terms</button></a>

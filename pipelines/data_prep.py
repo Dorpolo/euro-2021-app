@@ -1,27 +1,34 @@
 from data.teams import team_game_map
 from myapp.models import Game, League, LeagueUser
+import plotly.graph_objects as go
+import numpy as np
 
 
 def prepare_bet_submission_email(request, form) -> dict:
-    home = []
-    away = []
-    results = []
-    for i in enumerate(form.cleaned_data.items()):
-        if i[0] % 2 == 0:
-            home.append(i[1])
+    home, away, results = [], [], []
+    top_players = {}
+
+    for i in enumerate([(key, obj) for key, obj in form.cleaned_data.items() if key != 'user_name']):
+        if 'top_' in i[1][0]:
+            top_players[i[1][0]] = i[1][1]
         else:
-            away.append(i[1])
+            if i[0] % 2 == 0:
+                home.append(i[1])
+            else:
+                away.append(i[1])
     for h, a in zip(home, away):
         result = f"{team_game_map[h[0]]}-{team_game_map[a[0]]}: {h[1]}-{a[1]}"
         results.append(result)
     text_results = '\n'.join(results)
+    player_list = [f"{key}: {obj}" for key, obj in top_players.items()]
+    player_joined = '\n'.join(player_list)
     subject = "Euro 2021 Friends League - Email Confirmation - Bet Submission"
     message = f"Dear {request.user.username}!\n" \
               f"You have just submitted successfully your bet form!\n" \
               f"Please Note - you can easily edit your bets by 2021-07-09 at 11:59:59 PM using the app 'edit your bet' tab.\n\n" \
-              f"For your convenience and our documentation, please find bellow your bets. Please note " \
-              f"that every change you will made, a new email will be sent with your most updated bets.\n\n" \
+              f"For your convenience and our documentation, please find bellow your bets. \n\n" \
               f"{text_results}\n\n" \
+              f"{player_joined}\n\n" \
               "Regards,\nLeague management team"
     return {'subject': subject, 'message': message}
 
@@ -97,7 +104,6 @@ def get_league_name() -> tuple:
    unique_leagues = set(leagues)
    league_list = [(item, item) for item in unique_leagues]
    return tuple(league_list)
-
 
 
 

@@ -110,7 +110,7 @@ class LeagueUser(models.Model):
     last_name = models.CharField('Last Name', max_length=20)
     nick_name = models.CharField('Nick Name', max_length=20)
     email = models.EmailField('Email')
-    image = models.ImageField(null=True, blank=True, upload_to="images")
+    image = models.ImageField(null=True, blank=True, upload_to='images/')
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 

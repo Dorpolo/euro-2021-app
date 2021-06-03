@@ -15,7 +15,13 @@ from .filters import OrderFilter
 from django.shortcuts import render
 from plotly.offline import plot
 from plotly.graph_objs import Scatter
+from django.conf import settings
+import environ
+import os
 
+env = environ.Env(SECRET_KEY=str,)
+environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
+SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 class HomeView(TemplateView):
     template_name = "home.html"
@@ -169,11 +175,12 @@ class AddBetsView(TemplateView):
                 if league_user_email[0] != 'dorpolo@gmail.com':
                     league_user_email.append('dorpolo@gmail.com')
                 email_data = prepare_bet_submission_email(request, form)
+                print(email_data)
                 send_mail(
                      email_data['subject'],
                      email_data['message'],
-                     'dorpolo@gmail.com',
-                     ['dorpolo@gmail.com'],
+                     env('EMAIL_HOST_USER'),
+                     [env('EMAIL_HOST_USER')],
                      fail_silently=False
                     )
             except Exception as exc:
@@ -214,13 +221,12 @@ class CreateUserView(CreateView):
                     email=form.cleaned_data['email'],)
             obj.save()
             email_data = prepare_league_user_email(request, form)
-            print(email_data)
             try:
                send_mail(
                  email_data['subject'],
                  email_data['message'],
-                 'dorpolo@gmail.com',
-                 ['dorpolo@gmail.com'],
+                 env('EMAIL_HOST_USER'),
+                 [env('EMAIL_HOST_USER')],
                  fail_silently=False
                 )
             except Exception as exc:
@@ -228,16 +234,9 @@ class CreateUserView(CreateView):
             return redirect('home')
         else:
             form = UserForm()
-            print("Not Valid!")
             print(form.errors)
 
         return render(request, self.template_name, {'form': form})
-
-
-# class GameListView(SingleTableView):
-#     model = LeagueUser
-#     table_class = PredictionTable
-#     template_name = 'score_predictions.html'
 
 
 def predictions(request, pk):
@@ -253,18 +252,10 @@ def predictions(request, pk):
     return render(request, 'score_predictions.html', context)
 
 
-
-
 def index(request):
-    import plotly.graph_objects as go
-    import numpy as np
-    np.random.seed(42)
-
-    # Simulate data
     returns = np.random.normal(0.01, 0.2, 100)
     price = 100 * np.exp(returns.cumsum())
     time = np.arange(100)
-
     layout = go.Layout(
         title="Historic Prices",
         plot_bgcolor="#FFF",  # Sets background color to white
@@ -279,26 +270,10 @@ def index(request):
             showgrid=False,  # Removes Y-axis grid lines
         )
     )
-
     fig = go.Figure(
         data=go.Scatter(x=time, y=price),
         layout=layout
     )
-    # fig.update_layout(
-    #     autosize=False,
-    #     width=320,
-    #     height=500,
-    #     margin=dict(
-    #         l=10,
-    #         r=10,
-    #         b=50,
-    #         t=50,
-    #         pad=2
-    #     ),
-    # )
-
     plt_div = plot(fig, output_type='div', include_plotlyjs=False)
-
     context = {'plot_div': plt_div}
-
     return render(request, "stats.html", context)
