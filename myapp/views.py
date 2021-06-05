@@ -172,17 +172,17 @@ class AddBetsView(TemplateView):
             obj.save()
             try:
                 league_user_email = [get_league_user_email(request.user.id)]
-                if league_user_email[0] != 'dorpolo@gmail.com':
-                    league_user_email.append('dorpolo@gmail.com')
+                if league_user_email[0] != env('EMAIL_HOST_USER'):
+                    league_user_email.append(env('EMAIL_HOST_USER'))
                 email_data = prepare_bet_submission_email(request, form)
-                print(email_data)
                 send_mail(
                      email_data['subject'],
                      email_data['message'],
                      env('EMAIL_HOST_USER'),
-                     [env('EMAIL_HOST_USER')],
+                     league_user_email,
                      fail_silently=False
                     )
+                print(f"Email has been sent successfully to {', '.join(league_user_email)}")
             except Exception as exc:
                 print(exc)
             return redirect('home')
@@ -220,15 +220,18 @@ class CreateUserView(CreateView):
                     last_name=form.cleaned_data['last_name'],
                     email=form.cleaned_data['email'],)
             obj.save()
+            league_user_email = get_league_user_email(request.user.id)
             email_data = prepare_league_user_email(request, form)
+            recipient_list = [league_user_email, env('EMAIL_HOST_USER')]
             try:
                send_mail(
                  email_data['subject'],
                  email_data['message'],
                  env('EMAIL_HOST_USER'),
-                 [env('EMAIL_HOST_USER')],
+                 recipient_list,
                  fail_silently=False
                 )
+               print(f"Email has been sent successfully to {', '.join(recipient_list)}")
             except Exception as exc:
                 print(exc)
             return redirect('home')
