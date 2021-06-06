@@ -2,8 +2,8 @@ from data.teams import team_game_map
 from myapp.models import Game, League, LeagueMember, UserImage
 import plotly.graph_objects as go
 import numpy as np
-from myproject.settings import MEDIA_URL
-
+from myproject.settings import MEDIA_URL, AWS_S3_URL
+from collections import defaultdict
 
 def prepare_bet_submission_email(request, form) -> dict:
     home, away, results = [], [], []
@@ -48,23 +48,25 @@ def get_league_user_email(user) -> str:
     return data[0].email
 
 
-def extract_user_league_name_id(user) -> tuple:
-    data = LeagueMember.objects.filter(user_name_id=user)
-    if len(data) > 0:
-        league_name_id = data[0].league_name_id
-        return True, league_name_id
+def extract_user_league_name_id(user: int) -> tuple:
+    league_member_data = list(LeagueMember.objects.filter(user_name_id=user).values())
+    leagues = [item['league_name_id'] for item in league_member_data]
+    # data = LeagueMember.objects.filter(user_name_id=user)
+    if len(leagues) > 0:
+        # league_name_id = data[0].league_name_id
+        return True, leagues # league_name_id,
     else:
         return False, None
 
 
 def extract_league_users(user) -> tuple:
-    l_name_id = extract_user_league_name_id(user)
-    if l_name_id[0]:
-        data = LeagueMember.objects.filter(league_name_id=l_name_id[1])
-        user_list = {item.user_name_id:
-                         {'first_name': item.first_name,
-                          'last_name': item.last_name
-                          } for item in data}
+    league_ids = extract_user_league_name_id(user)
+    if league_ids[0]:
+        user_list = {}
+        for item in league_ids[1]:
+            data = list(LeagueMember.objects.filter(league_name_id=item).values())
+            for obj in data:
+                user_list[item] = obj
         return True, user_list
     else:
         return False, None
@@ -73,7 +75,8 @@ def extract_league_users(user) -> tuple:
 def extract_league_bets(user):
     league_users = extract_league_users(user)
     if league_users[0]:
-        unique_users = [item for item in league_users[1].keys()]
+        unique_leagues = [item for item in league_users[1].keys()]
+        unique_users = [item['user_name_id'] for item in league_users[1].values()]
         data = list(Game.objects.all().values())
         filtered_data = [item for item in data if item['user_name_id'] in unique_users]
         return filtered_data
@@ -117,21 +120,30 @@ def get_league_name() -> tuple:
    return tuple(league_list)
 
 
-def get_league_member_data(user_id: int) -> list:
+def get_league_member_data(user_id: int):
     league_name_id = extract_user_league_name_id(user_id)
     if league_name_id[0]:
-        league_users = list(LeagueMember.objects.filter(league_name_id=league_name_id[1]).values())
-        league_users_dict = {item['user_name_id']: item for item in league_users}
-        user_image = list(UserImage.objects.all().values())
-        user_image_dict = {item['user_name_id']: item['header_image'] for item in user_image}
-        user_id_with_images = [item for item in user_image_dict.keys()]
-        for member in league_users:
-            user_id = member['user_name_id']
-            if user_id in user_id_with_images:
-                league_users_dict[user_id]['image'] = f"{MEDIA_URL}{user_image_dict[user_id]}"
-        league_data_output = [item for item in league_users_dict.values()]
+        league_data_output = []
+        for obj in league_name_id[1]:
+            league_users = list(LeagueMember.objects.filter(league_name_id=obj).values())
+            league_users_dict = {item['user_name_id']: item for item in league_users}
+            user_image = list(UserImage.objects.all().values())
+            user_image_dict = {item['user_name_id']: item['header_image'] for item in user_image}
+            user_id_with_images = [item for item in user_image_dict.keys()]
+            for member in league_users:
+                user_id = member['user_name_id']
+                if user_id in user_id_with_images:
+                    league_users_dict[user_id]['image'] = f"{AWS_S3_URL}{user_image_dict[user_id]}"
+            league_data_output_unit = [item for item in league_users_dict.values()]
+            league_data_output.append(league_data_output_unit)
+        meta = {}
+        for item in league_data_output:
+            league_name = item[0]['league_name_id']
+            meta[league_name] = []
+            for sub_item in item:
+                meta[league_name].append([sub_item['nick_name'], sub_item['image']])
+        return meta
     else:
-        league_data_output = None
-    return league_data_output
+        return None
 
 

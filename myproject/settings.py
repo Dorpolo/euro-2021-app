@@ -145,5 +145,15 @@ EMAIL_HOST_PASSWORD = env('GMAIL_PASS')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+
+AWS_STORAGE_BUCKET_NAME = "euro-2021"
+AWS_S3_URL = 'https://euro-2021.s3-us-west-2.amazonaws.com/'
+
+AWS_S3_REGION_NAME = "us-west-2"
 
 django_heroku.settings(locals())

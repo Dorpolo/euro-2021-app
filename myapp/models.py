@@ -141,7 +141,7 @@ class CleanPredictions(models.Model):
 
 class UserImage(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
-    header_image = models.ImageField('User Image', null=True, blank=True, upload_to="images/")
+    header_image = models.ImageField('User Image', null=True, blank=True, upload_to="media/")
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 

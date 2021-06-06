@@ -120,39 +120,41 @@
   </style>
 
     {% if league_signup %}
-          <h3>League Details</h3>
-           <p> The following users have been already signed up to your league: <p/>
-          <div>
-              <table class="styled-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>League</th>
-                        </tr>
-                    <thead/>
-                    <tbody>
-                      {% for member in league_members %}
-                          {% if forloop.counter == 1 %}
-                              <tr class="active-row">
-                                 <td>{{ forloop.counter	}}</td>
-                                  <td><img class="dp-styled-img" src="{{ member.image }}"></td>
-                                 <td>{{ member.nick_name }}</td>
-                                 <td>{{ member.league_name_id }}</td>
+        <h3>League Details</h3>
+        <p> The following users have been already signed up to your league: <p/>
+        <hr>
+          {% for key, obj in league_members.items %}
+              <h3>{{ key }}</h3>
+              <hr>
+              <div>
+                  <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Image</th>
+                                <th>Name</th>
+                            </tr>
+                        <thead/>
+                        <tbody>
+                          {% for item in obj %}
+                              {% if forloop.counter == 1 %}
+                                  <tr class="active-row">
+                                     <td>{{ forloop.counter	}}</td>
+                                      <td><img class="dp-styled-img" src="{{ item.1 }}"></td>
+                                     <td>{{ item.0 }}</td>
+                                  </tr>
+                              {% else %}
+                              <tr>
+                                 <td>{{ forloop.counter	 }}</td>
+                                  <td><img class="dp-styled-img" src="{{ item.1}}"></td>
+                                  <td>{{ item.0 }}</td>
                               </tr>
-                          {% else %}
-                          <tr>
-                             <td>{{ forloop.counter	 }}</td>
-                              <td><img class="dp-styled-img" src="{{ member.image}}"></td>
-                              <td>{{ member.nick_name }}</td>
-                             <td>{{ member.league_name_id }}</td>
-                          </tr>
-                          {% endif %}
-                      {% endfor %}
-                    </tbody>
-              </table>
-            </div>
+                              {% endif %}
+                          {% endfor %}
+                        </tbody>
+                  </table>
+                </div>
+        {% endfor %}
     {% endif %}
   </body>
 {% else %}
