@@ -1,12 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail, BadHeaderError
-from django.http import HttpResponse
-from pipelines.read_data import EuroApi
 from pipelines.data_prep import *
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
-from .forms import BetForm, LeagueMemberForm, UserImageForm, LeagueForm
-from .models import UserImage, LeagueMember, CleanPredictions
+from .forms import *
+from .models import *
 from data.teams import team_game_map
 from django.urls import reverse
 from django_tables2 import SingleTableView
@@ -18,7 +16,6 @@ from plotly.graph_objs import Scatter
 from django.conf import settings
 import environ
 import os
-from myproject.settings import MEDIA_URL
 
 env = environ.Env(SECRET_KEY=str,)
 environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
@@ -292,3 +289,4 @@ class CreateLeagueView(CreateView):
     model = League
     form_class = LeagueForm
     template_name = 'add_league.html'
+

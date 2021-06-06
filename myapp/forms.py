@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from .models import Game, League, LeagueMember, UserImage
+from .models import *
 from pipelines.read_data import EuroApi
 from data.teams import team_game_map
 
@@ -163,7 +163,7 @@ class LeagueForm(forms.ModelForm):
 class LeagueMemberForm(forms.ModelForm):
     class Meta:
         model = LeagueMember
-        fields = ('league_name', 'first_name', 'last_name', 'nick_name', 'email')
+        fields = ('league_name', 'first_name', 'last_name', 'nick_name', 'email',)
 
         widgets = {
             'league_name': forms.Select(attrs={'class': 'form-select', 'placeholder': 'e.g: Avi Nimni'}),

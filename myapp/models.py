@@ -102,6 +102,9 @@ class League(models.Model):
     def get_absolute_url():
         return reverse('home')
 
+    def __str__(self):
+        return self.league_name
+
 
 class LeagueMember(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
