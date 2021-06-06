@@ -213,7 +213,6 @@ class CreateLeagueMemberView(CreateView):
                     last_name=form.cleaned_data['last_name'],
                     nick_name=form.cleaned_data['nick_name'],
                     email=form.cleaned_data['email'],
-                    header_image=form.cleaned_data['header_image'],
                 )
             obj.save()
             league_user_email = get_league_user_email(request.user.id)
