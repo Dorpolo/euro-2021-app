@@ -2,7 +2,7 @@ from data.teams import team_game_map
 from myapp.models import Game, League, LeagueMember, UserImage
 import plotly.graph_objects as go
 import numpy as np
-from myproject.settings import MEDIA_URL, AWS_S3_URL
+from myproject.settings import MEDIA_URL, AWS_S3_URL, DEFAULT_PHOTO
 from collections import defaultdict
 
 def prepare_bet_submission_email(request, form) -> dict:
@@ -51,10 +51,8 @@ def get_league_user_email(user) -> str:
 def extract_user_league_name_id(user: int) -> tuple:
     league_member_data = list(LeagueMember.objects.filter(user_name_id=user).values())
     leagues = [item['league_name_id'] for item in league_member_data]
-    # data = LeagueMember.objects.filter(user_name_id=user)
     if len(leagues) > 0:
-        # league_name_id = data[0].league_name_id
-        return True, leagues # league_name_id,
+        return True, leagues
     else:
         return False, None
 
@@ -134,6 +132,8 @@ def get_league_member_data(user_id: int):
                 user_id = member['user_name_id']
                 if user_id in user_id_with_images:
                     league_users_dict[user_id]['image'] = f"{AWS_S3_URL}{user_image_dict[user_id]}"
+                else:
+                    league_users_dict[user_id]['image'] = f"{AWS_S3_URL}{DEFAULT_PHOTO}"
             league_data_output_unit = [item for item in league_users_dict.values()]
             league_data_output.append(league_data_output_unit)
         meta = {}
