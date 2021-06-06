@@ -41,6 +41,4 @@ Pillow
 django_tables2
 django_filter
 plotly
-boto3
 django-storages
-collections
