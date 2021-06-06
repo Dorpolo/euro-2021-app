@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from pipelines.read_data import EuroApi
 from pipelines.data_prep import *
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
-from .forms import BetForm, LeagueMemberForm, UserImageForm
+from .forms import BetForm, LeagueMemberForm, UserImageForm, LeagueForm
 from .models import UserImage, LeagueMember, CleanPredictions
 from data.teams import team_game_map
 from django.urls import reverse
@@ -288,3 +288,8 @@ class UserImageView(CreateView):
     form_class = UserImageForm
     template_name = 'add_user_image.html'
 
+
+class CreateLeagueView(CreateView):
+    model = League
+    form_class = LeagueForm
+    template_name = 'add_league.html'

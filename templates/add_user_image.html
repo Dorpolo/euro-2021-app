@@ -5,13 +5,14 @@
 
 {% if user.is_authenticated %}
 	<h1>Add User Image</h1>
-
+<hr>
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.media }}
     {{ form.user_name }}
      {{ form.header_image.label_tag }}
      {{ form.header_image }}
+    <hr>
 <button class="btn btn-warning">Submit</button>
 <form/>
 
