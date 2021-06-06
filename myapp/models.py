@@ -103,14 +103,13 @@ class League(models.Model):
         return reverse('home')
 
 
-class LeagueUser(models.Model):
+class LeagueMember(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
     league_name = models.ForeignKey(League, to_field='league_name', on_delete=models.CASCADE)
     first_name = models.CharField('First Name', max_length=20)
     last_name = models.CharField('Last Name', max_length=20)
     nick_name = models.CharField('Nick Name', max_length=20)
     email = models.EmailField('Email')
-    image = models.ImageField(null=True, blank=True, upload_to='images/')
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -137,3 +136,11 @@ class CleanPredictions(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
 
+class UserImage(models.Model):
+    user_name = models.ForeignKey(User, on_delete=models.CASCADE)
+    header_image = models.ImageField('User Image', null=True, blank=True, upload_to="images/")
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def get_absolute_url(self):
+        return reverse('home')

@@ -1,7 +1,8 @@
 from data.teams import team_game_map
-from myapp.models import Game, League, LeagueUser
+from myapp.models import Game, League, LeagueMember, UserImage
 import plotly.graph_objects as go
 import numpy as np
+from myproject.settings import MEDIA_URL
 
 
 def prepare_bet_submission_email(request, form) -> dict:
@@ -43,12 +44,12 @@ def prepare_league_user_email(request, form) -> dict:
 
 
 def get_league_user_email(user) -> str:
-    data = LeagueUser.objects.filter(user_name_id=user)
+    data = LeagueMember.objects.filter(user_name_id=user)
     return data[0].email
 
 
 def extract_user_league_name_id(user) -> tuple:
-    data = LeagueUser.objects.filter(user_name_id=user)
+    data = LeagueMember.objects.filter(user_name_id=user)
     if len(data) > 0:
         league_name_id = data[0].league_name_id
         return True, league_name_id
@@ -59,7 +60,7 @@ def extract_user_league_name_id(user) -> tuple:
 def extract_league_users(user) -> tuple:
     l_name_id = extract_user_league_name_id(user)
     if l_name_id[0]:
-        data = LeagueUser.objects.filter(league_name_id=l_name_id[1])
+        data = LeagueMember.objects.filter(league_name_id=l_name_id[1])
         user_list = {item.user_name_id:
                          {'first_name': item.first_name,
                           'last_name': item.last_name
@@ -81,17 +82,27 @@ def extract_league_bets(user):
 
 
 def user_onboarding(user) -> dict:
-    league_data = LeagueUser.objects.filter(user_name_id=user)
+    league_data = LeagueMember.objects.filter(user_name_id=user)
     bet_data = Game.objects.filter(user_name_id=user)
+    image = UserImage.objects.filter(user_name_id=user)
     league_assigned = True if len(league_data) > 0 else False
     bet_assigned = True if len(bet_data) > 0 else False
-    return {'league': league_assigned, 'bet': bet_assigned}
+    image_uploaded = True if len(image) > 0 else False
+    return {'league': league_assigned, 'bet': bet_assigned, 'image': image_uploaded}
 
 
 def user_game_bet_id(user) -> dict:
     data = Game.objects.filter(user_name_id=user)
     if len(data) > 0:
         return data[0].id
+    else:
+        return None
+
+
+def get_user_image(user) -> dict:
+    data = UserImage.objects.filter(user_name_id=user)
+    if len(data) > 0:
+        return data[0].header_image
     else:
         return None
 
@@ -106,6 +117,21 @@ def get_league_name() -> tuple:
    return tuple(league_list)
 
 
-
+def get_league_member_data(user_id: int) -> list:
+    league_name_id = extract_user_league_name_id(user_id)
+    if league_name_id[0]:
+        league_users = list(LeagueMember.objects.filter(league_name_id=league_name_id[1]).values())
+        league_users_dict = {item['user_name_id']: item for item in league_users}
+        user_image = list(UserImage.objects.all().values())
+        user_image_dict = {item['user_name_id']: item['header_image'] for item in user_image}
+        user_id_with_images = [item for item in user_image_dict.keys()]
+        for member in league_users:
+            user_id = member['user_name_id']
+            if user_id in user_id_with_images:
+                league_users_dict[user_id]['image'] = f"{MEDIA_URL}{user_image_dict[user_id]}"
+        league_data_output = [item for item in league_users_dict.values()]
+    else:
+        league_data_output = None
+    return league_data_output
 
 

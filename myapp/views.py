@@ -1,13 +1,13 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from pipelines.read_data import EuroApi
 from pipelines.data_prep import *
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
-from .models import Game, League, LeagueUser, CleanPredictions
-from .forms import BetForm, LeagueForm, UserForm
+from .forms import BetForm, LeagueMemberForm, UserImageForm
+from .models import UserImage, LeagueMember, CleanPredictions
 from data.teams import team_game_map
-import json
 from django.urls import reverse
 from django_tables2 import SingleTableView
 from .tables import PredictionTable
@@ -18,10 +18,12 @@ from plotly.graph_objs import Scatter
 from django.conf import settings
 import environ
 import os
+from myproject.settings import MEDIA_URL
 
 env = environ.Env(SECRET_KEY=str,)
 environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
 SECRET_KEY = env('DJANGO_SECRET_KEY')
+
 
 class HomeView(TemplateView):
     template_name = "home.html"
@@ -29,21 +31,18 @@ class HomeView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            league_name_id = extract_user_league_name_id(request.user.id)
-            if league_name_id[0]:
-                league_users = LeagueUser.objects.filter(league_name_id=league_name_id[1])
-            else:
-                league_users = None
+            league_data_output = get_league_member_data(request.user.id)
         else:
-            league_users = None
+            league_data_output = None
         onboarding = user_onboarding(request.user.id)
         bet_id = user_game_bet_id(request.user.id)
         context = {
-            'league_users': league_users,
+            'league_members': league_data_output,
             'fixtures': self.get_api_data.main(),
             'teams': self.get_api_data.get_unique_teams(),
             'league_signup': onboarding['league'],
             'committed_a_bet': onboarding['bet'],
+            'image_uploaded': onboarding['image'],
             'bet_id': bet_id
         }
         return render(request, self.template_name, context)
@@ -191,34 +190,31 @@ class AddBetsView(TemplateView):
         return render(request, self.template_name, {'form': form})
 
 
-class CreateLeagueView(CreateView):
-    model = League
-    form_class = LeagueForm
-    template_name = 'add_league.html'
-
-
 class UpdateBetView(UpdateView):
     model = Game
     form_class = BetForm
     template_name = 'update_bets.html'
 
 
-class CreateUserView(CreateView):
-    template_name = "add_user.html"
+class CreateLeagueMemberView(CreateView):
+    template_name = "add_league_member.html"
 
     def get(self, request):
-        form = UserForm()
+        form = LeagueMemberForm()
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        form = UserForm(request.POST)
+        form = LeagueMemberForm(request.POST)
         if form.is_valid():
-            obj = LeagueUser(
+            obj = LeagueMember(
                     user_name=request.user,
                     league_name=form.cleaned_data['league_name'],
                     first_name=form.cleaned_data['first_name'],
                     last_name=form.cleaned_data['last_name'],
-                    email=form.cleaned_data['email'],)
+                    nick_name=form.cleaned_data['nick_name'],
+                    email=form.cleaned_data['email'],
+                    header_image=form.cleaned_data['header_image'],
+                )
             obj.save()
             league_user_email = get_league_user_email(request.user.id)
             email_data = prepare_league_user_email(request, form)
@@ -236,14 +232,13 @@ class CreateUserView(CreateView):
                 print(exc)
             return redirect('home')
         else:
-            form = UserForm()
+            form = LeagueMemberForm()
             print(form.errors)
-
         return render(request, self.template_name, {'form': form})
 
 
 def predictions(request, pk):
-    data = LeagueUser.objects.filter(user_name_id=pk)
+    data = LeagueMember.objects.filter(user_name_id=pk)
     league = data[0].league_name_id
     bets = CleanPredictions.objects.filter(league_name_id=league)
     myFilter = OrderFilter(request.GET, queryset=bets)
@@ -280,3 +275,16 @@ def index(request):
     plt_div = plot(fig, output_type='div', include_plotlyjs=False)
     context = {'plot_div': plt_div}
     return render(request, "stats.html", context)
+
+
+class UpdateBetView(UpdateView):
+    model = Game
+    form_class = BetForm
+    template_name = 'update_bets.html'
+
+
+class UserImageView(CreateView):
+    model = UserImage
+    form_class = UserImageForm
+    template_name = 'add_user_image.html'
+

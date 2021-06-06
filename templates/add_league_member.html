@@ -19,7 +19,7 @@
 </div>
 <hr style="height:4px;border-width:1px;color:#1C2833;background-color:#1C2833">
 <div class="form-group">
-    <form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.media }}
         {{ form.as_p }}
@@ -27,8 +27,7 @@
             <a href="{% url 'terms' %}"><button type="button" class="btn btn-danger">League Terms</button></a>
             <button class="btn btn-warning">Submit</button>
         </div>
-
-    </form>
+</form>
 </div>
 <br/>
 <center>

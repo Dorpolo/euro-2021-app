@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from .models import Game, League, LeagueUser
+from .models import Game, League, LeagueMember, UserImage
 from pipelines.read_data import EuroApi
 from data.teams import team_game_map
 
@@ -160,15 +160,25 @@ class LeagueForm(forms.ModelForm):
         }
 
 
-class UserForm(forms.ModelForm):
+class LeagueMemberForm(forms.ModelForm):
     class Meta:
-        model = LeagueUser
-        fields = ('league_name', 'first_name', 'last_name', 'nick_name', 'email', 'image',)
+        model = LeagueMember
+        fields = ('league_name', 'first_name', 'last_name', 'nick_name', 'email')
 
         widgets = {
             'league_name': forms.Select(attrs={'class': 'form-select', 'placeholder': 'e.g: Avi Nimni'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Avi'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Nimni'}),
             'nick_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: Nikita'}),
-            'email': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: tal_banin@gmail.com'}),
+            'email': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g: tal_banin@gmail.com'})
+        }
+
+
+class UserImageForm(forms.ModelForm):
+    class Meta:
+        model = UserImage
+        fields = ('user_name', 'header_image',)
+
+        widgets = {
+            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
         }

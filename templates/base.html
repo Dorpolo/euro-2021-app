@@ -35,7 +35,9 @@
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href={% url 'create_league' %}>Create New League</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href={% url 'create_user' %}>Sign up for a league</a></li>
+                    <li><a class="dropdown-item" href={% url 'create_league_member' %}>Join a League</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href={% url 'add_image' %}>Upload Your Image</a></li>
               </ul>
             </li>
           <li class="nav-item dropdown">
@@ -45,7 +47,9 @@
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item" href={% url 'add_your_bet' %}>Group Stage</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Quarter Finals</a></li>
+                <li><a class="dropdown-item" href="#">Top 16</a></li>
+                  <li><hr class="dropdown-divider"></li>
+               <li><a class="dropdown-item" href="#">Quarter Finals</a></li>
                   <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="#">Semi Finals</a></li>
                   <li><hr class="dropdown-divider"></li>
@@ -56,9 +60,6 @@
             <a class="nav-link" href={% url 'terms' %}>Terms</a>
          </li>
           {% endif %}
-         <li class="nav-item">
-            <a class="nav-link" href="https://www.uefa.com/uefaeuro-2020/news/0254-0d41684d1216-06773df7faed-1000--euro-2020-all-the-fixtures/">Uefa.com</a>
-         </li>
         {% if not user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'register' %}">Register</a>
