@@ -121,22 +121,23 @@ class LeagueMember(models.Model):
         return reverse('home')
 
 
-class CleanPredictions(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    user_full_name = models.CharField('User', max_length=100)
-    league_name = models.ForeignKey(League, to_field='league_name', on_delete=models.CASCADE)
-    match_label = models.CharField('Match', max_length=100)
-    predicted_score = models.CharField('Predicted Score', max_length=100)
-    real_score = models.CharField('Real Score', max_length=100)
-    game_status = models.CharField('Game Status', max_length=100)
-    date = models.DateField('Date', max_length=100)
-    hour = models.TimeField('Hour', max_length=100)
-    pred_score_home = models.IntegerField('Predicted Score Home')
-    pred_score_away = models.IntegerField('Predicted Score Away')
-    real_score_home = models.IntegerField('Real Score Home')
-    real_score_away = models.IntegerField('Real Score Away')
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
+# class UserPrediction(models.Model):
+#     record_id = models.CharField(max_length=50, unique=True, blank=True)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     user_full_name = models.CharField('User', max_length=100)
+#     league_name = models.ForeignKey(League, to_field='league_name', on_delete=models.CASCADE)
+#     match_label = models.CharField('Match', max_length=100)
+#     predicted_score = models.CharField('Predicted Score', max_length=100)
+#     real_score = models.CharField('Real Score', max_length=100)
+#     game_status = models.CharField('Game Status', max_length=100)
+#     date = models.DateField('Date', max_length=100)
+#     hour = models.TimeField('Hour', max_length=100)
+#     pred_score_home = models.IntegerField('Predicted Score Home')
+#     pred_score_away = models.IntegerField('Predicted Score Away')
+#     real_score_home = models.IntegerField('Real Score Home')
+#     real_score_away = models.IntegerField('Real Score Away')
+#     updated = models.DateTimeField(auto_now=True)
+#     created = models.DateTimeField(auto_now_add=True)
 
 
 class UserImage(models.Model):

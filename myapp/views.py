@@ -9,7 +9,7 @@ from data.teams import team_game_map
 from django.urls import reverse
 from django_tables2 import SingleTableView
 from .tables import PredictionTable
-from .filters import OrderFilter
+from .filters import *
 from django.shortcuts import render
 from plotly.offline import plot
 from plotly.graph_objs import Scatter
@@ -290,3 +290,21 @@ class CreateLeagueView(CreateView):
     form_class = LeagueForm
     template_name = 'add_league.html'
 
+
+class ScoreView(TemplateView):
+    template_name = "score_predictions.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            get_league_data = UpdateUserPrediction().present_predictions(request.user.id)
+            league_data_output = get_league_data[0]
+        else:
+            league_data_output = None
+        onboarding = user_onboarding(request.user.id)
+        context = {
+            'league_members': league_data_output,
+            'league_signup': onboarding['league'],
+            'committed_a_bet': onboarding['bet'],
+            'image_uploaded': onboarding['image']
+        }
+        return render(request, self.template_name, context)

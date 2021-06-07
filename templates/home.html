@@ -5,14 +5,20 @@
 {% if user.is_authenticated %}
   <body style="background-color:mintcream;">
   <h1>The {{ user.username }}'s Zone</h1>
-  <hr>
-  <div>
-{#      {% for item in teams %}#}
-{#                <img src="{{ item }}" class="rounded" alt="..." width="50" height="50">#}
-{#      {% endfor %}#}
-  <img src="/media/images/profile/Johan-Cruyffs.jpeg" style="min-width: 300px; max-width: 800px; overflow: auto; width: 100%;">
-  <div/>
-<hr>
+    <hr>
+      <div>
+          <img src="/media/images/profile/Johan-Cruyffs.jpeg" style="min-width: 300px; max-width: 800px; overflow: auto; width: 100%;">
+      <div/>
+        <hr>
+          {% if committed_a_bet %}
+          <h3>Quick Access</h3>
+             <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                <a href="{% url 'predictions' %}"><button type="button" class="btn btn-light">Your Predictions</button></a>
+                <button type="button" class="btn btn-light" disabled>League Stats</button></a>
+            </div>
+
+        <hr>
+      {% endif %}
   <div>
       <h3>Onboarding Check List</h3>
           {% if league_signup %}

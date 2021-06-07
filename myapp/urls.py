@@ -15,5 +15,6 @@ urlpatterns = [
     path('stats/', views.index, name='stats'),
     path('terms/', views.TermsView.as_view(), name='terms'),
     path('add_your_image/', views.UserImageView.as_view(), name='add_image'),
+    path('predictions/', views.ScoreView.as_view(), name='predictions'),
 ]
 
