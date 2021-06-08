@@ -153,7 +153,7 @@ AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
 
 AWS_STORAGE_BUCKET_NAME = "euro-2021"
 AWS_S3_URL = 'https://euro-2021.s3-us-west-2.amazonaws.com/'
-DEFAULT_PHOTO = 'media/jeff.jpeg'
+DEFAULT_PHOTO = 'media/avatar.png'
 AWS_S3_REGION_NAME = "us-west-2"
 
 django_heroku.settings(locals())
