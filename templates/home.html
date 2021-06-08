@@ -4,22 +4,74 @@
 
 {% if user.is_authenticated %}
   <body style="background-color:mintcream;">
-  <h1>The {{ user.username }}'s Zone</h1>
+        <h2> {{ user.username }}'s Fan Zone</h2>
     <hr>
       <div>
           <img src="/media/images/profile/Johan-Cruyffs.jpeg" style="min-width: 300px; max-width: 800px; overflow: auto; width: 100%;">
       <div/>
         <hr>
-          {% if committed_a_bet %}
-          <h3>Quick Access</h3>
-             <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                <a href="{% url 'predictions' %}"><button type="button" class="btn btn-light">Your Predictions</button></a>
-                <button type="button" class="btn btn-light" disabled>League Stats</button></a>
-            </div>
-
-        <hr>
+        {% if committed_a_bet %}
+              <h3>Quick Access</h3>
+                 <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                    <a href="{% url 'predictions' %}"><button type="button" class="btn btn-outline-dark">Your Predictions</button></a>
+                    <button type="button" class="btn btn-outline-dark" disabled>League Stats</button></a>
+                </div>
+            <hr>
       {% endif %}
   <div>
+  {% if committed_a_bet %}
+      <div>
+          <h3>League Table</h3>
+          {% for key, obj in league_member_points.items %}
+                <p>{{ key }}</p>
+              <hr>
+              <div>
+                  <table class="styled-table" style="width: 100%; height: 100%; text-align: center">
+                        <thead>
+                            <tr style="text-align: center">
+                                <th>#</th>
+                                <th>User</th>
+                                <th>Games</th>
+                                <th>Points</th>
+                                <th>Booms</th>
+                                <th>Winners</th>
+                                <th>Success</th>
+                                <th>B-Goals</th>
+                            </tr>
+                        <thead/>
+                        <tbody>
+                          {% for item in obj %}
+                              {% if forloop.counter == 1 %}
+                                    <tr class="active-row">
+                                      <th>{{ item.8 }}</th>
+                                      <td>{{ item.0 }}</td>
+                                      <td>{{ item.1 }}</td>
+                                      <td>{{ item.2 }}</td>
+                                      <td>{{ item.3 }}</td>
+                                      <td>{{ item.4 }}</td>
+                                      <td>{{ item.5 }}</td>
+                                      <td>{{ item.6 }}</td>
+                                  </tr>
+                              {% else %}
+                                  <tr>
+                                      <th>{{ item.8 }}</th>
+                                      <td>{{ item.0}}</td>
+                                      <td>{{ item.1 }}</td>
+                                      <td>{{ item.2 }}</td>
+                                      <td>{{ item.3 }}</td>
+                                      <td>{{ item.4 }}</td>
+                                      <td>{{ item.5 }}</td>
+                                      <td>{{ item.6 }}</td>
+                                  </tr>
+                              {% endif %}
+                          {% endfor %}
+                        </tbody>
+                  </table>
+                </div>
+        {% endfor %}
+      </div>
+      <hr>
+  {% endif %}
       <h3>Onboarding Check List</h3>
           {% if league_signup %}
               <p style="color:darkgreen;">
@@ -125,14 +177,64 @@
 
   </style>
 
+    <style>
+    .styled-table {
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 0.5em;
+        font-family: sans-serif;
+        min-width: 300px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .styled-table thead tr {
+        background-color: #DE3163;
+        color: #ffffff;
+        text-align: left;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 2px 3px;
+    }
+
+    .styled-table tbody tr {
+        border-bottom: 1px solid #dddddd;
+    }
+
+    .styled-table tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3;
+    }
+
+    .styled-table tbody tr:last-of-type {
+        border-bottom: 1px solid #090f18;
+    }
+
+    .styled-table tbody tr:first-of-type {
+        border-bottom: 1px solid #DE3163;
+    }
+
+    .styled-table tbody tr.active-row {
+        font-weight: bold;
+        color: #090f18;
+    }
+
+    .dp-styled-img {
+      height: 35px;
+      width: 35px;
+      border-radius: 50%;
+    }
+
+  </style>
+
     {% if league_signup %}
-        <h3>League Details</h3>
+        <h3>League Members</h3>
         <p> The following users have been already signed up to your league: <p/>
-        <hr>
           {% for key, obj in league_members.items %}
-              <h3>{{ key }}</h3>
+              <p>{{ key }}</p>
               <hr>
               <div>
+              <center>
                   <table class="styled-table">
                         <thead>
                             <tr>
@@ -159,6 +261,7 @@
                           {% endfor %}
                         </tbody>
                   </table>
+              </center>
                 </div>
         {% endfor %}
     {% endif %}

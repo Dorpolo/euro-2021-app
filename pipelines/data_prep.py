@@ -16,6 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(SECRET_KEY=str,)
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+
 def prepare_bet_submission_email(request, form) -> dict:
     home, away, results = [], [], []
     top_players = {}
@@ -84,7 +85,6 @@ def extract_league_users(user) -> tuple:
 def extract_league_bets(user):
     league_users = extract_league_users(user)
     if league_users[0]:
-        unique_leagues = [item for item in league_users[1].keys()]
         unique_users = [item['user_name_id'] for item in league_users[1].values()]
         data = list(Game.objects.all().values())
         filtered_data = [item for item in data if item['user_name_id'] in unique_users]
@@ -159,9 +159,11 @@ def get_league_member_data(user_id: int):
 
 
 class UpdateUserPrediction:
-    TOKEN = env('API_TOKEN')
-    PREFIX = 'https://api.statorium.com/api/v1'
-    URL = f'{PREFIX}/matches/?season_id=40&apikey={TOKEN}'
+    def __init__(self, user_id):
+        self.TOKEN = env('API_TOKEN')
+        self.PREFIX = 'https://api.statorium.com/api/v1'
+        self.URL = f'{self.PREFIX}/matches/?season_id=40&apikey={self.TOKEN}'
+        self.user_id = user_id
 
     def extract_data(self):
         r = requests.get(url=self.URL)
@@ -221,18 +223,15 @@ class UpdateUserPrediction:
              metadata[id]['status'],
              metadata[id]['date'],
              metadata[id]['time'],
-        ] for id in df_main.game_id]
+        ] for id in df_main.game_id.unique()]
         df_more_data = pd.DataFrame(more_data)
         df_more_data.columns = extra_fields
-
         df_main_2 = pd.merge(
                     df_main,
                     df_more_data,
                     on=['game_id'],
-                    how='inner'
-                )
-
-        league_member_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id']
+                    how='inner')
+        league_member_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name']
         df_league_member = pd.DataFrame(list(LeagueMember.objects.all().values()))[league_member_fields]
         output = pd.merge(
                     df_main_2,
@@ -243,11 +242,10 @@ class UpdateUserPrediction:
         output['user_full_name'] = output['first_name'] + ' ' + output['last_name']
         output['record_id'] = output['user_name_id'].astype(str) + '-' + output['match_label'] + '-' + output['league_name_id']
         output['date'] = output['date'].str[5:]
-
         output_fields = [
             'record_id',
             'user_name_id',
-            'user_full_name',
+            'nick_name',
             'league_name_id',
             'match_label',
             'predicted_score',
@@ -262,44 +260,64 @@ class UpdateUserPrediction:
             ]
         return output[output_fields]
 
-    def present_predictions(self, user_id: int):
+    def present_predictions(self):
         data = self.data_enrichment()
-        leagues = list(data[data.user_name_id == user_id]['league_name_id'].unique())
+        leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
         if len(leagues) > 0:
             output = {}
             for item in leagues:
-                required_fields = ['user_full_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
+                required_fields = ['nick_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
                                    'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
                                    'real_score_away', 'user_name_id']
-                filtered_df = data[(data.league_name_id == item) & (data.user_name_id == user_id)][required_fields]
+                filtered_df = data[(data.league_name_id == item) & (data.user_name_id == self.user_id)][required_fields]
                 output[item] = filtered_df.values.tolist()
-                print(filtered_df.values.tolist())
-                return output, required_fields
+            return output, required_fields
         else:
             return None, None
 
     @staticmethod
-    def get_game_points_group_stage(df) -> tuple:
-        df['points'] = np.where(df.pred_score_home == df.real_score_away)
-        return True
+    def table_calculations(x):
+        x['pred_dir'] = np.where(x.pred_score_home > x.pred_score_away, 'home', np.where(x.pred_score_home < x.pred_score_away, 'away', 'draw'))
+        x['real_dir'] = np.where(x.real_score_home > x.real_score_away, 'home', np.where(x.real_score_home < x.real_score_away, 'away', 'draw'))
+        x['is_direction'] = np.where(x.pred_dir == x.real_dir, 1, 0)
+        x['is_boom'] = np.where((x.pred_score_home == x.real_score_home) & (x.pred_score_away == x.real_score_away), 1, 0)
+        x['points'] = np.where(x.is_boom == 1, 3, np.where(x.is_direction == 1, 1, 0))
+        x['started'] = np.where(x.game_status != 'Fixture', 1, 0) #todo - change beta value
+        x['is_live'] = np.where(x.game_status == 'live', 1, 0) #todo - change live value
+        d = [
+            int(x['started'].sum()),
+            int((x['started'] * x['points']).sum()),
+            int((x['started'] * x['points']).sum()),
+            int((x['started'] * x['points']).sum()),
+            round((x['started'] * x['points']).sum()*100/(x['started'] * 3).sum(), 1),
+            int((x['started'] * x['is_boom'] * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()),
+            int((x['is_live'] * x['points']).sum()),
+        ]
+        index_names = ['games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points']
+        return pd.Series(d, index=[index_names])
 
-    @staticmethod
-    def get_game_points_knockout(user_id) -> tuple:
+    def get_game_points_group_stage(self, df) -> tuple:
+        data = df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).\
+            reset_index().drop(columns=['user_name_id']).sort_values(
+                    by=[('points',), ('boom',), ('direction', ), ('predicted_goals', )], ascending=[False]*4
+                    )
+        data['rn'] = np.arange(len(data)) + 1
+        return data.values.tolist()
+
+    def get_game_points_knockout(self) -> tuple:
         pass
 
-    @staticmethod
-    def get_game_points_players(user_id) -> tuple:
+    def get_game_points_players(self) -> tuple:
         pass
 
-    def league_member_points(self, user_id: int) -> tuple:
-        metadata = self.present_predictions(user_id)
+    def league_member_points(self):
+        metadata = self.present_predictions()
         output = {}
         if metadata[0] is not None:
             for key, obj in metadata[0].items():
                 df = pd.DataFrame(obj)
                 df.columns = metadata[1]
-                points = self.get_game_points_group_stage(df)
-                output[key] = points
+                output[key] = self.get_game_points_group_stage(df)
             return output
         else:
             return None

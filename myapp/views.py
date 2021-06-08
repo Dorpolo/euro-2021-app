@@ -33,6 +33,7 @@ class HomeView(TemplateView):
             league_data_output = None
         onboarding = user_onboarding(request.user.id)
         bet_id = user_game_bet_id(request.user.id)
+        league_table_output = UpdateUserPrediction(request.user.id).league_member_points()
         context = {
             'league_members': league_data_output,
             'fixtures': self.get_api_data.main(),
@@ -40,7 +41,8 @@ class HomeView(TemplateView):
             'league_signup': onboarding['league'],
             'committed_a_bet': onboarding['bet'],
             'image_uploaded': onboarding['image'],
-            'bet_id': bet_id
+            'bet_id': bet_id,
+            'league_member_points': league_table_output
         }
         return render(request, self.template_name, context)
 
@@ -233,19 +235,6 @@ class CreateLeagueMemberView(CreateView):
         return render(request, self.template_name, {'form': form})
 
 
-def predictions(request, pk):
-    data = LeagueMember.objects.filter(user_name_id=pk)
-    league = data[0].league_name_id
-    bets = CleanPredictions.objects.filter(league_name_id=league)
-    myFilter = OrderFilter(request.GET, queryset=bets)
-    bets = myFilter.qs
-    context = {
-        'bets': bets,
-        'myFilter': myFilter
-    }
-    return render(request, 'score_predictions.html', context)
-
-
 def index(request):
     returns = np.random.normal(0.01, 0.2, 100)
     price = 100 * np.exp(returns.cumsum())
@@ -296,8 +285,10 @@ class ScoreView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            get_league_data = UpdateUserPrediction().present_predictions(request.user.id)
+            class_init = UpdateUserPrediction(request.user.id)
+            get_league_data = class_init.present_predictions()
             league_data_output = get_league_data[0]
+            league_table_output = class_init.league_member_points()
         else:
             league_data_output = None
         onboarding = user_onboarding(request.user.id)
@@ -305,6 +296,29 @@ class ScoreView(TemplateView):
             'league_members': league_data_output,
             'league_signup': onboarding['league'],
             'committed_a_bet': onboarding['bet'],
-            'image_uploaded': onboarding['image']
+            'image_uploaded': onboarding['image'],
+            'league_member_points': league_table_output
+        }
+        return render(request, self.template_name, context)
+
+
+class LeagueTableView(TemplateView):
+    template_name = "league_table.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            class_init = UpdateUserPrediction(request.user.id)
+            get_league_data = class_init.present_predictions()
+            league_data_output = get_league_data[0]
+            league_table_output = class_init.league_member_points()
+        else:
+            league_data_output = None
+        onboarding = user_onboarding(request.user.id)
+        context = {
+            'league_members': league_data_output,
+            'league_signup': onboarding['league'],
+            'committed_a_bet': onboarding['bet'],
+            'image_uploaded': onboarding['image'],
+            'league_member_points': league_table_output
         }
         return render(request, self.template_name, context)
