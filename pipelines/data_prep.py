@@ -207,8 +207,7 @@ class UpdateUserPrediction:
         df['predicted_score'] = df['value'].astype(str)
         df_main = df.sort_values(by=['user_name_id', 'variable', 'location']).groupby(['user_name_id', 'game_id'])['predicted_score'].apply('-'.join).reset_index()
         new_cols = df_main.predicted_score.str.split('-', expand=True)
-        print(new_cols)
-        df_main[['pred_score_home', 'pred_score_away']] = df_main.predicted_score.str.split('-', expand=True)
+        df_main[['pred_score_home', 'pred_score_away']] = df_main.predicted_score.str.split('-', expand=True, n=1)[[0, 1]]
         return df_main
 
     def data_enrichment(self):
