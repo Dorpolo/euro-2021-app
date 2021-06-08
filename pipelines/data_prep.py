@@ -205,9 +205,9 @@ class UpdateUserPrediction:
         df['location'] = np.where(df.variable.str[-1:] == '0', 'Home', 'Away')
         df['game_id'] = df.variable.str[4:-2]
         df['predicted_score'] = df['value'].astype(str)
-        df_main = df.sort_values(by=['user_name_id', 'variable', 'location']).\
-            groupby(['user_name_id', 'game_id'])['predicted_score'].apply('-'.join).reset_index()
+        df_main = df.sort_values(by=['user_name_id', 'variable', 'location']).groupby(['user_name_id', 'game_id'])['predicted_score'].apply('-'.join).reset_index()
         df_main[['pred_score_home', 'pred_score_away']] = df_main.predicted_score.str.split('-', expand=True)
+        print(df_main)
         return df_main
 
     def data_enrichment(self):
@@ -282,8 +282,8 @@ class UpdateUserPrediction:
         x['is_direction'] = np.where(x.pred_dir == x.real_dir, 1, 0)
         x['is_boom'] = np.where((x.pred_score_home == x.real_score_home) & (x.pred_score_away == x.real_score_away), 1, 0)
         x['points'] = np.where(x.is_boom == 1, 3, np.where(x.is_direction == 1, 1, 0))
-        x['started'] = np.where(x.game_status != 'Fixture', 1, 0) #todo - change beta value
-        x['is_live'] = np.where(x.game_status == 'live', 1, 0) #todo - change live value
+        x['started'] = np.where(x.game_status != 'Fixture', 1, 0)
+        x['is_live'] = np.where(x.game_status == 'live', 1, 0)
         d = [
             int(x['started'].sum()),
             int((x['started'] * x['points']).sum()),
