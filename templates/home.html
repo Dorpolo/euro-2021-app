@@ -127,7 +127,8 @@
   <hr>
 {% if committed_a_bet %}
       <h3>Second Thoughts?</h3>
-          <p>You can easily <a href= {% url 'update_your_bet' bet_id %} > edit your bet form.</a></p>
+          <li> <a href= {% url 'update_your_bet' bet_id %}>Edit your bet form.</a></li>
+          <li> <a href= {% url 'update_league_member' bet_id %}>Edit your league profile.</a></li>
       * Available until 06-10-2021 23:59
       <hr>
 {% endif %}

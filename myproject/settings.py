@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'myapp',
     'members',
     'django_tables2',
-    'django_filters'
+    'django_filters',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
 ]
 
 STATIC_URL = '/static/'

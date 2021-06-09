@@ -206,7 +206,6 @@ class UpdateUserPrediction:
         df['game_id'] = df.variable.str[4:-2]
         df['predicted_score'] = df['value'].astype(str)
         df_main = df.sort_values(by=['user_name_id', 'variable', 'location']).groupby(['user_name_id', 'game_id'])['predicted_score'].apply('-'.join).reset_index()
-        new_cols = df_main.predicted_score.str.split('-', expand=True)
         df_main[['pred_score_home', 'pred_score_away']] = df_main.predicted_score.str.split('-', expand=True, n=1)[[0, 1]]
         return df_main
 
@@ -271,6 +270,7 @@ class UpdateUserPrediction:
                                    'real_score_away', 'user_name_id']
                 filtered_df = data[(data.league_name_id == item) & (data.user_name_id == self.user_id)][required_fields]
                 output[item] = filtered_df.values.tolist()
+                print(required_fields)
             return output, required_fields
         else:
             return None, None

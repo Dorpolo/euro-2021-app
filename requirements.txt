@@ -42,3 +42,4 @@ django_tables2
 django_filter
 plotly
 django-storages
+django_plotly_dash

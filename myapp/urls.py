@@ -16,5 +16,6 @@ urlpatterns = [
     path('add-your-image/', views.UserImageView.as_view(), name='add_image'),
     path('match-predictions/', views.ScoreView.as_view(), name='predictions'),
     path('league-table/', views.LeagueTableView.as_view(), name='league_table'),
+    path('update-league-member/<int:pk>', views.UpdateLeagueMember.as_view(), name='update_league_member'),
 ]
 

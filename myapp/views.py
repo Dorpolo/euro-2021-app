@@ -67,14 +67,14 @@ class BaseView(TemplateView):
         return render(request, self.template_name, context)
 
 
-def bet_index(request):
-    form = BetForm()
-    template_name = 'add_bets.html'
-    context = {
-        'form': form,
-        'fixtures': EuroApi().main()
-    }
-    return render(request, template_name, context)
+# def bet_index(request):
+#     form = BetForm()
+#     template_name = 'add_bets.html'
+#     context = {
+#         'form': form,
+#         'fixtures': EuroApi().main()
+#     }
+#     return render(request, template_name, context)
 
 
 class AddBetsView(TemplateView):
@@ -193,6 +193,12 @@ class UpdateBetView(UpdateView):
     model = Game
     form_class = BetForm
     template_name = 'update_bets.html'
+
+
+class UpdateLeagueMember(UpdateView):
+    model = LeagueMember
+    form_class = LeagueMemberForm
+    template_name = 'update_league_member.html'
 
 
 class CreateLeagueMemberView(CreateView):
