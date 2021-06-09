@@ -391,7 +391,7 @@ class EuMatch:
                        home_team_score, away_team, away_team_id, away_team_score, match_label]
                 output.append(row)
         fields = ['match_day_id', 'match_round', 'match_day_playoff', 'match_day_type', 'match_day_start',
-                  'match_day_end', 'match_id', 'match_status', 'match_date', 'match_hour','home_team',
+                  'match_day_end', 'match_id', 'match_status', 'match_date', 'match_hour', 'home_team',
                   'home_team_id', 'home_team_score', 'away_team', 'away_team_id', 'away_team_score','match_label']
         return output, fields
 
@@ -421,18 +421,16 @@ class StatsNextGame(UpdateUserPrediction):
                 df = pd.DataFrame(obj)
                 df.columns = df_input[1]
                 df = df[df.match_label == self.match_label]
+                df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
                 df['pred_dir'] = np.where(df.pred_score_home > df.pred_score_away,
-                                          'home', np.where(df.pred_score_home < df.pred_score_away, 'away', 'draw'))
+                                          df.home_team, np.where(df.pred_score_home < df.pred_score_away, df.away_team, 'Draw'))
                 df_scores = pd.DataFrame(df.groupby(['predicted_score', 'pred_dir'])['game_status'].count()).reset_index().\
                     rename(columns={
                             'game_status': 'count',
                             'predicted_score': 'score',
                             'pred_dir': 'winner'
-                        }).merge(vis.SCORE_MAP_DF, on='score', how='inner').merge(
-                                vis.SCORE_WINNER_DF,
-                                on='winner',
-                                how='inner')
-                df_fig = df_scores.sort_values(by=['score_rank', 'winner_rank'])
+                        }).merge(vis.SCORE_MAP_DF, on='score', how='inner')
+                df_fig = df_scores.sort_values(by=['score_rank', 'winner'])
                 output[key] = df_fig
             return output
         else:
@@ -445,13 +443,9 @@ class StatsNextGame(UpdateUserPrediction):
             for key, obj in df_input[0].items():
                 df_winner = pd.DataFrame(obj.groupby(['pred_dir'])['game_status'].count()).\
                     reset_index().rename(columns={
-                    'game_status': 'count',
-                    'pred_dir': 'winner'
-                    }).merge(
-                        vis.SCORE_WINNER_DF,
-                        on='winner',
-                        how='inner'
-                    )
+                        'game_status': 'count',
+                        'pred_dir': 'winner'
+                    })
                 df_winner_output = df_winner.sort_values(by=['winner_rank'])
                 output[key] = df_winner_output
             return output
