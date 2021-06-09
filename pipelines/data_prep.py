@@ -299,8 +299,7 @@ class UpdateUserPrediction:
                 required_fields = ['nick_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
                                    'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
                                    'real_score_away', 'user_name_id']
-                #TODO Add & (data.user_name_id == self.user_id) !!!!
-                filtered_df = data[(data.league_name_id == item)][required_fields]
+                filtered_df = data[(data.league_name_id == item) & (data.user_name_id == self.user_id)][required_fields]
                 output[item] = filtered_df.values.tolist()
             return output, required_fields
         else:
