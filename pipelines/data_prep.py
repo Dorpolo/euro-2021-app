@@ -352,6 +352,7 @@ class UpdateUserPrediction:
         else:
             return None
 
+
 class EuMatch:
     def __init__(self):
         self.TOKEN = 'bfa132288504de6860c8ae3259d21fa7'
@@ -433,7 +434,27 @@ class StatsNextGame(UpdateUserPrediction):
                                 how='inner')
                 df_fig = df_scores.sort_values(by=['score_rank', 'winner_rank'])
                 output[key] = df_fig
-                return output
+            return output
+        else:
+            return None
+
+    def next_match_winner_df(self):
+        df_input = self.present_predictions()
+        output = {}
+        if df_input[0] is not None:
+            for key, obj in df_input[0].items():
+                df_winner = pd.DataFrame(obj.groupby(['pred_dir'])['game_status'].count()).\
+                    reset_index().rename(columns={
+                    'game_status': 'count',
+                    'pred_dir': 'winner'
+                    }).merge(
+                        vis.SCORE_WINNER_DF,
+                        on='winner',
+                        how='inner'
+                    )
+                df_winner_output = df_winner.sort_values(by=['winner_rank'])
+                output[key] = df_winner_output
+            return output
         else:
             return None
 
@@ -446,11 +467,28 @@ class StatsNextGame(UpdateUserPrediction):
         div = opy.plot(fig, auto_open=False, output_type='div')
         return div
 
+    @staticmethod
+    def next_match_winner_plot(data):
+        fig = px.pie(data, values='count', names='winner', title='Predicted Winner')
+        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT,)
+        div = opy.plot(fig, auto_open=False, output_type='div')
+        return div
+
+    @staticmethod
+    def merge_dicts(a: dict, b: dict):
+        new_output = {}
+        for i, j in zip(a.items(), b.items()):
+            if i[0] == j[0]:
+                new_output[i[0]] = [i[1], j[1]]
+        return new_output
+
     def next_match_prediction_outputs(self):
-        dict_input = self.next_match_prediction_df()
-        if dict_input is not None:
-            output = {key: self.next_match_prediction_plot(data) for key, data in dict_input.items()}
-            return output
+        dict_score = self.next_match_prediction_df()
+        dict_winner = self.next_match_prediction_df()
+        if dict_score is not None:
+            output_score = {key: self.next_match_prediction_plot(data) for key, data in dict_score.items()}
+            output_winner = {key: self.next_match_winner_plot(data) for key, data in dict_winner.items()}
+            return self.merge_dicts(output_score, output_winner)
         else:
             return None
 

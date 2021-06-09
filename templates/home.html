@@ -13,8 +13,8 @@
         {% if committed_a_bet %}
               <h3>Quick Access</h3>
                  <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                    <a href="{% url 'predictions' %}"><button type="button" class="btn btn-outline-dark">Your Predictions</button></a>
-                    <button type="button" class="btn btn-outline-dark" disabled>League Stats</button></a>
+                    <a href="{% url 'predictions' %}"><button type="button" class="btn btn-outline-dark">Predictions</button></a>
+                    <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-outline-dark">Next Match</button></a>
                 </div>
             <hr>
       {% endif %}
@@ -138,50 +138,6 @@
       <hr>
 {% endif %}
 
-  <style>
-    .styled-table {
-        border-collapse: collapse;
-        margin: 20px 0;
-        font-size: 0.9em;
-        font-family: sans-serif;
-        min-width: 350px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .styled-table thead tr {
-        background-color: #009879;
-        color: #ffffff;
-        text-align: left;
-    }
-
-    .styled-table th,
-    .styled-table td {
-        padding: 12px 15px;
-    }
-
-    .styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
-    }
-
-    .styled-table tbody tr:nth-of-type(even) {
-        background-color: #f3f3f3;
-    }
-
-    .styled-table tbody tr:last-of-type {
-        border-bottom: 2px solid #009879;
-    }
-
-    .styled-table tbody tr.active-row {
-        font-weight: bold;
-        color: #009879;
-    }
-
-    .dp-styled-img {
-      height: 40px;
-      width: 40px;
-    }
-
-  </style>
 
     <style>
     .styled-table {
@@ -233,7 +189,7 @@
 
   </style>
 
-    {% if league_signup %}
+{% if league_signup %}
         <h3>League Members</h3>
         <p> The following users have been already signed up to your league: <p/>
           {% for key, obj in league_members.items %}
