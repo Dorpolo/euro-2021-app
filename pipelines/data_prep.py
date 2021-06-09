@@ -11,6 +11,9 @@ import os
 from pathlib import Path
 from data.teams import teams, groups
 import json
+import data.viz_variables as vis
+import plotly.express as px
+import plotly.offline as opy
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(SECRET_KEY=str,)
@@ -168,6 +171,22 @@ def get_league_member_data(user_id: int):
         return meta
     else:
         return None
+
+
+class EuApi:
+    def __init__(self, user_id):
+        self.TOKEN = env('API_TOKEN')
+        self.PREFIX = 'https://api.statorium.com/api/v1'
+        self.URL = f'{self.PREFIX}/matches/?season_id=40&apikey={self.TOKEN}'
+        self.user_id = user_id
+
+    def extract_data(self):
+        r = requests.get(url=self.URL)
+        data = json.loads(r.text)
+        return data
+
+    def next_match(self):
+        pass
 
 
 class UpdateUserPrediction:
@@ -332,6 +351,117 @@ class UpdateUserPrediction:
             return output
         else:
             return None
+
+class EuMatch:
+    def __init__(self):
+        self.TOKEN = 'bfa132288504de6860c8ae3259d21fa7'
+        self.PREFIX = 'https://api.statorium.com/api/v1'
+        self.URL = f'{self.PREFIX}/matches/?season_id=40&apikey={self.TOKEN}'
+
+    def extract_data(self):
+        r = requests.get(url=self.URL)
+        data = json.loads(r.text)
+        return data
+
+    def all_matches(self):
+        data = self.extract_data()
+        output = []
+        for item in data['calendar']['matchdays']:
+            match_day_id = item['matchdayID']
+            match_round = item['matchdayName']
+            match_day_playoff = item['matchdayPlayoff']
+            match_day_type = item['matchdayType']
+            match_day_start = item['matchdayStart']
+            match_day_end = item['matchdayEnd']
+            for subitem in item['matches']:
+                match_id = subitem['matchID']
+                match_status = subitem['matchStatus']['statusID']
+                match_date = subitem['matchDate']
+                match_hour = subitem['matchTime']
+                home_team = subitem['homeParticipant']['participantName']
+                home_team_id = subitem['homeParticipant']['participantID']
+                home_team_score = subitem['homeParticipant']['score']
+                away_team = subitem['awayParticipant']['participantName']
+                away_team_id = subitem['awayParticipant']['participantID']
+                away_team_score = subitem['awayParticipant']['score']
+                match_label = f"{home_team}-{away_team}"
+                row = [match_day_id, match_round, match_day_playoff, match_day_type, match_day_start,
+                       match_day_end, match_id, match_status, match_date, match_hour, home_team, home_team_id,
+                       home_team_score, away_team, away_team_id, away_team_score, match_label]
+                output.append(row)
+        fields = ['match_day_id', 'match_round', 'match_day_playoff', 'match_day_type', 'match_day_start',
+                  'match_day_end', 'match_id', 'match_status', 'match_date', 'match_hour','home_team',
+                  'home_team_id', 'home_team_score', 'away_team', 'away_team_id', 'away_team_score','match_label']
+        return output, fields
+
+    def next_match(self):
+        df_input = self.all_matches()
+        df = pd.DataFrame(df_input[0], columns=df_input[1])
+        output = df[df.match_status != 0].sort_values(by=['match_date', 'match_hour'])
+        return output.head(1)
+
+    def next_match_logos(self):
+        next_teams = self.next_match()
+        home = teams[next_teams.home_team[0]]['logo']
+        away = teams[next_teams.away_team[0]]['logo']
+        return {next_teams.home_team[0]:home, next_teams.away_team[0]:away}
+
+
+class StatsNextGame(UpdateUserPrediction):
+    def __init__(self, user_id, match_label):
+        super().__init__(user_id)
+        self.match_label = match_label
+
+    def next_match_prediction_df(self):
+        df_input = self.present_predictions()
+        output = {}
+        if df_input[0] is not None:
+            for key, obj in df_input[0].items():
+                df = pd.DataFrame(obj)
+                df.columns = df_input[1]
+                df = df[df.match_label == self.match_label]
+                df['pred_dir'] = np.where(df.pred_score_home > df.pred_score_away,
+                                          'home', np.where(df.pred_score_home < df.pred_score_away, 'away', 'draw'))
+                df_scores = pd.DataFrame(df.groupby(['predicted_score', 'pred_dir'])['game_status'].count()).reset_index().\
+                    rename(columns={
+                            'game_status': 'count',
+                            'predicted_score': 'score',
+                            'pred_dir': 'winner'
+                        }).merge(vis.SCORE_MAP_DF, on='score', how='inner').merge(
+                                vis.SCORE_WINNER_DF,
+                                on='winner',
+                                how='inner')
+                df_fig = df_scores.sort_values(by=['score_rank', 'winner_rank'])
+                output[key] = df_fig
+                return output
+        else:
+            return None
+
+    @staticmethod
+    def next_match_prediction_plot(data):
+        fig = px.bar(data, x='score', y='count', color="winner", template='simple_white', text='count',
+                     title="Score Distribution",  labels={"score": "Score", "count": "Prediction Count", "winner": ""})
+        fig.update_traces(textposition='inside')
+        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT,)
+        div = opy.plot(fig, auto_open=False, output_type='div')
+        return div
+
+    def next_match_prediction_outputs(self):
+        dict_input = self.next_match_prediction_df()
+        if dict_input is not None:
+            output = {key: self.next_match_prediction_plot(data) for key, data in dict_input.items()}
+            return output
+        else:
+            return None
+
+
+
+
+
+
+
+
+
 
 
 

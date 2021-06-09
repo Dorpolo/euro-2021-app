@@ -61,13 +61,15 @@
                   Numbers
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item" href={% url 'predictions' %}>League Table</a></li>
+                  <li><a class="dropdown-item" href={% url 'league_table' %}>League Table</a></li>
                 <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href={% url 'predictions' %}>Your Predictions</a></li>
                   <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href={% url 'predictions' %}>League Stats</a></li>
+                <li><a class="dropdown-item" href={% url 'next_match_stats' %}>Next Match</a></li>
                     <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href={% url 'predictions' %}>Live Match</a></li>
+                   <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href={% url 'predictions' %}>All Games</a></li>
               </ul>
         </li>
           <li class="nav-item">

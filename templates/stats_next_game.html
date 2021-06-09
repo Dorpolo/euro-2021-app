@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>test</title>
+ <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+    <h2>Next Match</h2>
+    <h3>League Predictions</h3>
+    <hr>
+<body>
+<center>
+    {% for key, obj in logos.items %}
+        <style>
+            img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
+            h4.liketext { display:inline }
+        </style>
+        <img class='likeordislike' src='{{ obj }}' width="40" height="40"/><h4 class='liketext'>{{ key }}</h4>
+
+        {% if forloop.counter == 1 %}
+            -
+        {% endif %}
+    {% endfor %}
+</center>
+<center>
+    <hr>
+        <p>Status: {{ status }} <br> {{ real_score }}</p>
+    <hr>
+</center>
+     {% for key, plot in plot_next_match.items %}
+         <p> {{ key }} </p>
+    <center>
+        <body>
+              {% autoescape off %}
+                {{ plot|safe }}
+              {% endautoescape %}
+              <hr>
+          {% endfor  %}
+    </body>
+</center>
+</body>
+{% endblock %}
+

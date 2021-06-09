@@ -16,6 +16,8 @@ from plotly.graph_objs import Scatter
 from django.conf import settings
 import environ
 import os
+import plotly.offline as opy
+
 
 env = environ.Env(SECRET_KEY=str,)
 environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
@@ -233,33 +235,6 @@ class CreateLeagueMemberView(CreateView):
         return render(request, self.template_name, {'form': form})
 
 
-def index(request):
-    returns = np.random.normal(0.01, 0.2, 100)
-    price = 100 * np.exp(returns.cumsum())
-    time = np.arange(100)
-    layout = go.Layout(
-        title="Historic Prices",
-        plot_bgcolor="#FFF",  # Sets background color to white
-        xaxis=dict(
-            title="time",
-            linecolor="#BCCCDC",  # Sets color of X-axis line
-            showgrid=False  # Removes X-axis grid lines
-        ),
-        yaxis=dict(
-            title="price",
-            linecolor="#BCCCDC",  # Sets color of Y-axis line
-            showgrid=False,  # Removes Y-axis grid lines
-        )
-    )
-    fig = go.Figure(
-        data=go.Scatter(x=time, y=price),
-        layout=layout
-    )
-    plt_div = plot(fig, output_type='div', include_plotlyjs=False)
-    context = {'plot_div': plt_div}
-    return render(request, "stats.html", context)
-
-
 class UpdateBetView(UpdateView):
     model = Game
     form_class = BetForm
@@ -320,3 +295,22 @@ class LeagueTableView(TemplateView):
             'league_member_points': league_table_output
         }
         return render(request, self.template_name, context)
+
+
+def plot_index(request):
+    next_match_init = EuMatch()
+    next_match = next_match_init.next_match()
+    match_label = next_match.match_label[0]
+    match_status = 'Fixture' if next_match.match_status[0] == '0' else 'Started'
+    score = f"{next_match.home_team_score[0]}-{next_match.away_team_score[0]}"
+    plot_init = StatsNextGame(request.user.id, match_label)
+    viz_next_match = plot_init.next_match_prediction_outputs()
+    next_match_logos = next_match_init.next_match_logos()
+    context = {
+        'plot_next_match': viz_next_match,
+        'title': match_label,
+        'real_score': score,
+        'logos': next_match_logos,
+        'status': match_status,
+        }
+    return render(request, "stats_next_game.html", context)
