@@ -299,7 +299,8 @@ class UpdateUserPrediction:
                 required_fields = ['nick_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
                                    'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
                                    'real_score_away', 'user_name_id']
-                filtered_df = data[(data.league_name_id == item) & (data.user_name_id == self.user_id)][required_fields]
+                #TODO Add & (data.user_name_id == self.user_id) !!!!
+                filtered_df = data[(data.league_name_id == item)][required_fields]
                 output[item] = filtered_df.values.tolist()
             return output, required_fields
         else:
@@ -405,7 +406,7 @@ class EuMatch:
         next_teams = self.next_match()
         home = teams[next_teams.home_team[0]]['logo']
         away = teams[next_teams.away_team[0]]['logo']
-        return {next_teams.home_team[0]:home, next_teams.away_team[0]:away}
+        return {next_teams.home_team[0]: home, next_teams.away_team[0]:away}
 
 
 class StatsNextGame(UpdateUserPrediction):
@@ -424,10 +425,13 @@ class StatsNextGame(UpdateUserPrediction):
                 df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
                 df['pred_dir'] = np.where(df.pred_score_home > df.pred_score_away,
                                           df.home_team, np.where(df.pred_score_home < df.pred_score_away, df.away_team, 'Draw'))
-                df_scores = pd.DataFrame(df.groupby(['predicted_score', 'pred_dir'])['game_status'].count()).reset_index().\
+                df['predicted_score_alternative'] = np.where(df['pred_dir'] == df.away_team,
+                                                             df['pred_score_away'] + '-' + df['pred_score_home'],
+                                                             df['predicted_score'])
+                df_scores = pd.DataFrame(df.groupby(['predicted_score_alternative', 'pred_dir'])['game_status'].count()).reset_index().\
                     rename(columns={
                             'game_status': 'count',
-                            'predicted_score': 'score',
+                            'predicted_score_alternative': 'score',
                             'pred_dir': 'winner'
                         }).merge(vis.SCORE_MAP_DF, on='score', how='inner')
                 df_fig = df_scores.sort_values(by=['score_rank', 'winner'])

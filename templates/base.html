@@ -17,7 +17,10 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-      <img src="https://api.statorium.com/media/bearleague/bl15689610832514.png" href={% url 'home' %} style="width:60px" style="display:inline-block; "/> &nbsp;
+
+      <a class="navbar-brand" href={% url 'home' %}>
+              <img src="https://api.statorium.com/media/bearleague/bl15689610832514.png" href={% url 'home' %} style="width:60px" style="display:inline-block; "/> &nbsp;
+      </a>
       {% if user.is_authenticated %}
             <a class="navbar-brand" href={% url 'home' %} style="text-align:center"> {{request.user.username}}</a>
       {% endif %}
