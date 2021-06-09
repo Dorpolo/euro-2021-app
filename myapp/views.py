@@ -34,6 +34,7 @@ class HomeView(TemplateView):
         onboarding = user_onboarding(request.user.id)
         bet_id = user_game_bet_id(request.user.id)
         league_table_output = UpdateUserPrediction(request.user.id).league_member_points()
+        league_memberships = get_league_member_id(request.user.id)
         context = {
             'league_members': league_data_output,
             'fixtures': self.get_api_data.main(),
@@ -42,7 +43,8 @@ class HomeView(TemplateView):
             'committed_a_bet': onboarding['bet'],
             'image_uploaded': onboarding['image'],
             'bet_id': bet_id,
-            'league_member_points': league_table_output
+            'league_member_points': league_table_output,
+            'league_memberships': league_memberships
         }
         return render(request, self.template_name, context)
 
@@ -65,16 +67,6 @@ class BaseView(TemplateView):
             'committed_a_bet': onboarding['bet']
         }
         return render(request, self.template_name, context)
-
-
-# def bet_index(request):
-#     form = BetForm()
-#     template_name = 'add_bets.html'
-#     context = {
-#         'form': form,
-#         'fixtures': EuroApi().main()
-#     }
-#     return render(request, template_name, context)
 
 
 class AddBetsView(TemplateView):

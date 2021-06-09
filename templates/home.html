@@ -128,7 +128,12 @@
 {% if committed_a_bet %}
       <h3>Second Thoughts?</h3>
           <li> <a href= {% url 'update_your_bet' bet_id %}>Edit your bet form.</a></li>
-          <li> <a href= {% url 'update_league_member' bet_id %}>Edit your league profile.</a></li>
+          <li>Edit your league profile:
+        <ul>
+          {% for key, obj in league_memberships.items %}
+              <li><a href= {% url 'update_league_member' obj %}>{{ key }}</a></li>
+          {% endfor %}
+        </ul>
       * Available until 06-10-2021 23:59
       <hr>
 {% endif %}

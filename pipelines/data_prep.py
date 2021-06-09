@@ -111,6 +111,18 @@ def user_game_bet_id(user) -> dict:
         return None
 
 
+def get_league_member_id(user) -> dict:
+    data = LeagueMember.objects.filter(user_name_id=user)
+    if len(data) > 0:
+        league_data = list(data.values())
+        output = {}
+        for item in league_data:
+            output[item['league_name_id']] = item['id']
+        return output
+    else:
+        return None
+
+
 def get_user_image(user) -> dict:
     data = UserImage.objects.filter(user_name_id=user)
     if len(data) > 0:
@@ -270,7 +282,6 @@ class UpdateUserPrediction:
                                    'real_score_away', 'user_name_id']
                 filtered_df = data[(data.league_name_id == item) & (data.user_name_id == self.user_id)][required_fields]
                 output[item] = filtered_df.values.tolist()
-                print(required_fields)
             return output, required_fields
         else:
             return None, None
