@@ -261,8 +261,11 @@ class UpdateUserPrediction:
                     df_more_data,
                     on=['game_id'],
                     how='inner')
-        league_member_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name']
-        df_league_member = pd.DataFrame(list(LeagueMember.objects.all().values()))[league_member_fields]
+        league_member_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name', 'created']
+        df_league_member_pre = pd.DataFrame(list(LeagueMember.objects.all().values()))[league_member_fields].\
+            sort_values(by=['user_name_id', 'league_name_id', 'created'], ascending=[True, True, False])
+        df_league_member = df_league_member_pre.groupby(['user_name_id', 'league_name_id']).first().\
+            reset_index().drop(columns='created')
         output = pd.merge(
                     df_main_2,
                     df_league_member,
