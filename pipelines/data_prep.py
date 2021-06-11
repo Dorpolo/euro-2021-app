@@ -299,7 +299,8 @@ class UpdateUserPrediction:
                 required_fields = ['nick_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
                                    'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
                                    'real_score_away', 'user_name_id']
-                filtered_df = data[(data.league_name_id == item) & (data.user_name_id == self.user_id)][required_fields]
+                # & (data.user_name_id == self.user_id)
+                filtered_df = data[(data.league_name_id == item)][required_fields]
                 output[item] = filtered_df.values.tolist()
             return output, required_fields
         else:
@@ -405,7 +406,7 @@ class EuMatch:
         next_teams = self.next_match()
         home = teams[next_teams.home_team[0]]['logo']
         away = teams[next_teams.away_team[0]]['logo']
-        return {next_teams.home_team[0]: home, next_teams.away_team[0]:away}
+        return {next_teams.home_team[0]: home, next_teams.away_team[0]: away}
 
 
 class StatsNextGame(UpdateUserPrediction):
@@ -451,6 +452,20 @@ class StatsNextGame(UpdateUserPrediction):
                     })
                 df_winner_output = df_winner.sort_values(by=['winner_rank'])
                 output[key] = df_winner_output
+            return output
+        else:
+            return None
+
+    def next_match_live_game(self):
+        df_input = self.present_predictions()
+        output = {}
+        if df_input[0] is not None:
+            for key, obj in df_input[0].items():
+                df = pd.DataFrame(obj)
+                df.columns = df_input[1]
+                df = df[df.match_label == self.match_label]
+                df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
+                output[key] = obj
             return output
         else:
             return None
