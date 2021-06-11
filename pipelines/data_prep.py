@@ -398,7 +398,8 @@ class EuMatch:
     def next_match(self):
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
-        output = df[df.match_status != 0].sort_values(by=['match_date', 'match_hour'])
+        output = df[df.match_status != '-1'].sort_values(by=['match_date', 'match_hour'])
+        print(output.head(1))
         return output.head(1)
 
     def next_match_logos(self):
