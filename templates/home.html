@@ -17,6 +17,7 @@
                         img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
                         p.liketext { display:inline }
                     </style>
+                     <center>
                     {% for key, obj in next_match_logos.items %}
                          <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
                          {% if forloop.counter == 1 %} - {% endif %}
@@ -27,6 +28,7 @@
                            {% endif %} <br>
                           Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }}
                       </p>
+                     </center>
 {#                      <p style="color:#DE3163;font-size:14px;">#}
 {#                              {{ next_match.match_date }} {{ next_match.match_hour }} (GMT)#}
 {#                              {{ next_match.match_status }}#}
