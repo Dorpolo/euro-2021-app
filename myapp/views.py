@@ -26,7 +26,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 class HomeView(TemplateView):
     template_name = "home.html"
-    get_api_data = EuroApi()
+    get_api_data = EuMatch()
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -37,10 +37,12 @@ class HomeView(TemplateView):
         bet_id = user_game_bet_id(request.user.id)
         league_table_output = UpdateUserPrediction(request.user.id).league_member_points()
         league_memberships = get_league_member_id(request.user.id)
+        next_match_df = self.get_api_data.next_match()
+        next_match = {key: obj[0] for key, obj in next_match_df.head(1).to_dict().items()}
         context = {
             'league_members': league_data_output,
-            'fixtures': self.get_api_data.main(),
-            'teams': self.get_api_data.get_unique_teams(),
+            'next_match': next_match,
+            'next_match_logos': self.get_api_data.next_match_logos(),
             'league_signup': onboarding['league'],
             'committed_a_bet': onboarding['bet'],
             'image_uploaded': onboarding['image'],

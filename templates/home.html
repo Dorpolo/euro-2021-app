@@ -11,6 +11,29 @@
       <div/>
         <hr>
         {% if committed_a_bet %}
+            <div>
+                <body>
+                     <style>
+                        img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
+                        p.liketext { display:inline }
+                    </style>
+                    {% for key, obj in next_match_logos.items %}
+                         <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
+                         {% if forloop.counter == 1 %} - {% endif %}
+                    {% endfor %}
+                      <p style="color:#1C2833;font-size:12px;">Game Status: {% if next_match.match_status == '-1' %} Live
+                            {% else %}
+                                Fixture ({{ next_match.match_date }} - {{ next_match.match_hour }})
+                           {% endif %} <br>
+                          Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }}
+                      </p>
+{#                      <p style="color:#DE3163;font-size:14px;">#}
+{#                              {{ next_match.match_date }} {{ next_match.match_hour }} (GMT)#}
+{#                              {{ next_match.match_status }}#}
+{#                      </p>#}
+                </body>
+            </div>
+            <hr>
               <h3>Quick Access</h3>
                  <div class="btn-group" role="group" aria-label="Basic mixed styles example">
                     <a href="{% url 'predictions' %}"><button type="button" class="btn btn-outline-dark">Predictions</button></a>

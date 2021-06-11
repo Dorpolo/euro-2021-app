@@ -185,9 +185,6 @@ class EuApi:
         data = json.loads(r.text)
         return data
 
-    def next_match(self):
-        pass
-
 
 class UpdateUserPrediction:
     def __init__(self, user_id):
@@ -321,8 +318,8 @@ class UpdateUserPrediction:
         d = [
             int(x['started'].sum()),
             int((x['started'] * x['points']).sum()),
-            int((x['started'] * x['points']).sum()),
-            int((x['started'] * x['points']).sum()),
+            int((x['started'] * x['is_boom'] * 3).sum()),
+            int((x['started'] * x['is_direction']).sum()),
             round((x['started'] * x['points']).sum()*100/(x['started'] * 3).sum(), 1),
             int((x['started'] * x['is_boom'] * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()),
             int((x['is_live'] * x['points']).sum()),
@@ -364,8 +361,7 @@ class EuMatch:
         self.URL = f'{self.PREFIX}/matches/?season_id=40&apikey={self.TOKEN}'
 
     def extract_data(self):
-        r = requests.get(url=self.URL)
-        data = json.loads(r.text)
+        data = requests.get(url=self.URL).json()
         return data
 
     def all_matches(self):

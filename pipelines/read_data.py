@@ -18,8 +18,9 @@ class EuroApi:
 
     def extract_data(self):
         r = requests.get(url=self.URL)
-        data = json.loads(r.text)
+        data = r.json()
         return data
+
 
     def read_fixtures(self):
         data = self.extract_data()
