@@ -43,11 +43,11 @@
                                   <p class="card-text" style="color:#1C2833;font-size:15px;">
                                       Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
                                       Your Prediction: {{ next_match.user_pred }}
-                                      {% for key, obj in user_game_points.items %}
-                                          {% if obj.next.boom|length > 0 %}
-                                             <br> {{ key }} Boomers: {% for nick in obj.next.boom %} {{ nick }} {% endfor %}
-                                          {% endif %}
-                                      {% endfor %}
+{#                                      {% for key, obj in user_game_points.items %}#}
+{#                                          {% if obj.next.boom|length > 0 %}#}
+{#                                             <br> {{ key }} Boomers: {% for nick in obj.next.boom %} {{ nick }} {% endfor %}#}
+{#                                          {% endif %}#}
+{#                                      {% endfor %}#}
                                   </p>
                                   <button href={% url 'next_match_stats'%} class="btn btn-warning" type="button">Statistics</button>
                             </div>
@@ -80,11 +80,11 @@
                                   <p class="card-text" style="color:#1C2833;font-size:15px;">
                                       Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>
                                       Your Prediction: {{ prev_match.user_pred }}
-                                      {% for key, obj in user_game_points.items %}
-                                          {% if obj.prev.boom|length > 0 %}
-                                             <br> {{ key }} Boomers: {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}
-                                          {% endif %}
-                                      {% endfor %}
+{#                                      {% for key, obj in user_game_points.items %}#}
+{#                                          {% if obj.prev.boom|length > 0 %}#}
+{#                                             <br> {{ key }} Boomers: {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}#}
+{#                                          {% endif %}#}
+{#                                      {% endfor %}#}
                                   </p>
                                   <button href={% url 'next_match_stats'%} class="btn btn-warning" type="button">Statistics</button>
                             </div>
