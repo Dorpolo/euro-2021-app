@@ -12,13 +12,25 @@
     <hr>
 {% if committed_a_bet %}
 
-     <div>
-        <body>
-             <style>
-                img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
-                p.liketext { display:inline }
-            </style>
-
+                 <div>
+                <body>
+                     <style>
+                        img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
+                        p.liketext { display:inline }
+                    </style>
+{#              <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">#}
+{#                  <div class="carousel-inner">#}
+{#                    <div class="carousel-item active">#}
+{#                      <img src="..." class="d-block w-100" alt="...">#}
+{#                    </div>#}
+{#                    <div class="carousel-item">#}
+{#                      <img src="..." class="d-block w-100" alt="...">#}
+{#                    </div>#}
+{#                    <div class="carousel-item">#}
+{#                      <img src="..." class="d-block w-100" alt="...">#}
+{#                    </div>#}
+{#                  </div>#}
+{#            </div>#}
              <center>
              <div class="card" style="width: 17rem;">
               <div class="card-body">
@@ -42,12 +54,17 @@
                       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                           <p class="card-text" style="color:#1C2833;font-size:15px;">
                               Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
-                              Your Prediction: {{ next_match.user_pred }}
-{#                                      {% for key, obj in user_game_points.items %}#}
-{#                                          {% if obj.next.boom|length > 0 %}#}
-{#                                             <br> {{ key }} Boomers: {% for nick in obj.next.boom %} {{ nick }} {% endfor %}#}
-{#                                          {% endif %}#}
-{#                                      {% endfor %}#}
+                              Your Prediction: {{ next_match.user_pred }} <br>
+{#                              {% if boom_logos.next.items|length > 0 %}#}
+{#                                    Boomers: </br>#}
+{#                              {% endif %}#}
+{#                              {% for key, val in boom_logos.next.items %}#}
+{#                                  {{ key }} -#}
+{#                                    {% for item in val %}#}
+{#                                        <img class="dp2-styled-img" src="{{ item }}">#}
+{#                                    {% endfor %}#}
+{#                                  <br>#}
+{#                              {% endfor %}#}
                           </p>
                        <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
                     </div>
@@ -79,59 +96,21 @@
                       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                           <p class="card-text" style="color:#1C2833;font-size:15px;">
                               Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>
-                              Your Prediction: {{ prev_match.user_pred }}
-{#                                      {% for key, obj in user_game_points.items %}#}
-{#                                          {% if obj.prev.boom|length > 0 %}#}
-{#                                             <br> {{ key }} Boomers: {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}#}
-{#                                          {% endif %}#}
-{#                                      {% endfor %}#}
+                              Your Prediction: {{ prev_match.user_pred }} <br>
+{#                              {% if boom_logos.prev.items|length > 0 %} Boomers: <br>{% endif %}#}
+{#                              {% for key, val in boom_logos.prev.items %}#}
+{#                                  {{ key }} -#}
+{#                                    {% for item in val %}#}
+{#                                        <img class="dp2-styled-img" src="{{ item }}">#}
+{#                                    {% endfor %}#}
+{#                                  <br>#}
+{#                              {% endfor %}#}
                           </p>
                           <a href="{% url 'prev_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
                     </div>
 
                 </div>
              </div>
-{#                    {% for key, obj in prev_match_logos.items %}#}
-{#                         <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>#}
-{#                         {% if forloop.counter == 1 %} - {% endif %}#}
-{#                    {% endfor %}#}
-{#                      <p style="color:#1C2833;font-size:12px;">Game Status: {% if prev_match.match_status == '-1' %} Live#}
-{#                            {% elif prev_match.match_status == '1'%}#}
-{#                              Finished#}
-{#                            {% else %}#}
-{#                                Fixture ({{ prev_match.match_date }}; {{ prev_match.match_hour }} GMT)#}
-{#                       {% endif %} <br>#}
-{#                          Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>#}
-{#                          Your Prediction: {{ prev_match.user_pred }}#}
-{##}
-{#                      <br>#}
-{#                          {% for key, obj in user_game_points.items %}#}
-{#                              {% if obj.prev.boom|length > 0 %}#}
-{#                                 <br> {{ key }} Boomers: {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}#}
-{#                              {% endif %}#}
-{#                          {% endfor %}#}
-{#                      </p>#}
-{#                     <hr>#}
-{#                        {% for key, obj in prev_match_logos.items %}#}
-{#                         <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>#}
-{#                         {% if forloop.counter == 1 %} - {% endif %}#}
-{#                    {% endfor %}#}
-{#                      <p style="color:#1C2833;font-size:12px;">Game Status: {% if prev_match.match_status == '-1' %} Live#}
-{#                            {% elif prev_match.match_status == '1'%}#}
-{#                              Finished#}
-{#                            {% else %}#}
-{#                                Fixture ({{ prev_match.match_date }}; {{ prev_match.match_hour }} GMT)#}
-{#                       {% endif %} <br>#}
-{#                          Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>#}
-{#                          Your Prediction: {{ prev_match.user_pred }}#}
-{##}
-{#                      <br>#}
-{#                          {% for key, obj in user_game_points.items %}#}
-{#                              {% if obj.prev.boom|length > 0 %}#}
-{#                               <br> {{ key }} Boomers:  {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}#}
-{#                              {% endif %}#}
-{#                          {% endfor %}#}
-{#                      </p>#}
                  </center>
                 </body>
             </div>
@@ -308,6 +287,12 @@
     .dp-styled-img {
       height: 35px;
       width: 35px;
+      border-radius: 50%;
+    }
+
+    .dp2-styled-img {
+      height: 30px;
+      width: 30px;
       border-radius: 50%;
     }
 
