@@ -53,8 +53,6 @@ class HomeView(TemplateView):
             boom_logos['prev'][key] = logos_prev
             boom_logos['next'][key] = logos_next
 
-        print(boom_logos)
-
         context = {
             'league_members': league_data_output,
             'next_match': presented_data[1],

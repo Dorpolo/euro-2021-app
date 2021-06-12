@@ -482,7 +482,7 @@ class EuMatch:
         # output = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
-        output = df.sort_values(by=['match_date', 'match_hour'])
+        output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
         # return output.tail(1).reset_index()
         return output.head(2).tail(1).reset_index()
 
