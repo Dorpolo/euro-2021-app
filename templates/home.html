@@ -26,7 +26,7 @@
                             {% elif next_match.match_status == '1'%}
                               Finished
                             {% else %}
-                                Fixture ({{ next_match.match_date }} - {{ next_match.match_hour }})
+                                Fixture ({{ next_match.match_date }}; {{ next_match.match_hour }} GMT)
                        {% endif %} <br>
                           Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }}
                       </p>
@@ -154,14 +154,14 @@
   <hr>
 {% if committed_a_bet %}
       <h3>Second Thoughts?</h3>
-          <li> <a href= {% url 'update_your_bet' bet_id %}>Edit your bet form.</a></li>
+{#          <li> <a href= {% url 'update_your_bet' bet_id %}>Edit your bet form.</a></li>#}
           <li>Edit your league profile:
         <ul>
           {% for key, obj in league_memberships.items %}
               <li><a href= {% url 'update_league_member' obj %}>{{ key }}</a></li>
           {% endfor %}
         </ul>
-      * Available until 06-10-2021 23:59
+{#      * Available until 06-10-2021 23:59#}
       <hr>
 {% endif %}
 

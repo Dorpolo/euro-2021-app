@@ -38,7 +38,8 @@ class HomeView(TemplateView):
         league_table_output = UpdateUserPrediction(request.user.id).league_member_points()
         league_memberships = get_league_member_id(request.user.id)
         next_match_df = self.get_api_data.next_match()
-        next_match = {key: obj[0] for key, obj in next_match_df.head(1).to_dict().items()}
+        ind = list(next_match_df.head(1).index)[0]
+        next_match = {key: obj[ind] for key, obj in next_match_df.head(1).to_dict().items()}
         context = {
             'league_members': league_data_output,
             'next_match': next_match,
