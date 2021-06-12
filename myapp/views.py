@@ -33,23 +33,27 @@ class HomeView(TemplateView):
             league_data_output = get_league_member_data(request.user.id)
         else:
             league_data_output = None
+        user_pred_init = UpdateUserPrediction(request.user.id)
         onboarding = user_onboarding(request.user.id)
         bet_id = user_game_bet_id(request.user.id)
-        league_table_output = UpdateUserPrediction(request.user.id).league_member_points()
+        league_table_output = user_pred_init.league_member_points()
         league_memberships = get_league_member_id(request.user.id)
-        next_match_df = self.get_api_data.next_match()
-        ind = list(next_match_df.head(1).index)[0]
-        next_match = {key: obj[ind] for key, obj in next_match_df.head(1).to_dict().items()}
+
+        presented_data = user_pred_init.home_screen_match_relevant_data()
+
         context = {
             'league_members': league_data_output,
-            'next_match': next_match,
+            'next_match': presented_data[1],
+            'prev_match': presented_data[0],
             'next_match_logos': self.get_api_data.next_match_logos(),
+            'prev_match_logos': self.get_api_data.prev_match_logos(),
             'league_signup': onboarding['league'],
             'committed_a_bet': onboarding['bet'],
             'image_uploaded': onboarding['image'],
             'bet_id': bet_id,
             'league_member_points': league_table_output,
-            'league_memberships': league_memberships
+            'league_memberships': league_memberships,
+            'user_game_points': presented_data[2],
         }
         return render(request, self.template_name, context)
 

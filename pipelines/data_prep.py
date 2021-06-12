@@ -173,19 +173,6 @@ def get_league_member_data(user_id: int):
         return None
 
 
-class EuApi:
-    def __init__(self, user_id):
-        self.TOKEN = env('API_TOKEN')
-        self.PREFIX = 'https://api.statorium.com/api/v1'
-        self.URL = f'{self.PREFIX}/matches/?season_id=40&apikey={self.TOKEN}'
-        self.user_id = user_id
-
-    def extract_data(self):
-        r = requests.get(url=self.URL)
-        data = json.loads(r.text)
-        return data
-
-
 class UpdateUserPrediction:
     def __init__(self, user_id):
         self.TOKEN = env('API_TOKEN')
@@ -295,6 +282,86 @@ class UpdateUserPrediction:
         leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
         if len(leagues) > 0:
             output = {}
+            required_fields = ['nick_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
+                               'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
+                               'real_score_away', 'user_name_id']
+            for item in leagues:
+                # & (data.user_name_id == self.user_id)
+                filtered_df = data[(data.league_name_id == item)][required_fields]
+                filtered_df['status_rank'] = np.where(filtered_df.game_status == 'Finished', 1, 0)
+                final_df = filtered_df.sort_values(by=['status_rank', 'date', 'hour']).drop(columns='status_rank')
+                output[item] = final_df.values.tolist()
+            return output, required_fields
+        else:
+            return None, None
+
+    @staticmethod
+    def add_game_attributes(data, item, game_label):
+        x = data[(data.league_name_id == item) & (data.match_label == game_label)]
+        x['pred_dir'] = np.where(x.pred_score_home > x.pred_score_away, 'home',
+                                 np.where(x.pred_score_home < x.pred_score_away, 'away', 'draw'))
+        x['real_dir'] = np.where(x.real_score_home > x.real_score_away,
+                                 'home', np.where(x.real_score_home < x.real_score_away, 'away', 'draw'))
+        x['is_direction'] = np.where(x.pred_dir == x.real_dir, 1, 0)
+        x['is_boom'] = np.where((x.pred_score_home == x.real_score_home) & (x.pred_score_away == x.real_score_away), 1, 0)
+        return x
+
+    def user_game_points(self):
+        data = self.data_enrichment()
+        leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
+        next_game = EuMatch().next_match().match_label[0]
+        prev_game = EuMatch().prev_match().match_label[0]
+        if len(leagues) > 0:
+            output = {}
+            for item in leagues:
+                x = {
+                    'next': self.add_game_attributes(data, item, next_game),
+                    'prev': self.add_game_attributes(data, item, prev_game)
+                }
+                boomers = {key: list(val[val.is_boom == 1].nick_name) for key, val in x.items()}
+                winners = {key: list(np.setdiff1d(list(val[val.is_direction == 1].nick_name), boomers[key])) for key, val in x.items()}
+
+                user_pred_df = x['next'].loc[x['next'].user_name_id == self.user_id]
+                user_nick = user_pred_df.nick_name.values[0]
+                user_pred = {key: value.predicted_score.values[0] for key, value in x.items()}
+                user_score = {key: 'Boom' if user_nick in value else '' for key, value in boomers.items()}
+
+                output[item] = {'boom': boomers, 'winner': winners, 'user_pred': user_pred, 'user_score': user_score}
+            reshaped_output = {key: {
+                            'next': {
+                                'boom': value['boom']['next'],
+                                'winner': value['winner']['next'],
+                                'user_pred': value['user_pred']['next'],
+                                'user_score': value['user_score']['next']
+                            },
+                            'prev': {
+                                'boom': value['boom']['prev'],
+                                'winner': value['winner']['prev'],
+                                'user_pred': value['user_pred']['prev'],
+                                'user_score': value['user_score']['prev']
+                           }
+                        } for key, value in output.items()}
+            return reshaped_output
+        else:
+            return None
+
+    def home_screen_match_relevant_data(self):
+        init_match = EuMatch()
+        next_match_df = init_match.next_match()
+        prev_match_df = init_match.prev_match()
+        next_match = {key: obj[0] for key, obj in next_match_df.head(1).to_dict().items()}
+        prev_match = {key: obj[0] for key, obj in prev_match_df.head(1).to_dict().items()}
+        user_data = self.user_game_points()
+        some_league = list(user_data.keys())[0]
+        next_match['user_pred'] = user_data[some_league]['next']['user_pred']
+        prev_match['user_pred'] = user_data[some_league]['prev']['user_pred']
+        return prev_match, next_match, user_data
+
+    def user_current_prediction(self):
+        data = self.data_enrichment()
+        leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
+        if len(leagues) > 0:
+            output = {}
             for item in leagues:
                 required_fields = ['nick_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
                                    'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
@@ -394,7 +461,7 @@ class EuMatch:
                 output.append(row)
         fields = ['match_day_id', 'match_round', 'match_day_playoff', 'match_day_type', 'match_day_start',
                   'match_day_end', 'match_id', 'match_status', 'match_date', 'match_hour', 'home_team',
-                  'home_team_id', 'home_team_score', 'away_team', 'away_team_id', 'away_team_score','match_label']
+                  'home_team_id', 'home_team_score', 'away_team', 'away_team_id', 'away_team_score', 'match_label']
         return output, fields
 
     def next_match(self):
@@ -403,8 +470,20 @@ class EuMatch:
         output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
         return output.head(1).reset_index()
 
+    def prev_match(self):
+        df_input = self.all_matches()
+        df = pd.DataFrame(df_input[0], columns=df_input[1])
+        output = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
+        return output.tail(1).reset_index()
+
     def next_match_logos(self):
         next_teams = self.next_match()
+        home = teams[next_teams.home_team[0]]['logo']
+        away = teams[next_teams.away_team[0]]['logo']
+        return {next_teams.home_team[0]: home, next_teams.away_team[0]: away}
+
+    def prev_match_logos(self):
+        next_teams = self.prev_match()
         home = teams[next_teams.home_team[0]]['logo']
         away = teams[next_teams.away_team[0]]['logo']
         return {next_teams.home_team[0]: home, next_teams.away_team[0]: away}
