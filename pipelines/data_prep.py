@@ -361,7 +361,7 @@ class UpdateUserPrediction:
             prev_match['user_pred'] = user_data[some_league]['prev']['user_pred']
             return prev_match, next_match, user_data
         else:
-            return None
+            return None, None, None
 
     def user_current_prediction(self):
         data = self.data_enrichment()
@@ -483,16 +483,16 @@ class EuMatch:
         return output.tail(1).reset_index()
 
     def next_match_logos(self):
-        next_teams = self.next_match()
-        home = teams[next_teams.home_team[0]]['logo']
-        away = teams[next_teams.away_team[0]]['logo']
-        return {next_teams.home_team[0]: home, next_teams.away_team[0]: away}
+        teams_data = self.next_match()
+        home = teams[teams_data.home_team[0]]['logo']
+        away = teams[teams_data.away_team[0]]['logo']
+        return {teams_data.home_team[0]: home, teams_data.away_team[0]: away}
 
     def prev_match_logos(self):
-        next_teams = self.prev_match()
-        home = teams[next_teams.home_team[0]]['logo']
-        away = teams[next_teams.away_team[0]]['logo']
-        return {next_teams.home_team[0]: home, next_teams.away_team[0]: away}
+        teams_data = self.prev_match()
+        home = teams[teams_data.home_team[0]]['logo']
+        away = teams[teams_data.away_team[0]]['logo']
+        return {teams_data.home_team[0]: home, teams_data.away_team[0]: away}
 
 
 class StatsNextGame(UpdateUserPrediction):

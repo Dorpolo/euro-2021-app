@@ -38,9 +38,7 @@ class HomeView(TemplateView):
         bet_id = user_game_bet_id(request.user.id)
         league_table_output = user_pred_init.league_member_points()
         league_memberships = get_league_member_id(request.user.id)
-
         presented_data = user_pred_init.home_screen_match_relevant_data()
-
         context = {
             'league_members': league_data_output,
             'next_match': presented_data[1],
@@ -324,14 +322,14 @@ def plot_index(request):
 
 
 def plot_index_last_match(request):
-    next_match_init = EuMatch()
-    prev_match = next_match_init.prev_match()
+    match_init = EuMatch()
+    prev_match = match_init.prev_match()
     match_label = prev_match.match_label[0]
-    match_status = 'Fixture' if prev_match.match_status[0] == '0' else 'Started'
+    match_status = 'Fixture' if prev_match.match_status[0] == '0' else 'Live' if prev_match.match_status[0] == '-1' else 'Finished'
     score = f"{prev_match.home_team_score[0]}-{prev_match.away_team_score[0]}"
     plot_init = StatsNextGame(request.user.id, match_label)
     viz_prev_match = plot_init.match_prediction_outputs()
-    next_match_logos = next_match_init.next_match_logos()
+    next_match_logos = match_init.prev_match_logos()
     context = {
         'plot_next_match': viz_prev_match,
         'title': match_label,
