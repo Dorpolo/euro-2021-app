@@ -321,11 +321,14 @@ class UpdateUserPrediction:
                 boomers = {key: list(val[val.is_boom == 1].nick_name) for key, val in x.items()}
                 winners = {key: list(np.setdiff1d(list(val[val.is_direction == 1].nick_name), boomers[key])) for key, val in x.items()}
 
-                user_pred_df = x['next'].loc[x['next'].user_name_id == self.user_id]
-                user_nick = user_pred_df.nick_name.values[0]
-                user_pred = {key: value.predicted_score.values[0] for key, value in x.items()}
+                user_pred_df_next = x['next'].loc[x['next'].user_name_id == self.user_id]
+                user_pred_df_prev = x['prev'].loc[x['prev'].user_name_id == self.user_id]
+                user_nick = user_pred_df_next.nick_name.values[0]
+                user_pred = {
+                    'next': user_pred_df_next.predicted_score.values[0],
+                    'prev': user_pred_df_prev.predicted_score.values[0]
+                    }
                 user_score = {key: 'Boom' if user_nick in value else '' for key, value in boomers.items()}
-
                 output[item] = {'boom': boomers, 'winner': winners, 'user_pred': user_pred, 'user_score': user_score}
             reshaped_output = {key: {
                             'next': {

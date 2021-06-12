@@ -18,56 +18,127 @@
                         img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
                         p.liketext { display:inline }
                     </style>
+
                      <center>
-                    {% for key, obj in next_match_logos.items %}
-                         <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
-                         {% if forloop.counter == 1 %} - {% endif %}
-                    {% endfor %}
-                      <p style="color:#1C2833;font-size:12px;">Game Status: {% if next_match.match_status == '-1' %} Live
-                            {% elif next_match.match_status == '1'%}
-                              Finished
-                            {% else %}
-                                Fixture ({{ next_match.match_date }}; {{ next_match.match_hour }} GMT)
-                       {% endif %} <br>
-                          Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
-                          Your Prediction: {{ next_match.user_pred }}
+                     <div class="card" style="width: 16rem;">
+                      <div class="card-body">
+                        <h5 class="card-title">
+                            {% for key, obj in next_match_logos.items %}
+                             <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
+                             {% if forloop.counter == 1 %} - {% endif %}
+                             {% endfor %}
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                             <p style="color:#1C2833;font-size:15px;">
+                                 {% if next_match.match_status == '-1' %}
+                                     Live
+                                 {% elif next_match.match_status == '1'%}
+                                     Finished
+                                 {% else %}
+                                    Fixture ({{ next_match.match_date }}; {{ next_match.match_hour }} GMT)
+                                 {% endif %}
+                             </p>
+                        </h6>
+                              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                  <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                      Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
+                                      Your Prediction: {{ next_match.user_pred }}
+                                      {% for key, obj in user_game_points.items %}
+                                          {% if obj.next.boom|length > 0 %}
+                                             <br> {{ key }} Boomers: {% for nick in obj.next.boom %} {{ nick }} {% endfor %}
+                                          {% endif %}
+                                      {% endfor %}
+                                  </p>
+                                  <button href={% url 'next_match_stats'%} class="btn btn-warning" type="button">Statistics</button>
+                            </div>
 
-                      <br>
-                          {% for key, obj in user_game_points.items %}
-                              {% if obj.next.boom|length > 0 %}
-                                 <br> {{ key }} Boomers: {% for nick in obj.next.boom %} {{ nick }} {% endfor %}<br>
-                              {% endif %}
-                          {% endfor %}
-                      </p>
+                        </div>
+                     </div>
+
                      <hr>
-                        {% for key, obj in prev_match_logos.items %}
-                         <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
-                         {% if forloop.counter == 1 %} - {% endif %}
-                    {% endfor %}
-                      <p style="color:#1C2833;font-size:12px;">Game Status: {% if prev_match.match_status == '-1' %} Live
-                            {% elif prev_match.match_status == '1'%}
-                              Finished
-                            {% else %}
-                                Fixture ({{ prev_match.match_date }}; {{ prev_match.match_hour }} GMT)
-                       {% endif %} <br>
-                          Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>
-                          Your Prediction: {{ prev_match.user_pred }}
 
-                      <br>
-                          {% for key, obj in user_game_points.items %}
-                              {% if obj.prev.boom|length > 0 %}
-                               <br>  {{ key }} Boomers:  {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}<br>
-                              {% endif %}
-                          {% endfor %}
-                      </p>
+                 <div class="card" style="width: 16rem;">
+                      <div class="card-body">
+                        <h5 class="card-title">
+                            {% for key, obj in prev_match_logos.items %}
+                             <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
+                             {% if forloop.counter == 1 %} - {% endif %}
+                             {% endfor %}
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                             <p style="color:#1C2833;font-size:15px;">
+                                 {% if prev_match.match_status == '-1' %}
+                                     Live
+                                 {% elif prev_match.match_status == '1'%}
+                                     Finished
+                                 {% else %}
+                                    Fixture ({{ prev_match.match_date }}; {{ prev_match.match_hour }} GMT)
+                                 {% endif %}
+                             </p>
+                        </h6>
+                              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                  <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                      Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>
+                                      Your Prediction: {{ prev_match.user_pred }}
+                                      {% for key, obj in user_game_points.items %}
+                                          {% if obj.prev.boom|length > 0 %}
+                                             <br> {{ key }} Boomers: {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}
+                                          {% endif %}
+                                      {% endfor %}
+                                  </p>
+                                  <button href={% url 'next_match_stats'%} class="btn btn-warning" type="button">Statistics</button>
+                            </div>
 
+                        </div>
+                     </div>
+{#                    {% for key, obj in prev_match_logos.items %}#}
+{#                         <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>#}
+{#                         {% if forloop.counter == 1 %} - {% endif %}#}
+{#                    {% endfor %}#}
+{#                      <p style="color:#1C2833;font-size:12px;">Game Status: {% if prev_match.match_status == '-1' %} Live#}
+{#                            {% elif prev_match.match_status == '1'%}#}
+{#                              Finished#}
+{#                            {% else %}#}
+{#                                Fixture ({{ prev_match.match_date }}; {{ prev_match.match_hour }} GMT)#}
+{#                       {% endif %} <br>#}
+{#                          Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>#}
+{#                          Your Prediction: {{ prev_match.user_pred }}#}
+{##}
+{#                      <br>#}
+{#                          {% for key, obj in user_game_points.items %}#}
+{#                              {% if obj.prev.boom|length > 0 %}#}
+{#                                 <br> {{ key }} Boomers: {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}#}
+{#                              {% endif %}#}
+{#                          {% endfor %}#}
+{#                      </p>#}
+{#                     <hr>#}
+{#                        {% for key, obj in prev_match_logos.items %}#}
+{#                         <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>#}
+{#                         {% if forloop.counter == 1 %} - {% endif %}#}
+{#                    {% endfor %}#}
+{#                      <p style="color:#1C2833;font-size:12px;">Game Status: {% if prev_match.match_status == '-1' %} Live#}
+{#                            {% elif prev_match.match_status == '1'%}#}
+{#                              Finished#}
+{#                            {% else %}#}
+{#                                Fixture ({{ prev_match.match_date }}; {{ prev_match.match_hour }} GMT)#}
+{#                       {% endif %} <br>#}
+{#                          Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>#}
+{#                          Your Prediction: {{ prev_match.user_pred }}#}
+{##}
+{#                      <br>#}
+{#                          {% for key, obj in user_game_points.items %}#}
+{#                              {% if obj.prev.boom|length > 0 %}#}
+{#                               <br> {{ key }} Boomers:  {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}#}
+{#                              {% endif %}#}
+{#                          {% endfor %}#}
+{#                      </p>#}
                  </center>
                 </body>
             </div>
             <hr>
               <h3>Quick Access</h3>
                  <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                    <a href="{% url 'predictions' %}"><button type="button" class="btn btn-outline-dark">Predictions</button></a>
+                    <a href="{% url 'predictions' %}"><button type="button" class="btn btn-dark">All Predictions</button></a>
                     <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-outline-dark">Next Match</button></a>
     </div>
             <hr>
