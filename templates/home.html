@@ -33,7 +33,7 @@
                           Your Prediction: {{ next_match.user_pred }}
                           {% for key, obj in user_game_points.items %}
                               {% if obj.next.boom|length > 0 %}
-                                 {{ key }} Boomers: {{ obj.next.boom}} {% for nick in obj.next.boom %} {{ nick }} {% endfor %}<br>
+                                 <br> {{ key }} Boomers: {% for nick in obj.next.boom %} {{ nick }} {% endfor %}<br>
                               {% endif %}
                           {% endfor %}
                       </p>
@@ -54,7 +54,7 @@
                       <br>
                           {% for key, obj in user_game_points.items %}
                               {% if obj.prev.boom|length > 0 %}
-                                 {{ key }} Boomers: {{ obj.prev.boom}} {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}<br>
+                               <br>  {{ key }} Boomers:  {% for nick in obj.prev.boom %} {{ nick }} {% endfor %}<br>
                               {% endif %}
                           {% endfor %}
                       </p>
