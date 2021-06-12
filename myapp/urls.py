@@ -17,5 +17,6 @@ urlpatterns = [
     path('league-table/', views.LeagueTableView.as_view(), name='league_table'),
     path('update-league-member/edit/<int:pk>', views.UpdateLeagueMember.as_view(), name='update_league_member'),
     path('numbers-next-match/', views.plot_index, name='next_match_stats'),
+    path('numbers-last-match/', views.plot_index_last_match, name='prev_match_stats'),
 ]
 

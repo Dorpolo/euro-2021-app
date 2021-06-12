@@ -311,7 +311,7 @@ def plot_index(request):
     match_status = 'Fixture' if next_match.match_status[0] == '0' else 'Started'
     score = f"{next_match.home_team_score[0]}-{next_match.away_team_score[0]}"
     plot_init = StatsNextGame(request.user.id, match_label)
-    viz_next_match = plot_init.next_match_prediction_outputs()
+    viz_next_match = plot_init.match_prediction_outputs()
     next_match_logos = next_match_init.next_match_logos()
     context = {
         'plot_next_match': viz_next_match,
@@ -321,3 +321,22 @@ def plot_index(request):
         'status': match_status,
         }
     return render(request, "stats_next_game.html", context)
+
+
+def plot_index_last_match(request):
+    next_match_init = EuMatch()
+    prev_match = next_match_init.prev_match()
+    match_label = prev_match.match_label[0]
+    match_status = 'Fixture' if prev_match.match_status[0] == '0' else 'Started'
+    score = f"{prev_match.home_team_score[0]}-{prev_match.away_team_score[0]}"
+    plot_init = StatsNextGame(request.user.id, match_label)
+    viz_prev_match = plot_init.match_prediction_outputs()
+    next_match_logos = next_match_init.next_match_logos()
+    context = {
+        'plot_next_match': viz_prev_match,
+        'title': match_label,
+        'real_score': score,
+        'logos': next_match_logos,
+        'status': match_status,
+        }
+    return render(request, "stats_prev_game.html", context)

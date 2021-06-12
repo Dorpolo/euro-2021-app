@@ -355,10 +355,13 @@ class UpdateUserPrediction:
         next_match = {key: obj[0] for key, obj in next_match_df.head(1).to_dict().items()}
         prev_match = {key: obj[0] for key, obj in prev_match_df.head(1).to_dict().items()}
         user_data = self.user_game_points()
-        some_league = list(user_data.keys())[0]
-        next_match['user_pred'] = user_data[some_league]['next']['user_pred']
-        prev_match['user_pred'] = user_data[some_league]['prev']['user_pred']
-        return prev_match, next_match, user_data
+        if isinstance(user_data, dict):
+            some_league = list(user_data.keys())[0]
+            next_match['user_pred'] = user_data[some_league]['next']['user_pred']
+            prev_match['user_pred'] = user_data[some_league]['prev']['user_pred']
+            return prev_match, next_match, user_data
+        else:
+            return None
 
     def user_current_prediction(self):
         data = self.data_enrichment()
@@ -497,7 +500,7 @@ class StatsNextGame(UpdateUserPrediction):
         super().__init__(user_id)
         self.match_label = match_label
 
-    def next_match_prediction_df(self):
+    def match_prediction_df(self):
         df_input = self.present_predictions()
         output = {}
         if df_input[0] is not None:
@@ -523,23 +526,29 @@ class StatsNextGame(UpdateUserPrediction):
         else:
             return None
 
-    def next_match_winner_df(self):
+    def match_winner_df(self):
         df_input = self.present_predictions()
         output = {}
         if df_input[0] is not None:
             for key, obj in df_input[0].items():
-                df_winner = pd.DataFrame(obj.groupby(['pred_dir'])['game_status'].count()).\
+                df = pd.DataFrame(obj)
+                df.columns = df_input[1]
+                df = df[df.match_label == self.match_label]
+                df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
+                df['pred_dir'] = np.where(df.pred_score_home > df.pred_score_away,
+                                          df.home_team, np.where(df.pred_score_home < df.pred_score_away, df.away_team, 'Draw'))
+                df_winner = pd.DataFrame(df.groupby(['pred_dir'])['game_status'].count()).\
                     reset_index().rename(columns={
                         'game_status': 'count',
                         'pred_dir': 'winner'
                     })
-                df_winner_output = df_winner.sort_values(by=['winner_rank'])
+                df_winner_output = df_winner
                 output[key] = df_winner_output
             return output
         else:
             return None
 
-    def next_match_live_game(self):
+    def match_live_game(self):
         df_input = self.present_predictions()
         output = {}
         if df_input[0] is not None:
@@ -554,7 +563,7 @@ class StatsNextGame(UpdateUserPrediction):
             return None
 
     @staticmethod
-    def next_match_prediction_plot(data):
+    def match_prediction_plot(data):
         fig = px.bar(data, x='score', y='count', color="winner", template='simple_white', text='count',
                      title="Score Distribution",  labels={"score": "Score", "count": "Prediction Count", "winner": ""})
         fig.update_traces(textposition='inside')
@@ -563,7 +572,7 @@ class StatsNextGame(UpdateUserPrediction):
         return div
 
     @staticmethod
-    def next_match_winner_plot(data):
+    def match_winner_plot(data):
         fig = px.pie(data, values='count', names='winner', title='Predicted Winner')
         fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT,)
         div = opy.plot(fig, auto_open=False, output_type='div')
@@ -577,12 +586,12 @@ class StatsNextGame(UpdateUserPrediction):
                 new_output[i[0]] = [i[1], j[1]]
         return new_output
 
-    def next_match_prediction_outputs(self):
-        dict_score = self.next_match_prediction_df()
-        dict_winner = self.next_match_prediction_df()
+    def match_prediction_outputs(self):
+        dict_score = self.match_prediction_df()
+        dict_winner = self.match_winner_df()
         if dict_score is not None:
-            output_score = {key: self.next_match_prediction_plot(data) for key, data in dict_score.items()}
-            output_winner = {key: self.next_match_winner_plot(data) for key, data in dict_winner.items()}
+            output_score = {key: self.match_prediction_plot(data) for key, data in dict_score.items()}
+            output_winner = {key: self.match_winner_plot(data) for key, data in dict_winner.items()}
             return self.merge_dicts(output_score, output_winner)
         else:
             return None
