@@ -390,7 +390,7 @@ class UpdateUserPrediction:
         d = [
             int(x['started'].sum()),
             int((x['started'] * x['points']).sum()),
-            int((x['started'] * x['is_boom'] * 3).sum()),
+            int((x['started'] * x['is_boom']).sum()),
             int((x['started'] * x['is_direction']).sum()),
             round((x['started'] * x['points']).sum()*100/(x['started'] * 3).sum(), 1),
             int((x['started'] * x['is_boom'] * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()),
