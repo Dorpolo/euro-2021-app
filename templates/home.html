@@ -31,6 +31,8 @@
                        {% endif %} <br>
                           Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
                           Your Prediction: {{ next_match.user_pred }}
+
+                      <br>
                           {% for key, obj in user_game_points.items %}
                               {% if obj.next.boom|length > 0 %}
                                  <br> {{ key }} Boomers: {% for nick in obj.next.boom %} {{ nick }} {% endfor %}<br>
