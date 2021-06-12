@@ -301,7 +301,9 @@ class UpdateUserPrediction:
                                    'real_score_away', 'user_name_id']
                 # & (data.user_name_id == self.user_id)
                 filtered_df = data[(data.league_name_id == item)][required_fields]
-                output[item] = filtered_df.values.tolist()
+                filtered_df['status_rank'] = np.where(filtered_df.game_status == 'Finished', 1, 0)
+                final_df = filtered_df.sort_values(by=['status_rank', 'date', 'hour']).drop(columns='status_rank')
+                output[item] = final_df.values.tolist()
             return output, required_fields
         else:
             return None, None
