@@ -13,11 +13,12 @@ urlpatterns = [
     path('join-a-league/', views.CreateLeagueMemberView.as_view(), name='create_league_member'),
     path('league-terms/', views.TermsView.as_view(), name='terms'),
     path('add-your-image/', views.UserImageView.as_view(), name='add_image'),
-    path('match-predictions/', views.ScoreView.as_view(), name='predictions'),
+    path('match-predictions/', views.AllPredictionsView.as_view(), name='predictions' ),
     path('league-table/', views.LeagueTableView.as_view(), name='league_table'),
     path('update-league-member/edit/<int:pk>', views.UpdateLeagueMember.as_view(), name='update_league_member'),
     path('numbers-next-match/', views.plot_index, name='next_match_stats'),
     path('numbers-last-match/', views.plot_index_last_match, name='prev_match_stats'),
     path('top-players/', views.plot_top_players, name='top_players'),
+    path('my-predictions/', views.MyPredictionsView.as_view(), name='my_predictions'),
 ]
 

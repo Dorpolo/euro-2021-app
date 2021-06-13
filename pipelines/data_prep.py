@@ -325,6 +325,23 @@ class UpdateUserPrediction:
         else:
             return None, None
 
+    def present_my_predictions(self):
+        data = self.data_enrichment()
+        leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
+        if len(leagues) > 0:
+            output = {}
+            required_fields = ['nick_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
+                               'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
+                               'real_score_away', 'user_name_id']
+            for item in leagues:
+                filtered_df = data[(data.league_name_id == item) & (data.user_name_id == self.user_id)][required_fields]
+                filtered_df['status_rank'] = np.where(filtered_df.game_status == 'Finished', 1, 0)
+                final_df = filtered_df.sort_values(by=['status_rank', 'date', 'hour']).drop(columns='status_rank')
+                output[item] = final_df.values.tolist()
+            return output[leagues[0]], required_fields
+        else:
+            return None, None
+
     @staticmethod
     def add_game_attributes(data, item, game_label):
         x = data[(data.league_name_id == item) & (data.match_label == game_label)]

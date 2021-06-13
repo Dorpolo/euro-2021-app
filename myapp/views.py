@@ -280,7 +280,7 @@ class CreateLeagueView(CreateView):
     template_name = 'add_league.html'
 
 
-class ScoreView(TemplateView):
+class AllPredictionsView(TemplateView):
     template_name = "score_predictions.html"
 
     def get(self, request):
@@ -298,6 +298,22 @@ class ScoreView(TemplateView):
             'committed_a_bet': onboarding['bet'],
             'image_uploaded': onboarding['image'],
             'league_member_points': league_table_output
+        }
+        return render(request, self.template_name, context)
+
+
+class MyPredictionsView(TemplateView):
+    template_name = "my_predictions.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            class_init = UpdateUserPrediction(request.user.id)
+            get_my_predictions = class_init.present_my_predictions()
+            print(get_my_predictions[0])
+        else:
+            get_my_predictions = None
+        context = {
+            'league_members': get_my_predictions[0],
         }
         return render(request, self.template_name, context)
 
