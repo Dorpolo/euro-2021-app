@@ -14,6 +14,7 @@ import json
 import data.viz_variables as vis
 import plotly.express as px
 import plotly.offline as opy
+import plotly.graph_objects as go
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(SECRET_KEY=str,)
@@ -225,14 +226,28 @@ class UpdateUserPrediction:
         return df_main
 
     @staticmethod
-    def get_top_players_predictions():
+    def fetch_user_league_membership_data(user_id):
+        league_member_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name', 'created']
+        df_league_member_pre = pd.DataFrame(list(LeagueMember.objects.all().values()))[league_member_fields].\
+            sort_values(by=['user_name_id', 'league_name_id', 'created'], ascending=[True, True, False])
+        leagues = list(df_league_member_pre[df_league_member_pre.user_name_id == user_id].league_name_id.unique())
+        df_league_member = df_league_member_pre.groupby(['user_name_id', 'league_name_id']).first().\
+            reset_index().drop(columns='created')
+        return df_league_member[df_league_member.league_name_id.isin(leagues)]
+
+    def get_top_players_predictions(self) -> dict:
         df_init = pd.DataFrame(list(Game.objects.all().values()))
         df = df_init.drop(columns=['created', 'updated', 'id']).sort_values(by='user_name_id').\
             groupby('user_name_id').first().reset_index().melt(id_vars='user_name_id')
         df = df[df.variable.str.contains('top_')]
         df['player_name'] = df.value.str.split(' - ', expand=True, n=1)[[1]]
-        df['variable_type'] = df.value.str.split(' - ', expand=True, n=1)[[1]]
-        return df
+        df['variable_type'] = df.variable.str[:-2]
+        df_predictions = df[['user_name_id', 'variable_type', 'player_name', 'value']]
+        df_league = self.fetch_user_league_membership_data(self.user_id)[['user_name_id', 'nick_name', 'league_name_id']]
+        output_df = pd.merge(df_predictions, df_league, on='user_name_id', how='inner')
+        leagues = list(output_df.league_name_id.unique())
+        output = {league: output_df[output_df.league_name_id == league].values.tolist() for league in leagues}
+        return output
 
     def data_enrichment(self):
         extra_fields = ['game_id', 'match_label', 'real_score', 'real_score_home', 'real_score_away', 'game_status', 'date', 'hour']
@@ -500,11 +515,7 @@ class EuMatch:
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
         output = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
-        # df_input = self.all_matches()
-        # df = pd.DataFrame(df_input[0], columns=df_input[1])
-        # output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
         return output.tail(1).reset_index()
-        # return output.head(2).tail(1).reset_index()
 
     def next_match_logos(self):
         teams_data = self.next_match()
@@ -523,6 +534,93 @@ class EuMatch:
         df = pd.DataFrame(df_input[0], columns=df_input[1])
         games_played = int(df[df.match_status != '0'].shape[0])
         return games_played
+
+    def top_players(self, event_type: int = 1) -> list:
+        event_name = 'Top Scorer' if event_type == 1 else 'Top Assist'
+        url = f'{self.PREFIX}/topplayers/40&apikey={self.TOKEN}&event_id={str(event_type)}&limit=10'
+        top_player_api = requests.get(url=url).json()['season']['players']
+        top_player_list = [[item['shortname'], item['teamname'], int(item['eventCount']), f'{event_name}']
+                           for item in top_player_api if int(item['eventCount']) > 0]
+        return top_player_list
+
+
+class StatsTopPlayers(EuMatch):
+    def __init__(self, user_id):
+        super().__init__()
+        self.user_id = user_id
+
+    def top_players_real(self) -> tuple:
+        scorers = self.top_players(1)
+        assists = self.top_players(2)
+        players_dict = {'top_scorer': scorers, 'top_assists': assists}
+        cols = ['player_name', 'team', 'count', 'event_type']
+        df = pd.DataFrame(scorers + assists, columns=cols)
+        return players_dict, df
+
+    @staticmethod
+    def build_plot(data: dict):
+        fig = px.bar(data, x='score', y='count', color="winner", template='simple_white', text='count',
+                     title="Score Distribution",  labels={"score": "Score", "count": "Prediction Count", "winner": ""})
+        fig.update_traces(textposition='inside')
+        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT,)
+        div = opy.plot(fig, auto_open=False, output_type='div')
+        return div
+
+    @staticmethod
+    def unique(list1):
+        unique_list = []
+        for x in list1:
+            if x not in unique_list:
+                unique_list.append(x)
+        return unique_list
+
+    @staticmethod
+    def ranked_items(x):
+        seq = sorted(x)
+        index = [seq.index(v) for v in x]
+        return index
+
+    def prepare_data_for_sankey_plot(self, data, event_type) -> dict:
+        relevant_data = [item for item in data if item[1] == event_type]
+        predicted_player = [obj[2] for obj in relevant_data]
+        user_ids = [obj[0] for obj in relevant_data]
+        unique_user_ids = self.unique(user_ids)
+        ranked_unique_user_ids = self.ranked_items(unique_user_ids)
+        source_map = {key: val for key, val in zip(unique_user_ids, ranked_unique_user_ids)}
+        source = [source_map[i] for i in user_ids]
+        users = [obj[4] for obj in relevant_data]
+        unique_users = self.unique(users)
+        unique_players = self.unique(predicted_player)
+        label = unique_users + unique_players
+        n_start, n_players = len(ranked_unique_user_ids), len(unique_players)
+        n_end = n_players + n_start + 1
+        player_id = {obj: key for key, obj in zip(range(n_start, n_end), unique_players)}
+        target = [player_id[obj[2]] for obj in relevant_data]
+        value = [1 for _ in source]
+        print({'source': source, 'target': target, 'value': value, 'label': label})
+        return {'source': source, 'target': target, 'value': value, 'label': label}
+
+    @staticmethod
+    def build_sankey_plot(data: dict) -> dict:
+        link = dict(source=data['source'], target=data['target'], value=data['value'])
+        node = dict(label=data['label'], pad=50, thickness=5)
+        plot_data = go.Sankey(link=link, node=node)
+        fig = go.Figure(plot_data)
+        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT,)
+        div = opy.plot(fig, auto_open=False, output_type='div')
+        return div
+
+    def top_players_pred_plot(self) -> dict:
+        data = UpdateUserPrediction(user_id=self.user_id).get_top_players_predictions()
+        output = {}
+        for key, val in data.items():
+            scorers_data = self.prepare_data_for_sankey_plot(val, 'top_scorer')
+            assists_data = self.prepare_data_for_sankey_plot(val, 'top_assist')
+            output[key] = {
+                        'top_scorer': self.build_sankey_plot(scorers_data),
+                        'top_assist': self.build_sankey_plot(assists_data)
+                   }
+        return output
 
 
 class StatsNextGame(UpdateUserPrediction):

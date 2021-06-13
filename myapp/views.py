@@ -360,3 +360,16 @@ def plot_index_last_match(request):
         'status': match_status,
         }
     return render(request, "stats_prev_game.html", context)
+
+
+def plot_top_players(request):
+    data_class_init = StatsTopPlayers(request.user.id)
+    top_players_real = data_class_init.top_players_real()[0]
+    started_games = data_class_init.started_games()
+    predicted_plots = data_class_init.top_players_pred_plot()
+    context = {
+        'top_players': top_players_real,
+        'games_started': started_games,
+        'plots': predicted_plots
+        }
+    return render(request, "stats_top_players.html", context)

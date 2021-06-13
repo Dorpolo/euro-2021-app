@@ -18,5 +18,6 @@ urlpatterns = [
     path('update-league-member/edit/<int:pk>', views.UpdateLeagueMember.as_view(), name='update_league_member'),
     path('numbers-next-match/', views.plot_index, name='next_match_stats'),
     path('numbers-last-match/', views.plot_index_last_match, name='prev_match_stats'),
+    path('top-players/', views.plot_top_players, name='top_players'),
 ]
 

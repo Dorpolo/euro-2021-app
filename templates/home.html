@@ -267,9 +267,16 @@
             </div>
             <hr>
               <h6>Quick Access</h6>
-                 <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                    <a href="{% url 'predictions' %}"><button type="button" class="btn btn-dark">All Predictions</button></a>
-    </div>
+                <center>
+                         <div class="btn-group btn-group-sm" role="group">
+                            <a href="{% url 'predictions' %}"><button type="button" class="btn btn-outline-dark">
+                                Predictions
+                            </button></a>
+                             <a href="{% url 'top_players' %}"><button type="button" class="btn btn-outline-dark">
+                                Top Players
+                             </button></a>
+                        </div>
+                </center>
             <hr>
       {% endif %}
   <div>
