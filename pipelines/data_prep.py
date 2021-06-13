@@ -224,6 +224,16 @@ class UpdateUserPrediction:
         df_main[['pred_score_home', 'pred_score_away']] = df_main.predicted_score.str.split('-', expand=True, n=1)[[0, 1]]
         return df_main
 
+    @staticmethod
+    def get_top_players_predictions():
+        df_init = pd.DataFrame(list(Game.objects.all().values()))
+        df = df_init.drop(columns=['created', 'updated', 'id']).sort_values(by='user_name_id').\
+            groupby('user_name_id').first().reset_index().melt(id_vars='user_name_id')
+        df = df[df.variable.str.contains('top_')]
+        df['player_name'] = df.value.str.split(' - ', expand=True, n=1)[[1]]
+        df['variable_type'] = df.value.str.split(' - ', expand=True, n=1)[[1]]
+        return df
+
     def data_enrichment(self):
         extra_fields = ['game_id', 'match_label', 'real_score', 'real_score_home', 'real_score_away', 'game_status', 'date', 'hour']
         df_main = self.get_user_prediction()

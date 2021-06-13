@@ -36,41 +36,44 @@ class HomeView(TemplateView):
             bet_id = user_game_bet_id(request.user.id)
             league_table_output = user_pred_init.league_member_points()
             league_memberships = get_league_member_id(request.user.id)
-
             games_started = self.get_api_data.started_games()
-
             presented_data = user_pred_init.home_screen_match_relevant_data()
             logos_dict = {}
 
-            for key, val in league_data_output.items():
-                logos_dict[key] = {}
-                for value in val:
-                    logos_dict[key][value[0]] = value[1]
+            if league_data_output is not None:
+                for key, val in league_data_output.items():
+                    logos_dict[key] = {}
+                    for value in val:
+                        logos_dict[key][value[0]] = value[1]
+                boom_logos = {'prev': {}, 'next': {}}
 
-            boom_logos = {'prev': {}, 'next': {}}
-            for key, val in presented_data[2].items():
-                logos_prev = [logos_dict[key][item] for item in val['prev']['boom']]
-                logos_next = [logos_dict[key][item] for item in val['next']['boom']]
-                boom_logos['prev'][key] = logos_prev
-                boom_logos['next'][key] = logos_next
-
-            context = {
-                'league_members': league_data_output,
-                'next_match': presented_data[1],
-                'prev_match': presented_data[0],
-                'next_match_logos': self.get_api_data.next_match_logos(),
-                'prev_match_logos': self.get_api_data.prev_match_logos(),
-                'league_signup': onboarding['league'],
-                'committed_a_bet': onboarding['bet'],
-                'image_uploaded': onboarding['image'],
-                'bet_id': bet_id,
-                'league_member_points': league_table_output,
-                'league_memberships': league_memberships,
-                'user_game_points': presented_data[2],
-                'boom_logos': boom_logos,
-                'games_started': games_started
-            }
-            return render(request, self.template_name, context)
+                if presented_data[0] is not None:
+                    for key, val in presented_data[2].items():
+                        logos_prev = [logos_dict[key][item] for item in val['prev']['boom']]
+                        logos_next = [logos_dict[key][item] for item in val['next']['boom']]
+                        boom_logos['prev'][key] = logos_prev
+                        boom_logos['next'][key] = logos_next
+                else:
+                    boom_logos = None
+                context = {
+                    'league_members': league_data_output,
+                    'next_match': presented_data[1],
+                    'prev_match': presented_data[0],
+                    'next_match_logos': self.get_api_data.next_match_logos(),
+                    'prev_match_logos': self.get_api_data.prev_match_logos(),
+                    'league_signup': onboarding['league'],
+                    'committed_a_bet': onboarding['bet'],
+                    'image_uploaded': onboarding['image'],
+                    'bet_id': bet_id,
+                    'league_member_points': league_table_output,
+                    'league_memberships': league_memberships,
+                    'user_game_points': presented_data[2],
+                    'boom_logos': boom_logos,
+                    'games_started': games_started
+                }
+                return render(request, self.template_name, context)
+            else:
+                return render(request, self.template_name, {'data': None})
         else:
             return render(request, self.template_name, {'data': None})
 
