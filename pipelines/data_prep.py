@@ -402,13 +402,23 @@ class UpdateUserPrediction:
         index_names = ['games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points']
         return pd.Series(d, index=[index_names])
 
-    def get_game_points_group_stage(self, df) -> tuple:
+    @staticmethod
+    def adjust_table_column_type(data) -> list:
+        adj_df = []
+        for item in data.values.tolist():
+            nick = [item[0]]
+            values = [int(sub) for sub in item[1:]]
+            values[4] = f"{values[4]}%"
+            adj_df.append(nick + values)
+        return adj_df
+
+    def get_game_points_group_stage(self, df):
         data = df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).\
             reset_index().drop(columns=['user_name_id']).sort_values(
                     by=[('points',), ('boom',), ('direction', ), ('predicted_goals', )], ascending=[False]*4
                     )
         data['rn'] = np.arange(len(data)) + 1
-        return data.values.tolist()
+        return self.adjust_table_column_type(data)
 
     def get_game_points_knockout(self) -> tuple:
         pass
@@ -477,14 +487,14 @@ class EuMatch:
         return output.head(1).reset_index()
 
     def prev_match(self):
-        # df_input = self.all_matches()
-        # df = pd.DataFrame(df_input[0], columns=df_input[1])
-        # output = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
-        output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
-        # return output.tail(1).reset_index()
-        return output.head(2).tail(1).reset_index()
+        output = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
+        # df_input = self.all_matches()
+        # df = pd.DataFrame(df_input[0], columns=df_input[1])
+        # output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
+        return output.tail(1).reset_index()
+        # return output.head(2).tail(1).reset_index()
 
     def next_match_logos(self):
         teams_data = self.next_match()
