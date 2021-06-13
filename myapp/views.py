@@ -37,6 +37,8 @@ class HomeView(TemplateView):
             league_table_output = user_pred_init.league_member_points()
             league_memberships = get_league_member_id(request.user.id)
 
+            games_started = self.get_api_data.started_games()
+
             presented_data = user_pred_init.home_screen_match_relevant_data()
             logos_dict = {}
 
@@ -65,7 +67,8 @@ class HomeView(TemplateView):
                 'league_member_points': league_table_output,
                 'league_memberships': league_memberships,
                 'user_game_points': presented_data[2],
-                'boom_logos': boom_logos
+                'boom_logos': boom_logos,
+                'games_started': games_started
             }
             return render(request, self.template_name, context)
         else:

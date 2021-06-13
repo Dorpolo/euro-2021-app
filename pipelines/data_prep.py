@@ -508,6 +508,12 @@ class EuMatch:
         away = teams[teams_data.away_team[0]]['logo']
         return {teams_data.home_team[0]: home, teams_data.away_team[0]: away}
 
+    def started_games(self) -> int:
+        df_input = self.all_matches()
+        df = pd.DataFrame(df_input[0], columns=df_input[1])
+        games_played = int(df[df.match_status != '0'].shape[0])
+        return games_played
+
 
 class StatsNextGame(UpdateUserPrediction):
     def __init__(self, user_id, match_label):
