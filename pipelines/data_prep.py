@@ -249,6 +249,11 @@ class UpdateUserPrediction:
         output = {league: output_df[output_df.league_name_id == league].values.tolist() for league in leagues}
         return output
 
+    def get_live_game_predictions(self) -> dict:
+        data = self.get_user_prediction()
+        print(data)
+        return data
+
     def data_enrichment(self):
         extra_fields = ['game_id', 'match_label', 'real_score', 'real_score_home', 'real_score_away', 'game_status', 'date', 'hour']
         df_main = self.get_user_prediction()
@@ -580,7 +585,7 @@ class StatsTopPlayers(EuMatch):
         index = [seq.index(v) for v in x]
         return index
 
-    def prepare_data_for_sankey_plot(self, data, event_type) -> dict:
+    def data_sankey_top_players(self, data, event_type) -> dict:
         relevant_data = [item for item in data if item[1] == event_type]
         predicted_player = [obj[2] for obj in relevant_data]
         user_ids = [obj[0] for obj in relevant_data]
@@ -597,7 +602,25 @@ class StatsTopPlayers(EuMatch):
         player_id = {obj: key for key, obj in zip(range(n_start, n_end), unique_players)}
         target = [player_id[obj[2]] for obj in relevant_data]
         value = [1 for _ in source]
-        print({'source': source, 'target': target, 'value': value, 'label': label})
+        return {'source': source, 'target': target, 'value': value, 'label': label}
+
+    def data_sankey_live_game(self, data, event_type) -> dict:
+        relevant_data = [item for item in data if item[1] == event_type]
+        predicted_player = [obj[2] for obj in relevant_data]
+        user_ids = [obj[0] for obj in relevant_data]
+        unique_user_ids = self.unique(user_ids)
+        ranked_unique_user_ids = self.ranked_items(unique_user_ids)
+        source_map = {key: val for key, val in zip(unique_user_ids, ranked_unique_user_ids)}
+        source = [source_map[i] for i in user_ids]
+        users = [obj[4] for obj in relevant_data]
+        unique_users = self.unique(users)
+        unique_players = self.unique(predicted_player)
+        label = unique_users + unique_players
+        n_start, n_players = len(ranked_unique_user_ids), len(unique_players)
+        n_end = n_players + n_start + 1
+        player_id = {obj: key for key, obj in zip(range(n_start, n_end), unique_players)}
+        target = [player_id[obj[2]] for obj in relevant_data]
+        value = [1 for _ in source]
         return {'source': source, 'target': target, 'value': value, 'label': label}
 
     @staticmethod
@@ -614,8 +637,8 @@ class StatsTopPlayers(EuMatch):
         data = UpdateUserPrediction(user_id=self.user_id).get_top_players_predictions()
         output = {}
         for key, val in data.items():
-            scorers_data = self.prepare_data_for_sankey_plot(val, 'top_scorer')
-            assists_data = self.prepare_data_for_sankey_plot(val, 'top_assist')
+            scorers_data = self.data_sankey_top_players( val, 'top_scorer' )
+            assists_data = self.data_sankey_top_players( val, 'top_assist' )
             output[key] = {
                         'top_scorer': self.build_sankey_plot(scorers_data),
                         'top_assist': self.build_sankey_plot(assists_data)
