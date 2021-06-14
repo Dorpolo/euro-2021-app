@@ -20,5 +20,7 @@ urlpatterns = [
     path('numbers-last-match/', views.plot_index_last_match, name='prev_match_stats'),
     path('top-players/', views.plot_top_players, name='top_players'),
     path('my-predictions/', views.MyPredictionsView.as_view(), name='my_predictions'),
+    path('live-match/', views.plot_live_next_match, name='live_next_match'),
+    path('live-match-prev/', views.plot_live_prev_match, name='live_prev_match'),
 ]
 

@@ -9,7 +9,7 @@
   <title>test</title>
  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
-    <h3>Next Match Predictions</h3>
+    <h3>Live Score Predictions</h3>
     <hr>
 <body>
 <center>
@@ -24,13 +24,12 @@
 </center>
 <center>
     <hr>
-        <p>Status: {{ status }} <br> {{ real_score }}</p>
+        <p> Status: {{ status }} <br> {{ real_score }}</p>
 </center>
-     {% for key, plot in plot_next_match.items %}
+     {% for key, plot in plots.items %}
          <hr class="bold">
          <center> <p> {{ key }} </p> </center>
          <hr class="bold">
-            {% for item in plot %}
             <body>
                  <style>
                      .modebar{
@@ -41,12 +40,11 @@
                         }
                  </style>
                   {% autoescape off %}
-                    {{ item|safe }}
+                    {{ plot|safe }}
                   {% endautoescape %}
-                  {% if forloop.counter == 1 %}<hr>{% endif %}
              </body>
-          {% endfor %}
         {% endfor %}
+
 </body>
 
 {% endblock %}

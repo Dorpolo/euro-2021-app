@@ -345,7 +345,8 @@ def plot_index(request):
     next_match_init = EuMatch()
     next_match = next_match_init.next_match()
     match_label = next_match.match_label[0]
-    match_status = 'Fixture' if next_match.match_status[0] == '0' else 'Started'
+    status = next_match.match_status[0]
+    match_status = 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished'
     score = f"{next_match.home_team_score[0]}-{next_match.away_team_score[0]}"
     plot_init = StatsNextGame(request.user.id, match_label)
     viz_next_match = plot_init.match_prediction_outputs()
@@ -364,7 +365,8 @@ def plot_index_last_match(request):
     match_init = EuMatch()
     prev_match = match_init.prev_match()
     match_label = prev_match.match_label[0]
-    match_status = 'Fixture' if prev_match.match_status[0] == '0' else 'Live' if prev_match.match_status[0] == '-1' else 'Finished'
+    status = prev_match.match_status[0]
+    match_status = 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished'
     score = f"{prev_match.home_team_score[0]}-{prev_match.away_team_score[0]}"
     plot_init = StatsNextGame(request.user.id, match_label)
     viz_prev_match = plot_init.match_prediction_outputs()
@@ -391,3 +393,47 @@ def plot_top_players(request):
         'plots': predicted_plots
         }
     return render(request, "stats_top_players.html", context)
+
+
+def plot_live_next_match(request):
+    data_class_init = StatsTopPlayers(request.user.id)
+    next_match_init = EuMatch()
+    next_match_logos = next_match_init.next_match_logos()
+    next_match = next_match_init.next_match()
+    match_label = next_match.match_label[0]
+    status = next_match.match_status[0]
+    match_status = 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished'
+    score = f"{next_match.home_team_score[0]}-{next_match.away_team_score[0]}"
+
+    live_plots = data_class_init.live_game_plot(match_label=match_label)
+
+    context = {
+        'title': match_label,
+        'real_score': score,
+        'status': match_status,
+        'plots': live_plots,
+        'logos': next_match_logos
+        }
+    return render(request, "stats_live_game_next.html", context)
+
+
+def plot_live_prev_match(request):
+    data_class_init = StatsTopPlayers(request.user.id)
+    prev_match_init = EuMatch()
+    prev_match_logos = prev_match_init.prev_match_logos()
+    prev_match = prev_match_init.prev_match()
+    match_label = prev_match.match_label[0]
+    status = prev_match.match_status[0]
+    match_status = 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished'
+    score = f"{prev_match.home_team_score[0]}-{prev_match.away_team_score[0]}"
+
+    live_plots = data_class_init.live_game_plot(match_label=match_label)
+
+    context = {
+        'title': match_label,
+        'real_score': score,
+        'status': match_status,
+        'plots': live_plots,
+        'logos': prev_match_logos
+        }
+    return render(request, "stats_live_game_next.html", context)

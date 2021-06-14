@@ -40,13 +40,14 @@
                          {% endif %}
                      </p>
                 </h6>
-                      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                          <p class="card-text" style="color:#1C2833;font-size:15px;">
-                              Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
-                              Your Prediction: {{ next_match.user_pred }} <br>
-                          </p>
-                       <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
-                    </div>
+                            <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                                     <a href="{% url 'my_predictions' %}">
+                                         <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
+                                     </a>
+                                    <a href="{% url 'predictions' %}">
+                                       <a href="{% url 'live_next_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
+                                    </a>
+                            </div>
 
                 </div>
              </div>
@@ -162,14 +163,18 @@
                                          {% endif %}
                                      </p>
                                 </h6>
-                                      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                          <p class="card-text" style="color:#1C2833;font-size:15px;">
-                                              Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>
-                                              Your Prediction: {{ prev_match.user_pred }} <br>
-                                          </p>
-                                          <a href="{% url 'prev_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
+                                  <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                      Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>
+                                      Your Prediction: {{ prev_match.user_pred }} <br>
+                                  </p>
+                                     <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                                             <a href="{% url 'my_predictions' %}">
+                                                 <a href="{% url 'prev_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
+                                             </a>
+                                            <a href="{% url 'predictions' %}">
+                                               <a href="{% url 'live_prev_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
+                                            </a>
                                     </div>
-
                 </div>
              </div>
                 </center>
@@ -268,15 +273,15 @@
             <hr>
               <h6>Quick Access</h6>
                 <center>
-                <div class="btn-group btn-group-sm" role="group">
+                <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                              <a href="{% url 'my_predictions' %}">
-                                 <button type="button" class="btn btn-outline-dark">My Bets</button>
+                                 <button type="button" class="btn btn-dark">My Bets</button>
                              </a>
                             <a href="{% url 'predictions' %}">
-                                <button type="button" class="btn btn-outline-dark">All Bets</button>
+                                <button type="button" class="btn btn-dark">All Bets</button>
                             </a>
                              <a href="{% url 'top_players' %}">
-                                 <button type="button" class="btn btn-outline-dark">Players</button>
+                                 <button type="button" class="btn btn-dark">Players</button>
                              </a>
                     </div>
                 </center>

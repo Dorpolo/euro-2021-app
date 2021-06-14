@@ -321,7 +321,7 @@ class UpdateUserPrediction:
             ]
         return output[output_fields]
 
-    def present_predictions(self):
+    def present_predictions(self) -> tuple:
         data = self.data_enrichment()
         leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
         if len(leagues) > 0:
@@ -330,7 +330,6 @@ class UpdateUserPrediction:
                                'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
                                'real_score_away', 'user_name_id']
             for item in leagues:
-                # & (data.user_name_id == self.user_id)
                 filtered_df = data[(data.league_name_id == item)][required_fields]
                 filtered_df['status_rank'] = np.where(filtered_df.game_status == 'Finished', 1, 0)
                 final_df = filtered_df.sort_values(by=['status_rank', 'date', 'hour']).drop(columns='status_rank')
@@ -635,29 +634,26 @@ class StatsTopPlayers(EuMatch):
         value = [1 for _ in source]
         return {'source': source, 'target': target, 'value': value, 'label': label}
 
-    def data_sankey_live_game(self, data, event_type) -> dict:
-        relevant_data = [item for item in data if item[1] == event_type]
-        predicted_player = [obj[2] for obj in relevant_data]
-        user_ids = [obj[0] for obj in relevant_data]
-        unique_user_ids = self.unique(user_ids)
-        ranked_unique_user_ids = self.ranked_items(unique_user_ids)
-        source_map = {key: val for key, val in zip(unique_user_ids, ranked_unique_user_ids)}
-        source = [source_map[i] for i in user_ids]
-        users = [obj[4] for obj in relevant_data]
+    def data_sankey_live_game(self, data) -> dict:
+        predicted_result = [obj[1] for obj in data]
+        users = [obj[0] for obj in data]
         unique_users = self.unique(users)
-        unique_players = self.unique(predicted_player)
-        label = unique_users + unique_players
-        n_start, n_players = len(ranked_unique_user_ids), len(unique_players)
+        ranked_unique_user_ids = self.ranked_items(unique_users)
+        source_map = {key: val for key, val in zip(unique_users, ranked_unique_user_ids)}
+        source = [source_map[i] for i in users]
+        unique_results = self.unique(predicted_result)
+        label = unique_users + unique_results
+        n_start, n_players = len(ranked_unique_user_ids), len(unique_results)
         n_end = n_players + n_start + 1
-        player_id = {obj: key for key, obj in zip(range(n_start, n_end), unique_players)}
-        target = [player_id[obj[2]] for obj in relevant_data]
-        value = [1 for _ in source]
+        result_id = {obj: key for key, obj in zip(range(n_start, n_end), unique_results)}
+        target = [result_id[obj[1]] for obj in data]
+        value = [1/(0.1 if item[2] == 0 else item[2]) for item in data]
         return {'source': source, 'target': target, 'value': value, 'label': label}
 
     @staticmethod
     def build_sankey_plot(data: dict) -> dict:
         link = dict(source=data['source'], target=data['target'], value=data['value'])
-        node = dict(label=data['label'], pad=50, thickness=5)
+        node = dict(label=data['label'], pad=40, thickness=5)
         plot_data = go.Sankey(link=link, node=node)
         fig = go.Figure(plot_data)
         fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT,)
@@ -674,6 +670,26 @@ class StatsTopPlayers(EuMatch):
                         'top_scorer': self.build_sankey_plot(scorers_data),
                         'top_assist': self.build_sankey_plot(assists_data)
                    }
+        return output
+
+    @staticmethod
+    def score_distance(score_list: list) -> int:
+        if score_list[2] > score_list[0] or score_list[3] > score_list[1]:
+            return 15
+        else:
+            home_distance = score_list[0] - score_list[2]
+            away_distance = score_list[1] - score_list[3]
+            return home_distance + away_distance
+
+    def live_game_plot(self, match_label: str = 'Denmark-Finland') -> dict:
+        data = UpdateUserPrediction(user_id=self.user_id).present_predictions()[0]
+        output = {}
+        for key, val in data.items():
+            init_data = [[item[0], item[4], self.score_distance([int(i) for i in item[7:11]])]
+                             for item in val if item[3] == match_label]
+            relevant_data = [item for item in init_data if item[2] < 15]
+            data_preps = self.data_sankey_live_game(relevant_data)
+            output[key] = self.build_sankey_plot(data_preps)
         return output
 
 
@@ -777,6 +793,7 @@ class StatsNextGame(UpdateUserPrediction):
             return self.merge_dicts(output_score, output_winner)
         else:
             return None
+
 
 
 
