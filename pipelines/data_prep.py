@@ -636,15 +636,17 @@ class StatsTopPlayers(EuMatch):
 
     def data_sankey_live_game(self, data) -> dict:
         predicted_result = [obj[1] for obj in data]
+        user_ids = [obj[3] for obj in data] #new
+        unique_user_ids = self.unique(user_ids)
+        ranked_unique_user_ids = self.ranked_items(unique_user_ids)
+        source_map = {key: val for key, val in zip(unique_user_ids, ranked_unique_user_ids)}
+        source = [source_map[i] for i in user_ids]
         users = [obj[0] for obj in data]
         unique_users = self.unique(users)
-        ranked_unique_user_ids = self.ranked_items(unique_users)
-        source_map = {key: val for key, val in zip(unique_users, ranked_unique_user_ids)}
-        source = [source_map[i] for i in users]
         unique_results = self.unique(predicted_result)
         label = unique_users + unique_results
-        n_start, n_players = len(ranked_unique_user_ids), len(unique_results)
-        n_end = n_players + n_start + 1
+        n_start, n_results = len(ranked_unique_user_ids), len(unique_results)
+        n_end = n_results + n_start + 1
         result_id = {obj: key for key, obj in zip(range(n_start, n_end), unique_results)}
         target = [result_id[obj[1]] for obj in data]
         value = [1/(0.1 if item[2] == 0 else item[2]) for item in data]
@@ -664,8 +666,8 @@ class StatsTopPlayers(EuMatch):
         data = UpdateUserPrediction(user_id=self.user_id).get_top_players_predictions()
         output = {}
         for key, val in data.items():
-            scorers_data = self.data_sankey_top_players( val, 'top_scorer')
-            assists_data = self.data_sankey_top_players( val, 'top_assist')
+            scorers_data = self.data_sankey_top_players(val, 'top_scorer')
+            assists_data = self.data_sankey_top_players(val, 'top_assist')
             output[key] = {
                         'top_scorer': self.build_sankey_plot(scorers_data),
                         'top_assist': self.build_sankey_plot(assists_data)
@@ -683,10 +685,16 @@ class StatsTopPlayers(EuMatch):
 
     def live_game_plot(self, match_label: str = 'Denmark-Finland') -> dict:
         data = UpdateUserPrediction(user_id=self.user_id).present_predictions()[0]
+        user_id_df = pd.DataFrame(LeagueMember.objects.all().values())
+        user_id_map = {item[1]: item[0] for item in user_id_df[['user_name_id', 'nick_name']].values.tolist()}
         output = {}
         for key, val in data.items():
-            init_data = [[item[0], item[4], self.score_distance([int(i) for i in item[7:11]])]
-                             for item in val if item[3] == match_label]
+            init_data = [[
+                item[0],
+                item[4],
+                self.score_distance([int(i) for i in item[7:11]]),
+                user_id_map[item[0]]
+            ] for item in val if item[3] == match_label]
             relevant_data = [item for item in init_data if item[2] < 15]
             data_preps = self.data_sankey_live_game(relevant_data)
             output[key] = self.build_sankey_plot(data_preps)

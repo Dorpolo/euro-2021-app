@@ -40,6 +40,10 @@
                          {% endif %}
                      </p>
                 </h6>
+                         <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                      Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
+                                      Your Prediction: {{ next_match.user_pred }} <br>
+                                  </p>
                             <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                                      <a href="{% url 'my_predictions' %}">
                                          <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
