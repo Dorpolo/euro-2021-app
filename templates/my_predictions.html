@@ -60,7 +60,7 @@
                             </tr>
                         <thead/>
                         <tbody>
-                          {% for item in league_members %}
+                          {% for item in my_predictions %}
                               <tr>
                               {% if item.6 == 'Finished' %}
                                       <td style="color: darkgray">{{ item.1 }}</td>
@@ -81,5 +81,31 @@
                           {% endfor %}
                         </tbody>
                   </table>
+                </div>
+        <h3>My Players</h3>
+        <hr>
+              <div>
+              {% for key, val in my_players.items %}
+                  <p>{{ key }}</p>
+                  <hr>
+                  <table class="styled-table" style="width: 100%; height: 100%; text-align: center">
+                        <thead>
+                            <tr style="text-align: center">
+                                <th>Player</th>
+                                <th>Team</th>
+                                <th>Count</th>
+                            </tr>
+                        <thead/>
+                        <tbody>
+                          {% for item in val %}
+                              <tr>
+                                  <td>{{ item.0 }}</td>
+                                  <td>{{ item.1 }}</td>
+                                  <td>{{ item.2 }}</td>
+                              </tr>
+                          {% endfor %}
+                        </tbody>
+                  </table>
+              {% endfor %}
                 </div>
 {% endblock %}

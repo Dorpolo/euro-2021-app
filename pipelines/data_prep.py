@@ -249,9 +249,23 @@ class UpdateUserPrediction:
         output = {league: output_df[output_df.league_name_id == league].values.tolist() for league in leagues}
         return output
 
+    def get_top_players_my_predictions(self) -> dict:
+        df_init = pd.DataFrame(list(Game.objects.filter(user_name_id=self.user_id).values()))
+        df = df_init.drop(columns=['created', 'updated', 'id']).sort_values(by='user_name_id').\
+            groupby('user_name_id').first().reset_index().melt(id_vars='user_name_id')
+        df = df[df.variable.str.contains('top_')]
+        df['player_name'] = df.value.str.split(' - ', expand=True, n=1)[[1]]
+        df['event_type'] = df.variable.str[:-2]
+        df_predictions = df[['user_name_id', 'event_type', 'player_name', 'value']]
+        df_predictions['event_type'] = np.where(df_predictions['event_type'] == 'top_scorer', 'Top Scorer', 'Top Assist')
+        df_real_players = StatsTopPlayers(self.user_id).top_players_real()
+        df_output = pd.merge(df_predictions, df_real_players[1], on=['player_name', 'event_type'], how='left')
+        output = {item: df_output[df_output.event_type == item][['player_name', 'team', 'count']].values.tolist()
+                  for item in ['Top Scorer', 'Top Assist']}
+        return output
+
     def get_live_game_predictions(self) -> dict:
         data = self.get_user_prediction()
-        print(data)
         return data
 
     def data_enrichment(self):
@@ -559,10 +573,10 @@ class EuMatch:
 
     def top_players(self, event_type: int = 1) -> list:
         event_name = 'Top Scorer' if event_type == 1 else 'Top Assist'
-        url = f'{self.PREFIX}/topplayers/40&apikey={self.TOKEN}&event_id={str(event_type)}&limit=10'
+        url = f'{self.PREFIX}/topplayers/40&apikey={self.TOKEN}&event_id={str(event_type)}&limit=1000'
         top_player_api = requests.get(url=url).json()['season']['players']
         top_player_list = [[item['shortname'], item['teamname'], int(item['eventCount']), f'{event_name}']
-                           for item in top_player_api if int(item['eventCount']) > 0]
+                           for item in top_player_api]
         return top_player_list
 
 
@@ -654,8 +668,8 @@ class StatsTopPlayers(EuMatch):
         data = UpdateUserPrediction(user_id=self.user_id).get_top_players_predictions()
         output = {}
         for key, val in data.items():
-            scorers_data = self.data_sankey_top_players( val, 'top_scorer' )
-            assists_data = self.data_sankey_top_players( val, 'top_assist' )
+            scorers_data = self.data_sankey_top_players( val, 'top_scorer')
+            assists_data = self.data_sankey_top_players( val, 'top_assist')
             output[key] = {
                         'top_scorer': self.build_sankey_plot(scorers_data),
                         'top_assist': self.build_sankey_plot(assists_data)

@@ -309,11 +309,12 @@ class MyPredictionsView(TemplateView):
         if request.user.is_authenticated:
             class_init = UpdateUserPrediction(request.user.id)
             get_my_predictions = class_init.present_my_predictions()
-            print(get_my_predictions[0])
+            get_my_players = class_init.get_top_players_my_predictions()
         else:
             get_my_predictions = None
         context = {
-            'league_members': get_my_predictions[0],
+            'my_predictions': get_my_predictions[0],
+            'my_players': get_my_players
         }
         return render(request, self.template_name, context)
 
@@ -380,7 +381,8 @@ def plot_index_last_match(request):
 
 def plot_top_players(request):
     data_class_init = StatsTopPlayers(request.user.id)
-    top_players_real = data_class_init.top_players_real()[0]
+    top_players_real = {key: val[0:10] for key, val in
+                        data_class_init.top_players_real()[0].items()}
     started_games = data_class_init.started_games()
     predicted_plots = data_class_init.top_players_pred_plot()
     context = {
