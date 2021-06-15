@@ -3,7 +3,6 @@ from myapp.models import *
 import plotly.graph_objects as go
 import numpy as np
 from myproject.settings import MEDIA_URL, AWS_S3_URL, DEFAULT_PHOTO
-from collections import defaultdict
 import pandas as pd
 import requests
 import environ
@@ -21,160 +20,57 @@ env = environ.Env(SECRET_KEY=str,)
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
-def prepare_bet_submission_email(request, form) -> dict:
-    home, away, results = [], [], []
-    top_players = {}
-
-    for i in enumerate([(key, obj) for key, obj in form.cleaned_data.items() if key != 'user_name']):
-        if 'top_' in i[1][0]:
-            top_players[i[1][0]] = i[1][1]
-        else:
-            if i[0] % 2 == 0:
-                home.append(i[1])
+class MailTemplate:
+    def prepare_bet_submission_email(request, form) -> dict:
+        home, away, results, top_players = [], [], [], {}
+        for i in enumerate([(key, obj) for key, obj in form.cleaned_data.items() if key != 'user_name']):
+            if 'top_' in i[1][0]:
+                top_players[i[1][0]] = i[1][1]
             else:
-                away.append(i[1])
-    for h, a in zip(home, away):
-        result = f"{team_game_map[h[0]]}-{team_game_map[a[0]]}: {h[1]}-{a[1]}"
-        results.append(result)
-    text_results = '\n'.join(results)
-    player_list = [f"{key}: {obj}" for key, obj in top_players.items()]
-    player_joined = '\n'.join(player_list)
-    subject = "Euro 2021 Friends League - Email Confirmation - Bet Submission"
-    message = f"Dear {request.user.username}!\n" \
-              f"You have just submitted successfully your bet form!\n" \
-              f"Please Note - you can easily edit your bets by 2021-07-09 at 11:59:59 PM using the app 'edit your bet' tab.\n\n" \
-              f"For your convenience and our documentation, please find bellow your bets. \n\n" \
-              f"{text_results}\n\n" \
-              f"{player_joined}\n\n" \
-              "Regards,\nLeague management team"
-    return {'subject': subject, 'message': message}
-
-
-def prepare_league_user_email(request, form) -> dict:
-     subject = "Euro 2021 Friends League - Email Confirmation - League Membership"
-     message = f"Dear {form.cleaned_data['first_name']}!\n" \
-               f"You are officially part of the {form.cleaned_data['league_name']} league. " \
-               f"Please make sure to submit your bets. Good luck!\n\n" \
-               "Regards,\nLeague management team"
-     return {'subject': subject, 'message': message}
-
-
-def get_league_user_email(user) -> str:
-    data = LeagueMember.objects.filter(user_name_id=user)
-    return data[0].email
-
-
-def extract_user_league_name_id(user: int) -> tuple:
-    league_member_data = list(LeagueMember.objects.filter(user_name_id=user).values())
-    leagues = [item['league_name_id'] for item in league_member_data]
-    if len(leagues) > 0:
-        return True, leagues
-    else:
-        return False, None
-
-
-def extract_league_users(user) -> tuple:
-    league_ids = extract_user_league_name_id(user)
-    if league_ids[0]:
-        user_list = {}
-        for item in league_ids[1]:
-            data = list(LeagueMember.objects.filter(league_name_id=item).values())
-            for obj in data:
-                user_list[item] = obj
-        return True, user_list
-    else:
-        return False, None
-
-
-def extract_league_bets(user):
-    league_users = extract_league_users(user)
-    if league_users[0]:
-        unique_users = [item['user_name_id'] for item in league_users[1].values()]
-        data = list(Game.objects.all().values())
-        filtered_data = [item for item in data if item['user_name_id'] in unique_users]
-        return filtered_data
-    else:
-        return None
-
-
-def user_onboarding(user) -> dict:
-    league_data = LeagueMember.objects.filter(user_name_id=user)
-    bet_data = Game.objects.filter(user_name_id=user)
-    image = UserImage.objects.filter(user_name_id=user)
-    league_assigned = True if len(league_data) > 0 else False
-    bet_assigned = True if len(bet_data) > 0 else False
-    image_uploaded = True if len(image) > 0 else False
-    return {'league': league_assigned, 'bet': bet_assigned, 'image': image_uploaded}
-
-
-def user_game_bet_id(user) -> dict:
-    data = Game.objects.filter(user_name_id=user)
-    if len(data) > 0:
-        return data[0].id
-    else:
-        return None
-
-
-def get_league_member_id(user) -> dict:
-    data = LeagueMember.objects.filter(user_name_id=user)
-    if len(data) > 0:
-        league_data = list(data.values())
-        output = {}
-        for item in league_data:
-            output[item['league_name_id']] = item['id']
-        return output
-    else:
-        return None
-
-
-def get_user_image(user) -> dict:
-    data = UserImage.objects.filter(user_name_id=user)
-    if len(data) > 0:
-        return data[0].header_image
-    else:
-        return None
-
-
-def get_league_name() -> tuple:
-   data = League.objects.all()
-   leagues = []
-   for j in range(len(data)):
-       leagues.append(data[j].league_name)
-   unique_leagues = set(leagues)
-   league_list = [(item, item) for item in unique_leagues]
-   return tuple(league_list)
-
-
-def get_league_member_data(user_id: int):
-    league_name_id = extract_user_league_name_id(user_id)
-    if league_name_id[0]:
-        league_data_output = []
-        for obj in league_name_id[1]:
-            league_users = list(LeagueMember.objects.filter(league_name_id=obj).values())
-            league_users_dict = {item['user_name_id']: item for item in league_users}
-            user_image = list(UserImage.objects.all().values())
-            user_image_dict = {item['user_name_id']: item['header_image'] for item in user_image}
-            user_id_with_images = [item for item in user_image_dict.keys()]
-            for member in league_users:
-                user_id = member['user_name_id']
-                if user_id in user_id_with_images:
-                    league_users_dict[user_id]['image'] = f"{AWS_S3_URL}{user_image_dict[user_id]}"
+                if i[0] % 2 == 0:
+                    home.append(i[1])
                 else:
-                    league_users_dict[user_id]['image'] = f"{AWS_S3_URL}{DEFAULT_PHOTO}"
-            league_data_output_unit = [item for item in league_users_dict.values()]
-            league_data_output.append(league_data_output_unit)
-        meta = {}
-        for item in league_data_output:
-            league_name = item[0]['league_name_id']
-            meta[league_name] = []
-            for sub_item in item:
-                meta[league_name].append([sub_item['nick_name'], sub_item['image']])
-        return meta
-    else:
-        return None
+                    away.append(i[1])
+        for h, a in zip(home, away):
+            result = f"{team_game_map[h[0]]}-{team_game_map[a[0]]}: {h[1]}-{a[1]}"
+            results.append(result)
+        text_results = '\n'.join(results)
+        player_list = [f"{key}: {obj}" for key, obj in top_players.items()]
+        player_joined = '\n'.join(player_list)
+        subject = "Euro 2021 Friends League - Email Confirmation - Bet Submission"
+        message = f"Dear {request.user.username}!\n" \
+                  f"You have just submitted successfully your bet form!\n" \
+                  f"Please Note - you can easily edit your bets by 2021-07-09 at 11:59:59 PM using the app 'edit your bet' tab.\n\n" \
+                  f"For your convenience and our documentation, please find bellow your bets. \n\n" \
+                  f"{text_results}\n\n" \
+                  f"{player_joined}\n\n" \
+                  "Regards,\nLeague management team"
+        return {'subject': subject, 'message': message}
+
+    def prepare_league_user_email(request, form) -> dict:
+         subject = "Euro 2021 Friends League - Email Confirmation - League Membership"
+         message = f"Dear {form.cleaned_data['first_name']}!\n" \
+                   f"You are officially part of the {form.cleaned_data['league_name']} league. " \
+                   f"Please make sure to submit your bets. Good luck!\n\n" \
+                   "Regards,\nLeague management team"
+         return {'subject': subject, 'message': message}
 
 
-class UpdateUserPrediction:
+class BaseViewUserControl:
+    def __init__(self, user_id):
+        self.user_id = user_id
+
+    def onboarding(self) -> dict:
+        league_data = LeagueMember.objects.filter(user_name_id=self.user_id)
+        bet_data = Game.objects.filter(user_name_id=self.user_id)
+        image = UserImage.objects.filter(user_name_id=self.user_id)
+        league_assigned = True if len(league_data) > 0 else False
+        bet_assigned = True if len(bet_data) > 0 else False
+        image_uploaded = True if len(image) > 0 else False
+        return {'league': league_assigned, 'bet': bet_assigned, 'image': image_uploaded}
+
+
+class UserPredictionBase:
     def __init__(self, user_id):
         self.TOKEN = env('API_TOKEN')
         self.PREFIX = 'https://api.statorium.com/api/v1'
@@ -212,9 +108,68 @@ class UpdateUserPrediction:
                  }
         return metadata
 
-    @staticmethod
-    def get_user_prediction():
-        df_init = pd.DataFrame(list(Game.objects.all().values()))
+    def get_user_leagues(self) -> tuple:
+        league_member_data = list(LeagueMember.objects.filter(user_name_id=self.user_id).values())
+        leagues = [item['league_name_id'] for item in league_member_data]
+        if len(leagues) > 0:
+            return True, leagues
+        else:
+            return False, None
+
+    def get_league_members(self):
+        leagues = self.get_user_leagues()
+        if leagues[0]:
+            league_data_output = []
+            for obj in leagues[1]:
+                league_users = list(LeagueMember.objects.filter(league_name_id=obj).values())
+                league_users_dict = {item['user_name_id']: item for item in league_users}
+                user_image = list(UserImage.objects.all().values())
+                user_image_dict = {item['user_name_id']: item['header_image'] for item in user_image}
+                user_id_with_images = [item for item in user_image_dict.keys()]
+                for member in league_users:
+                    user_id = member['user_name_id']
+                    if user_id in user_id_with_images:
+                        league_users_dict[user_id]['image'] = f"{AWS_S3_URL}{user_image_dict[user_id]}"
+                    else:
+                        league_users_dict[user_id]['image'] = f"{AWS_S3_URL}{DEFAULT_PHOTO}"
+                league_data_output_unit = [item for item in league_users_dict.values()]
+                league_data_output.append(league_data_output_unit)
+            meta = {}
+            for item in league_data_output:
+                league_name = item[0]['league_name_id']
+                meta[league_name] = []
+                for sub_item in item:
+                    meta[league_name].append([sub_item['nick_name'], sub_item['image']])
+            return meta
+        else:
+            return None
+
+    def get_league_members_data(self) -> dict:
+        data = LeagueMember.objects.filter(user_name_id=self.user_id)
+        if len(data) > 0:
+            league_data = list(data.values())
+            output = {}
+            for item in league_data:
+                output[item['league_name_id']] = item['id']
+            return output
+        else:
+            return None
+
+    def user_game_bet_id(self) -> dict:
+        data = Game.objects.filter(user_name_id=self.user_id)
+        if len(data) > 0:
+            return data[0].id
+        else:
+            return None
+
+    def extract_relevant_user_ids(self) -> list:
+        leagues = list(LeagueMember.objects.filter(user_name_id=self.user_id).values('league_name'))
+        ids = list(LeagueMember.objects.filter(league_name_id__in=[i['league_name'] for i in leagues]).values('user_name_id'))
+        return [i['user_name_id'] for i in ids]
+
+    def get_user_prediction(self):
+        relevant_ids = self.extract_relevant_user_ids()
+        df_init = pd.DataFrame(list(Game.objects.filter(user_name_id__in=relevant_ids).values()))
         df = df_init.drop(columns=['created', 'updated', 'id']).sort_values(by='user_name_id').\
             groupby('user_name_id').first().reset_index().melt(id_vars='user_name_id')
         df = df[~df.variable.str.contains('top_')]
@@ -225,10 +180,10 @@ class UpdateUserPrediction:
         df_main[['pred_score_home', 'pred_score_away']] = df_main.predicted_score.str.split('-', expand=True, n=1)[[0, 1]]
         return df_main
 
-    @staticmethod
-    def fetch_user_league_membership_data(user_id):
+    def fetch_user_league_membership_data(self, user_id):
+        relevant_ids = self.extract_relevant_user_ids()
         league_member_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name', 'created']
-        df_league_member_pre = pd.DataFrame(list(LeagueMember.objects.all().values()))[league_member_fields].\
+        df_league_member_pre = pd.DataFrame(list(LeagueMember.objects.filter(user_name_id__in=relevant_ids).values()))[league_member_fields].\
             sort_values(by=['user_name_id', 'league_name_id', 'created'], ascending=[True, True, False])
         leagues = list(df_league_member_pre[df_league_member_pre.user_name_id == user_id].league_name_id.unique())
         df_league_member = df_league_member_pre.groupby(['user_name_id', 'league_name_id']).first().\
@@ -236,7 +191,8 @@ class UpdateUserPrediction:
         return df_league_member[df_league_member.league_name_id.isin(leagues)]
 
     def get_top_players_predictions(self) -> dict:
-        df_init = pd.DataFrame(list(Game.objects.all().values()))
+        relevant_ids = self.extract_relevant_user_ids()
+        df_init = pd.DataFrame(list(Game.objects.filter(user_name_id=relevant_ids).values()))
         df = df_init.drop(columns=['created', 'updated', 'id']).sort_values(by='user_name_id').\
             groupby('user_name_id').first().reset_index().melt(id_vars='user_name_id')
         df = df[df.variable.str.contains('top_')]
@@ -258,15 +214,11 @@ class UpdateUserPrediction:
         df['event_type'] = df.variable.str[:-2]
         df_predictions = df[['user_name_id', 'event_type', 'player_name', 'value']]
         df_predictions['event_type'] = np.where(df_predictions['event_type'] == 'top_scorer', 'Top Scorer', 'Top Assist')
-        df_real_players = StatsTopPlayers(self.user_id).top_players_real()
+        df_real_players = TopPlayerStats( self.user_id ).top_players_real()
         df_output = pd.merge(df_predictions, df_real_players[1], on=['player_name', 'event_type'], how='left')
         output = {item: df_output[df_output.event_type == item][['player_name', 'team', 'count']].values.tolist()
                   for item in ['Top Scorer', 'Top Assist']}
         return output
-
-    def get_live_game_predictions(self) -> dict:
-        data = self.get_user_prediction()
-        return data
 
     def data_enrichment(self):
         extra_fields = ['game_id', 'match_label', 'real_score', 'real_score_home', 'real_score_away', 'game_status', 'date', 'hour']
@@ -369,8 +321,8 @@ class UpdateUserPrediction:
     def user_game_points(self):
         data = self.data_enrichment()
         leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
-        next_game = EuMatch().next_match().match_label[0]
-        prev_game = EuMatch().prev_match().match_label[0]
+        next_game = GetMatchData().next_match().match_label[0]
+        prev_game = GetMatchData().prev_match().match_label[0]
         if len(leagues) > 0:
             output = {}
             for item in leagues:
@@ -409,7 +361,7 @@ class UpdateUserPrediction:
             return None
 
     def home_screen_match_relevant_data(self):
-        init_match = EuMatch()
+        init_match = GetMatchData()
         next_match_df = init_match.next_match()
         prev_match_df = init_match.prev_match()
         next_match = {key: obj[0] for key, obj in next_match_df.head(1).to_dict().items()}
@@ -499,7 +451,7 @@ class UpdateUserPrediction:
             return None
 
 
-class EuMatch:
+class GetMatchData:
     def __init__(self):
         self.TOKEN = 'bfa132288504de6860c8ae3259d21fa7'
         self.PREFIX = 'https://api.statorium.com/api/v1'
@@ -579,7 +531,7 @@ class EuMatch:
         return top_player_list
 
 
-class StatsTopPlayers(EuMatch):
+class TopPlayerStats(GetMatchData):
     def __init__(self, user_id):
         super().__init__()
         self.user_id = user_id
@@ -636,7 +588,7 @@ class StatsTopPlayers(EuMatch):
 
     def data_sankey_live_game(self, data) -> dict:
         predicted_result = [obj[1] for obj in data]
-        user_ids = [obj[3] for obj in data] #new
+        user_ids = [obj[3] for obj in data]
         unique_user_ids = self.unique(user_ids)
         ranked_unique_user_ids = self.ranked_items(unique_user_ids)
         source_map = {key: val for key, val in zip(unique_user_ids, ranked_unique_user_ids)}
@@ -663,14 +615,14 @@ class StatsTopPlayers(EuMatch):
         return div
 
     def top_players_pred_plot(self) -> dict:
-        data = UpdateUserPrediction(user_id=self.user_id).get_top_players_predictions()
+        data = UserPredictionBase( user_id=self.user_id ).get_top_players_predictions()
         output = {}
         for key, val in data.items():
             scorers_data = self.data_sankey_top_players(val, 'top_scorer')
             assists_data = self.data_sankey_top_players(val, 'top_assist')
             output[key] = {
-                        'top_scorer': self.build_sankey_plot(scorers_data),
-                        'top_assist': self.build_sankey_plot(assists_data)
+                    'top_scorer': self.build_sankey_plot(scorers_data),
+                    'top_assist': self.build_sankey_plot(assists_data)
                    }
         return output
 
@@ -683,10 +635,37 @@ class StatsTopPlayers(EuMatch):
             away_distance = score_list[1] - score_list[3]
             return home_distance + away_distance
 
+    @staticmethod
+    def get_live_winning_users(data, ids: dict, images: dict, match_label: str):
+        output = {}
+        for key, val in data.items():
+            base_data = [[item[0]] + [*item[7:11]] for item in val if item[3] == match_label]
+            df = pd.DataFrame(base_data, columns=['nick', 'p_h', 'p_a', 'r_h', 'r_a'])
+            df['user_type'] = np.where(((df.p_h == df.r_h) & (df.p_a == df.r_a)), 'boomer',
+                                       np.where(
+                                            ((df.p_h > df.p_a) & (df.r_h > df.r_a)) |
+                                            ((df.p_h == df.p_a) & (df.r_h == df.r_a)) |
+                                            ((df.p_h < df.p_a) & (df.r_h < df.r_a))
+                                            , 'winner', 'Loser'))
+            adj_img_dict = {}
+            relevant_users = [ids[i] for i in list(df[df.user_type != 'Loser']['nick'].unique())]
+            for uid in relevant_users:
+                adj_img_dict[uid] = f"{AWS_S3_URL}{images[uid]}" if uid in [i for i in images.keys()] else f"{AWS_S3_URL}{DEFAULT_PHOTO}"
+            output[key] = {
+                'Boomers': [[item, ids[item], adj_img_dict[ids[item]]] for item in df[df.user_type == 'boomer']['nick']],
+                'Winners': [[item, ids[item], adj_img_dict[ids[item]]] for item in df[df.user_type == 'winner']['nick']]
+            }
+        return output
+
     def live_game_plot(self, match_label: str = 'Denmark-Finland') -> dict:
-        data = UpdateUserPrediction(user_id=self.user_id).present_predictions()[0]
-        user_id_df = pd.DataFrame(LeagueMember.objects.all().values())
-        user_id_map = {item[1]: item[0] for item in user_id_df[['user_name_id', 'nick_name']].values.tolist()}
+        BaseClassData = UserPredictionBase(user_id=self.user_id)
+        relevant_user_ids = BaseClassData.extract_relevant_user_ids()
+        data = BaseClassData.present_predictions()[0]
+        league_members_data = list(LeagueMember.objects.filter(user_name_id__in=relevant_user_ids).values('user_name_id', 'nick_name'))
+        user_id_map = {item['nick_name']: item['user_name_id'] for item in league_members_data}
+        unique_user_ids = list(set([item for item in user_id_map.values()]))
+        user_image = {item['user_name_id']: item['header_image']
+                      for item in list(UserImage.objects.filter(user_name_id__in=unique_user_ids).values())}
         output = {}
         for key, val in data.items():
             init_data = [[
@@ -698,10 +677,10 @@ class StatsTopPlayers(EuMatch):
             relevant_data = [item for item in init_data if item[2] < 15]
             data_preps = self.data_sankey_live_game(relevant_data)
             output[key] = self.build_sankey_plot(data_preps)
-        return output
+        return output, self.get_live_winning_users(data, user_id_map, user_image, match_label)
 
 
-class StatsNextGame(UpdateUserPrediction):
+class GameStats(UserPredictionBase):
     def __init__(self, user_id, match_label):
         super().__init__(user_id)
         self.match_label = match_label
@@ -801,16 +780,6 @@ class StatsNextGame(UpdateUserPrediction):
             return self.merge_dicts(output_score, output_winner)
         else:
             return None
-
-
-
-
-
-
-
-
-
-
 
 
 

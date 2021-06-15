@@ -1,22 +1,16 @@
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import send_mail
 from pipelines.data_prep import *
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
+from django.views.generic import CreateView, UpdateView, TemplateView
 from .forms import *
 from .models import *
 from data.teams import team_game_map
 from django.urls import reverse
-from django_tables2 import SingleTableView
-from .tables import PredictionTable
 from .filters import *
 from django.shortcuts import render
-from plotly.offline import plot
-from plotly.graph_objs import Scatter
 from django.conf import settings
 import environ
 import os
-import plotly.offline as opy
 
 
 env = environ.Env(SECRET_KEY=str,)
@@ -26,52 +20,33 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 class HomeView(TemplateView):
     template_name = "home.html"
-    get_api_data = EuMatch()
+    GetAPIData = GetMatchData()
 
     def get(self, request):
         if request.user.is_authenticated:
-            league_data_output = get_league_member_data(request.user.id)
-            user_pred_init = UpdateUserPrediction(request.user.id)
-            onboarding = user_onboarding(request.user.id)
-            bet_id = user_game_bet_id(request.user.id)
-            league_table_output = user_pred_init.league_member_points()
-            league_memberships = get_league_member_id(request.user.id)
-            games_started = self.get_api_data.started_games()
-            presented_data = user_pred_init.home_screen_match_relevant_data()
-            logos_dict = {}
-
+            UserPred = UserPredictionBase(request.user.id)
+            games_started = self.GetAPIData.started_games()
+            league_data_output = UserPred.get_league_members()
+            onboarding = BaseViewUserControl(request.user.id).onboarding()
             if league_data_output is not None:
-                for key, val in league_data_output.items():
-                    logos_dict[key] = {}
-                    for value in val:
-                        logos_dict[key][value[0]] = value[1]
-                boom_logos = {'prev': {}, 'next': {}}
-
-                if presented_data[0] is not None:
-                    for key, val in presented_data[2].items():
-                        logos_prev = [logos_dict[key][item] for item in val['prev']['boom']]
-                        logos_next = [logos_dict[key][item] for item in val['next']['boom']]
-                        boom_logos['prev'][key] = logos_prev
-                        boom_logos['next'][key] = logos_next
-                else:
-                    boom_logos = None
-                context = {
-                    'league_members': league_data_output,
-                    'next_match': presented_data[1],
-                    'prev_match': presented_data[0],
-                    'next_match_logos': self.get_api_data.next_match_logos(),
-                    'prev_match_logos': self.get_api_data.prev_match_logos(),
-                    'league_signup': onboarding['league'],
-                    'committed_a_bet': onboarding['bet'],
-                    'image_uploaded': onboarding['image'],
-                    'bet_id': bet_id,
-                    'league_member_points': league_table_output,
-                    'league_memberships': league_memberships,
-                    'user_game_points': presented_data[2],
-                    'boom_logos': boom_logos,
-                    'games_started': games_started
-                }
-                return render(request, self.template_name, context)
+               context = {
+                        'league_members': league_data_output,
+                        'next_match_logos': self.GetAPIData.next_match_logos(),
+                        'prev_match_logos': self.GetAPIData.prev_match_logos(),
+                        'league_signup': onboarding['league'],
+                        'committed_a_bet': onboarding['bet'],
+                        'image_uploaded': onboarding['image'],
+                        'bet_id': UserPred.user_game_bet_id(),
+                        'league_member_points': UserPred.league_member_points(),
+                        'league_memberships': UserPred.get_league_members_data(),
+                        'games_started': games_started
+                    }
+               presented_data = UserPred.home_screen_match_relevant_data()
+               if presented_data[0] is not None:
+                    context['user_game_points'] = presented_data[2]
+                    context['next_match'] = presented_data[1]
+                    context['prev_match'] = presented_data[0]
+               return render(request, self.template_name, context)
             else:
                 return render(request, self.template_name, {'data': None})
         else:
@@ -90,7 +65,7 @@ class BaseView(TemplateView):
     template_name = "base.html"
 
     def get(self, request):
-        onboarding = user_onboarding(request.user.id)
+        onboarding = BaseViewUserControl(request.user.id).onboarding()
         context = {
             'league_signup': onboarding['league'],
             'committed_a_bet': onboarding['bet']
@@ -190,10 +165,10 @@ class AddBetsView(TemplateView):
                     top_assist_3=form.cleaned_data['top_assist_3'],)
             obj.save()
             try:
-                league_user_email = [get_league_user_email(request.user.id)]
+                league_user_email = [LeagueMember.objects.filter(user_name_id=request.user.id)[0].email]
                 if league_user_email[0] != env('EMAIL_HOST_USER'):
                     league_user_email.append(env('EMAIL_HOST_USER'))
-                email_data = prepare_bet_submission_email(request, form)
+                email_data = MailTemplate().prepare_bet_submission_email(request, form)
                 send_mail(
                      email_data['subject'],
                      email_data['message'],
@@ -241,8 +216,8 @@ class CreateLeagueMemberView(CreateView):
                     email=form.cleaned_data['email'],
                 )
             obj.save()
-            league_user_email = get_league_user_email(request.user.id)
-            email_data = prepare_league_user_email(request, form)
+            league_user_email = LeagueMember.objects.filter(user_name_id=request.user.id)[0].email
+            email_data = MailTemplate.prepare_league_user_email(request, form)
             recipient_list = [league_user_email, env('EMAIL_HOST_USER')]
             try:
                send_mail(
@@ -285,7 +260,7 @@ class AllPredictionsView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            class_init = UpdateUserPrediction(request.user.id)
+            class_init = UserPredictionBase( request.user.id )
             get_league_data = class_init.present_predictions()
             league_data_output = get_league_data[0]
             league_table_output = class_init.league_member_points()
@@ -307,7 +282,7 @@ class MyPredictionsView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            class_init = UpdateUserPrediction(request.user.id)
+            class_init = UserPredictionBase( request.user.id )
             get_my_predictions = class_init.present_my_predictions()
             get_my_players = class_init.get_top_players_my_predictions()
         else:
@@ -324,7 +299,7 @@ class LeagueTableView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            class_init = UpdateUserPrediction(request.user.id)
+            class_init = UserPredictionBase( request.user.id )
             get_league_data = class_init.present_predictions()
             league_data_output = get_league_data[0]
             league_table_output = class_init.league_member_points()
@@ -341,48 +316,79 @@ class LeagueTableView(TemplateView):
         return render(request, self.template_name, context)
 
 
-def plot_index(request):
-    next_match_init = EuMatch()
-    next_match = next_match_init.next_match()
-    match_label = next_match.match_label[0]
-    status = next_match.match_status[0]
-    match_status = 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished'
-    score = f"{next_match.home_team_score[0]}-{next_match.away_team_score[0]}"
-    plot_init = StatsNextGame(request.user.id, match_label)
-    viz_next_match = plot_init.match_prediction_outputs()
-    next_match_logos = next_match_init.next_match_logos()
-    context = {
-        'plot_next_match': viz_next_match,
-        'title': match_label,
-        'real_score': score,
-        'logos': next_match_logos,
-        'status': match_status,
+class LiveGameView:
+    def next(request):
+        is_next = True
+        Match = GetMatchData()
+        match = Match.next_match() if is_next else Match.prev_match()
+        status = match.match_status[0]
+        LiveOutput = TopPlayerStats(request.user.id).live_game_plot( match_label=match.match_label[0] )
+        context = {
+            'title': match.match_label[0],
+            'real_score': f"{match.home_team_score[0]}-{match.away_team_score[0]}",
+            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
+            'plots': LiveOutput[0],
+            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
+            'entitled_users': LiveOutput[1]
         }
-    return render(request, "stats_next_game.html", context)
+        template_name = f"stats_live_game_{'next' if is_next else 'prev'}.html"
+        return render(request, template_name, context)
+
+    def prev(request):
+        is_next = False
+        TopPlayer = TopPlayerStats(request.user.id)
+        Match = GetMatchData()
+        match = Match.next_match() if is_next else Match.prev_match()
+        status = match.match_status[0]
+        context = {
+            'title': match.match_label[0],
+            'real_score': f"{match.home_team_score[0]}-{match.away_team_score[0]}",
+            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
+            'plots': TopPlayer.live_game_plot(match_label=match.match_label[0]),
+            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos()
+        }
+        template_name = f"stats_live_game_{'next' if is_next else 'prev'}.html"
+        return render(request, template_name, context)
 
 
-def plot_index_last_match(request):
-    match_init = EuMatch()
-    prev_match = match_init.prev_match()
-    match_label = prev_match.match_label[0]
-    status = prev_match.match_status[0]
-    match_status = 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished'
-    score = f"{prev_match.home_team_score[0]}-{prev_match.away_team_score[0]}"
-    plot_init = StatsNextGame(request.user.id, match_label)
-    viz_prev_match = plot_init.match_prediction_outputs()
-    next_match_logos = match_init.prev_match_logos()
-    context = {
-        'plot_next_match': viz_prev_match,
-        'title': match_label,
-        'real_score': score,
-        'logos': next_match_logos,
-        'status': match_status,
-        }
-    return render(request, "stats_prev_game.html", context)
+class GameStatsView:
+    def next(request):
+        is_next = True
+        Match = GetMatchData()
+        match = Match.next_match() if is_next else Match.prev_match()
+        status = match.match_status[0]
+        Plot = GameStats( request.user.id, match.match_label[0] )
+        viz = Plot.match_prediction_outputs()
+        context = {
+            'plot_next_match': viz,
+            'title': match.match_label[0],
+            'real_score':  f"{match.home_team_score[0]}-{match.away_team_score[0]}",
+            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
+            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
+            }
+        template = 'stats_next_game.html' if is_next else 'stats_prev_game.html'
+        return render(request, template, context)
+
+    def prev(request):
+        is_next = False
+        Match = GetMatchData()
+        match = Match.next_match() if is_next else Match.prev_match()
+        status = match.match_status[0]
+        Plot = GameStats( request.user.id, match.match_label[0] )
+        viz = Plot.match_prediction_outputs()
+        context = {
+            'plot_next_match': viz,
+            'title': match.match_label[0],
+            'real_score':  f"{match.home_team_score[0]}-{match.away_team_score[0]}",
+            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
+            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
+            }
+        template = 'stats_next_game.html' if is_next else 'stats_prev_game.html'
+        return render(request, template, context)
 
 
 def plot_top_players(request):
-    data_class_init = StatsTopPlayers(request.user.id)
+    data_class_init = TopPlayerStats(request.user.id)
     top_players_real = {key: val[0:10] for key, val in
                         data_class_init.top_players_real()[0].items()}
     started_games = data_class_init.started_games()
@@ -393,47 +399,3 @@ def plot_top_players(request):
         'plots': predicted_plots
         }
     return render(request, "stats_top_players.html", context)
-
-
-def plot_live_next_match(request):
-    data_class_init = StatsTopPlayers(request.user.id)
-    next_match_init = EuMatch()
-    next_match_logos = next_match_init.next_match_logos()
-    next_match = next_match_init.next_match()
-    match_label = next_match.match_label[0]
-    status = next_match.match_status[0]
-    match_status = 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished'
-    score = f"{next_match.home_team_score[0]}-{next_match.away_team_score[0]}"
-
-    live_plots = data_class_init.live_game_plot(match_label=match_label)
-
-    context = {
-        'title': match_label,
-        'real_score': score,
-        'status': match_status,
-        'plots': live_plots,
-        'logos': next_match_logos
-        }
-    return render(request, "stats_live_game_next.html", context)
-
-
-def plot_live_prev_match(request):
-    data_class_init = StatsTopPlayers(request.user.id)
-    prev_match_init = EuMatch()
-    prev_match_logos = prev_match_init.prev_match_logos()
-    prev_match = prev_match_init.prev_match()
-    match_label = prev_match.match_label[0]
-    status = prev_match.match_status[0]
-    match_status = 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished'
-    score = f"{prev_match.home_team_score[0]}-{prev_match.away_team_score[0]}"
-
-    live_plots = data_class_init.live_game_plot(match_label=match_label)
-
-    context = {
-        'title': match_label,
-        'real_score': score,
-        'status': match_status,
-        'plots': live_plots,
-        'logos': prev_match_logos
-        }
-    return render(request, "stats_live_game_next.html", context)
