@@ -12,40 +12,38 @@
     <h3>Next Match Predictions</h3>
     <hr>
 <body>
-<center>
-    {% for key, obj in logos.items %}
-        <style>
-            img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
-            h4.liketext { display:inline }
-        </style>
-            <img class='likeordislike' src='{{ obj }}' width="40" height="40"/><h4 class='liketext'>{{ key }}</h4>
-        {% if forloop.counter == 1 %} - {% endif %}
-    {% endfor %}
-</center>
-<center>
-    <hr>
-        <p>Status: {{ status }} <br> {{ real_score }}</p>
-</center>
      {% for key, plot in plot_next_match.items %}
+         <center>
+            {% for key, obj in logos.items %}
+                <style>
+                    img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
+                    h4.liketext { display:inline }
+                </style>
+                    <img class='likeordislike' src='{{ obj }}' width="40" height="40"/><h4 class='liketext'>{{ key }}</h4>
+                {% if forloop.counter == 1 %} - {% endif %}
+            {% endfor %}
+                <p>Status: {{ status }} <br> {{ real_score }}</p>
+        </center>
          <hr class="bold">
          <center> <p> {{ key }} </p> </center>
          <hr class="bold">
-            {% for item in plot %}
-            <body>
-                 <style>
-                     .modebar{
-                        display: none !important;
-                     }
-                     hr.bold {
-                          border-top: 2px dashed #DE3163;
-                        }
-                 </style>
-                  {% autoescape off %}
-                    {{ item|safe }}
-                  {% endautoescape %}
-                  {% if forloop.counter == 1 %}<hr>{% endif %}
-             </body>
-          {% endfor %}
+                {% for item in plot %}
+                    <body>
+                         <style>
+                             .modebar{
+                                display: none !important;
+                             }
+                             hr.bold {
+                                    border: 1px solid #DE3163;
+                                    border-radius: 1px;
+                                }
+                         </style>
+                          {% autoescape off %}
+                            {{ item|safe }}
+                          {% endautoescape %}
+                    <hr>
+                     </body>
+              {% endfor %}
         {% endfor %}
 </body>
 
