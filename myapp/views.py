@@ -266,7 +266,7 @@ class AllPredictionsView(TemplateView):
             league_table_output = class_init.league_member_points()
         else:
             league_data_output = None
-        onboarding = user_onboarding(request.user.id)
+        onboarding = BaseViewUserControl(request.user.id).onboarding()
         context = {
             'league_members': league_data_output,
             'league_signup': onboarding['league'],
@@ -388,11 +388,11 @@ class GameStatsView:
 
 
 def plot_top_players(request):
-    data_class_init = TopPlayerStats(request.user.id)
+    DataClass = TopPlayerStats(request.user.id)
     top_players_real = {key: val[0:10] for key, val in
-                        data_class_init.top_players_real()[0].items()}
-    started_games = data_class_init.started_games()
-    predicted_plots = data_class_init.top_players_pred_plot()
+                        DataClass.top_players_real()[0].items()}
+    started_games = DataClass.started_games()
+    predicted_plots = DataClass.top_players_pred_plot()
     context = {
         'top_players': top_players_real,
         'games_started': started_games,

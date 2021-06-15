@@ -192,7 +192,7 @@ class UserPredictionBase:
 
     def get_top_players_predictions(self) -> dict:
         relevant_ids = self.extract_relevant_user_ids()
-        df_init = pd.DataFrame(list(Game.objects.filter(user_name_id=relevant_ids).values()))
+        df_init = pd.DataFrame(list(Game.objects.filter(user_name_id__in=relevant_ids).values()))
         df = df_init.drop(columns=['created', 'updated', 'id']).sort_values(by='user_name_id').\
             groupby('user_name_id').first().reset_index().melt(id_vars='user_name_id')
         df = df[df.variable.str.contains('top_')]
