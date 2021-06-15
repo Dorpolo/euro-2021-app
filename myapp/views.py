@@ -260,10 +260,10 @@ class AllPredictionsView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            class_init = UserPredictionBase( request.user.id )
-            get_league_data = class_init.present_predictions()
+            UserPrediction = UserPredictionBase( request.user.id )
+            get_league_data = UserPrediction.present_predictions()
             league_data_output = get_league_data[0]
-            league_table_output = class_init.league_member_points()
+            league_table_output = UserPrediction.league_member_points()
         else:
             league_data_output = None
         onboarding = BaseViewUserControl(request.user.id).onboarding()
@@ -322,7 +322,7 @@ class LiveGameView:
         Match = GetMatchData()
         match = Match.next_match() if is_next else Match.prev_match()
         status = match.match_status[0]
-        LiveOutput = TopPlayerStats(request.user.id).live_game_plot( match_label=match.match_label[0] )
+        LiveOutput = TopPlayerStats(request.user.id).live_game_plot( match_label=match.match_label[0])
         context = {
             'title': match.match_label[0],
             'real_score': f"{match.home_team_score[0]}-{match.away_team_score[0]}",
@@ -336,16 +336,17 @@ class LiveGameView:
 
     def prev(request):
         is_next = False
-        TopPlayer = TopPlayerStats(request.user.id)
         Match = GetMatchData()
         match = Match.next_match() if is_next else Match.prev_match()
         status = match.match_status[0]
+        LiveOutput = TopPlayerStats(request.user.id).live_game_plot( match_label=match.match_label[0])
         context = {
             'title': match.match_label[0],
             'real_score': f"{match.home_team_score[0]}-{match.away_team_score[0]}",
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
-            'plots': TopPlayer.live_game_plot(match_label=match.match_label[0]),
-            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos()
+            'plots': LiveOutput[0],
+            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
+            'entitled_users': LiveOutput[1]
         }
         template_name = f"stats_live_game_{'next' if is_next else 'prev'}.html"
         return render(request, template_name, context)
@@ -374,7 +375,7 @@ class GameStatsView:
         Match = GetMatchData()
         match = Match.next_match() if is_next else Match.prev_match()
         status = match.match_status[0]
-        Plot = GameStats( request.user.id, match.match_label[0] )
+        Plot = GameStats(request.user.id, match.match_label[0])
         viz = Plot.match_prediction_outputs()
         context = {
             'plot_next_match': viz,

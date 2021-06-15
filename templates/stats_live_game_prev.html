@@ -3,6 +3,15 @@
 
 
 {% block content %}
+
+<style>
+    .dp-styled-img {
+      height: 35px;
+      width: 35px;
+      border-radius: 50%;
+    }
+</style>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,20 +23,20 @@
     <body>
      {% for key, plot in plots.items %}
              <center>
-                {% for key, obj in logos.items %}
+                {% for subkey, obj in logos.items %}
                     <style>
                         img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
                         h4.liketext { display:inline }
                     </style>
-                        <img class='likeordislike' src='{{ obj }}' width="40" height="40"/><h4 class='liketext'>{{ key }}</h4>
+                        <img class='likeordislike' src='{{ obj }}' width="40" height="40"/><h4 class='liketext'>{{ subkey }}</h4>
                     {% if forloop.counter == 1 %} - {% endif %}
                 {% endfor %}
                     <p> Status: {{ status }} <br> {{ real_score }}</p>
             </center>
-         <hr class="bold">
+          <hr class="bold">
             <center> <p> {{ key }} </p> </center>
-         <hr class="bold">
-    <body>
+          <hr class="bold">
+            <body>
                  <style>
                      .modebar{
                         display: none !important;
@@ -40,8 +49,30 @@
                   {% autoescape off %}
                     {{ plot|safe }}
                   {% endautoescape %}
+                 <center>
+                     <div>
+                        {% for entitled_key, entitled_val in entitled_users.items %}
+                            {% if key == entitled_key %}
+                                {% for item_key, item_val in entitled_val.items %}
+                                    {% if item_val|length > 0 %}
+                                        <h6>{{ item_key }}</h6>
+                                            {% for subitem_val in item_val %}
+                                                <img class="dp-styled-img" src="{{subitem_val.2}}">
+                                            {% endfor %}
+                                            <br>
+                                    {% endif %}
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        <hr>
+                        Can't see yourself? <a href={% url 'add_image' %}>upload your photo</a>
+                     </div>
+                 </center>
              </body>
-        {% endfor %}
+         <hr>
+    {% endfor %}
+     <hr class="bold">
 </body>
-{% endblock %}
 
+{% endblock %}
