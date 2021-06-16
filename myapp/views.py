@@ -305,7 +305,7 @@ class LeagueTableView(TemplateView):
             league_table_output = class_init.league_member_points()
         else:
             league_data_output = None
-        onboarding = user_onboarding(request.user.id)
+        onboarding = onboarding = BaseViewUserControl(request.user.id).onboarding()
         context = {
             'league_members': league_data_output,
             'league_signup': onboarding['league'],
