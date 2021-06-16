@@ -358,7 +358,7 @@ class GameStatsView:
         Match = GetMatchData()
         match = Match.next_match() if is_next else Match.prev_match()
         status = match.match_status[0]
-        Plot = GameStats( request.user.id, match.match_label[0] )
+        Plot = GameStats(request.user.id, match.match_label[0])
         viz = Plot.match_prediction_outputs()
         context = {
             'plot_next_match': viz,

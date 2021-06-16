@@ -426,11 +426,17 @@ class UserPredictionBase:
 
     def get_game_points_group_stage(self, df):
         data = df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).\
-            reset_index().drop(columns=['user_name_id']).sort_values(
+            reset_index().sort_values(
                     by=[('points',), ('boom',), ('direction', ), ('predicted_goals', )], ascending=[False]*4
-                    )
+                    )[['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate',
+                       'predicted_goals', 'live_points', 'user_name_id']]
         data['rn'] = np.arange(len(data)) + 1
         return self.adjust_table_column_type(data)
+
+    def get_user_league_rank(self) -> dict:
+        get_user_points = self.league_member_points()
+        print(get_user_points)
+        return {key: {sub[0]: sub[9] for sub in val} for key, val in get_user_points.items()}
 
     def get_game_points_knockout(self) -> tuple:
         pass
@@ -586,7 +592,7 @@ class TopPlayerStats(GetMatchData):
         value = [1 for _ in source]
         return {'source': source, 'target': target, 'value': value, 'label': label}
 
-    def data_sankey_live_game(self, data) -> dict:
+    def data_sankey_live_game(self, data, league_name: str) -> dict:
         predicted_result = [obj[1] for obj in data]
         user_ids = [obj[3] for obj in data]
         unique_user_ids = self.unique(user_ids)
@@ -594,7 +600,9 @@ class TopPlayerStats(GetMatchData):
         source_map = {key: val for key, val in zip(unique_user_ids, ranked_unique_user_ids)}
         source = [source_map[i] for i in user_ids]
         users = [obj[0] for obj in data]
-        unique_users = self.unique(users)
+        unique_users_pre = self.unique(users)
+        user_rank_map = UserPredictionBase(self.user_id).get_user_league_rank()[league_name]
+        unique_users = [f"{item} ({user_rank_map[item]})" for item in unique_users_pre]
         unique_results = self.unique(predicted_result)
         label = unique_users + unique_results
         n_start, n_results = len(ranked_unique_user_ids), len(unique_results)
@@ -657,7 +665,7 @@ class TopPlayerStats(GetMatchData):
             }
         return output
 
-    def live_game_plot(self, match_label: str = 'Denmark-Finland') -> dict:
+    def live_game_plot(self, match_label: str) -> dict:
         BaseClassData = UserPredictionBase(user_id=self.user_id)
         relevant_user_ids = BaseClassData.extract_relevant_user_ids()
         data = BaseClassData.present_predictions()[0]
@@ -675,7 +683,7 @@ class TopPlayerStats(GetMatchData):
                 user_id_map[item[0]]
             ] for item in val if item[3] == match_label]
             relevant_data = [item for item in init_data if item[2] < 15]
-            data_preps = self.data_sankey_live_game(relevant_data)
+            data_preps = self.data_sankey_live_game(relevant_data, league_name=key)
             output[key] = self.build_sankey_plot(data_preps)
         return output, self.get_live_winning_users(data, user_id_map, user_image, match_label)
 
