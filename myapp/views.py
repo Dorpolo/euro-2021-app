@@ -185,6 +185,45 @@ class AddBetsView(TemplateView):
         return render(request, self.template_name, {'form': form})
 
 
+class AddBetsTop16View(TemplateView):
+    template_name = "add_bets_top_16.html"
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
+class AddBetsTop8View(TemplateView):
+    template_name = "add_bets_top_8.html"
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+class AddBetsTop4View(TemplateView):
+    template_name = "add_bets_top_4.html"
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+class AddBetsTop2View(TemplateView):
+    template_name = "add_bets_top_2.html"
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
+
 class UpdateBetView(UpdateView):
     model = Game
     form_class = BetForm
@@ -282,9 +321,9 @@ class MyPredictionsView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            class_init = UserPredictionBase( request.user.id )
-            get_my_predictions = class_init.present_my_predictions()
-            get_my_players = class_init.get_top_players_my_predictions()
+            UserPred = UserPredictionBase(request.user.id)
+            get_my_predictions = UserPred.present_my_predictions()
+            get_my_players = UserPred.get_top_players_my_predictions()
         else:
             get_my_predictions = None
         context = {
@@ -305,7 +344,7 @@ class LeagueTableView(TemplateView):
             league_table_output = class_init.league_member_points()
         else:
             league_data_output = None
-        onboarding = onboarding = BaseViewUserControl(request.user.id).onboarding()
+        onboarding = BaseViewUserControl(request.user.id).onboarding()
         context = {
             'league_members': league_data_output,
             'league_signup': onboarding['league'],
