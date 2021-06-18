@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from data import players
+from data.knockout import *
 
 
 class Game(models.Model):
@@ -92,6 +93,106 @@ class Game(models.Model):
         return reverse('home')
 
 
+class GameTop16(models.Model):
+    user_name = models.OneToOneField(User, on_delete=models.CASCADE)
+    gid_a0_0 = models.IntegerField(TOP_16[0][0][0])
+    gid_a0_1 = models.IntegerField(TOP_16[0][1][0])
+    gid_a0_w = models.CharField('Winning Team', max_length=40, choices=TOP_16[0])
+    gid_a0_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a1_0 = models.IntegerField(TOP_16[1][0][0])
+    gid_a1_1 = models.IntegerField(TOP_16[1][1][0])
+    gid_a1_w = models.CharField('Winning Team', max_length=40, choices=TOP_16[1])
+    gid_a1_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a2_0 = models.IntegerField(TOP_16[2][0][0])
+    gid_a2_1 = models.IntegerField(TOP_16[2][1][0])
+    gid_a2_w = models.CharField('Winning Team', max_length=40, choices=TOP_16[2])
+    gid_a2_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a3_0 = models.IntegerField(TOP_16[3][0][0])
+    gid_a3_1 = models.IntegerField(TOP_16[3][1][0])
+    gid_a3_w = models.CharField('Winning Team', max_length=40, choices=TOP_16[3])
+    gid_a3_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a4_0 = models.IntegerField(TOP_16[4][0][0])
+    gid_a4_1 = models.IntegerField(TOP_16[4][1][0])
+    gid_a4_w = models.CharField('Winning Team', max_length=40, choices=TOP_16[4])
+    gid_a4_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a5_0 = models.IntegerField(TOP_16[5][0][0])
+    gid_a5_1 = models.IntegerField(TOP_16[5][1][0])
+    gid_a5_w = models.CharField('Winning Team', max_length=40, choices=TOP_16[5])
+    gid_a5_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a6_0 = models.IntegerField(TOP_16[6][0][0])
+    gid_a6_1 = models.IntegerField(TOP_16[6][1][0])
+    gid_a6_w = models.CharField('Winning Team', max_length=40, choices=TOP_16[6])
+    gid_a6_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a7_0 = models.IntegerField(TOP_16[7][0][0])
+    gid_a7_1 = models.IntegerField(TOP_16[7][1][0])
+    gid_a7_w = models.CharField('Winning Team', max_length=40, choices=TOP_16[7])
+    gid_a7_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def get_absolute_url():
+        return reverse('home')
+
+
+class GameTop8(models.Model):
+    user_name = models.OneToOneField(User, on_delete=models.CASCADE)
+    gid_a0_0 = models.IntegerField(TOP_8[0][0][0])
+    gid_a0_1 = models.IntegerField(TOP_8[0][1][0])
+    gid_a0_w = models.CharField('Winning Team', max_length=40, choices=TOP_8[0])
+    gid_a0_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a1_0 = models.IntegerField(TOP_8[1][0][0])
+    gid_a1_1 = models.IntegerField(TOP_8[1][1][0])
+    gid_a1_w = models.CharField('Winning Team', max_length=40, choices=TOP_8[1])
+    gid_a1_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a2_0 = models.IntegerField(TOP_8[2][0][0])
+    gid_a2_1 = models.IntegerField(TOP_8[2][1][0])
+    gid_a2_w = models.CharField('Winning Team', max_length=40, choices=TOP_8[2])
+    gid_a2_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a3_0 = models.IntegerField(TOP_8[3][0][0])
+    gid_a3_1 = models.IntegerField(TOP_8[3][1][0])
+    gid_a3_w = models.CharField('Winning Team', max_length=40, choices=TOP_8[3])
+    gid_a3_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def get_absolute_url():
+        return reverse('home')
+
+
+class GameTop4(models.Model):
+    user_name = models.OneToOneField(User, on_delete=models.CASCADE)
+    gid_a0_0 = models.IntegerField(TOP_4[0][0][0])
+    gid_a0_1 = models.IntegerField(TOP_4[0][1][0])
+    gid_a0_w = models.CharField('Winning Team', max_length=40, choices=TOP_4[0])
+    gid_a0_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    gid_a1_0 = models.IntegerField(TOP_4[1][0][0])
+    gid_a1_1 = models.IntegerField(TOP_4[1][1][0])
+    gid_a1_w = models.CharField('Winning Team', max_length=40, choices=TOP_4[1])
+    gid_a1_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def get_absolute_url():
+        return reverse('home')
+
+
+class GameTop2(models.Model):
+    user_name = models.OneToOneField(User, on_delete=models.CASCADE)
+    gid_a0_0 = models.IntegerField(TOP_2[0][0][0])
+    gid_a0_1 = models.IntegerField(TOP_2[0][1][0])
+    gid_a0_w = models.CharField('Winning Team', max_length=40, choices=TOP_2[0])
+    gid_a0_alt = models.CharField('Cup Alternative Score', max_length=3, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def get_absolute_url():
+        return reverse('home')
+
+
 class League(models.Model):
     league_name = models.CharField('League Name', max_length=20, unique=True)
     league_owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
@@ -121,30 +222,12 @@ class LeagueMember(models.Model):
         return reverse('home')
 
 
-# class UserPrediction(models.Model):
-#     record_id = models.CharField(max_length=50, unique=True, blank=True)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     user_full_name = models.CharField('User', max_length=100)
-#     league_name = models.ForeignKey(League, to_field='league_name', on_delete=models.CASCADE)
-#     match_label = models.CharField('Match', max_length=100)
-#     predicted_score = models.CharField('Predicted Score', max_length=100)
-#     real_score = models.CharField('Real Score', max_length=100)
-#     game_status = models.CharField('Game Status', max_length=100)
-#     date = models.DateField('Date', max_length=100)
-#     hour = models.TimeField('Hour', max_length=100)
-#     pred_score_home = models.IntegerField('Predicted Score Home')
-#     pred_score_away = models.IntegerField('Predicted Score Away')
-#     real_score_home = models.IntegerField('Real Score Home')
-#     real_score_away = models.IntegerField('Real Score Away')
-#     updated = models.DateTimeField(auto_now=True)
-#     created = models.DateTimeField(auto_now_add=True)
-
-
 class UserImage(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
     header_image = models.ImageField('User Image', null=True, blank=True, upload_to="media/")
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
-    def get_absolute_url(self):
+    @staticmethod
+    def get_absolute_url():
         return reverse('home')

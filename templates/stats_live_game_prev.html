@@ -19,6 +19,7 @@
  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
     <h3>Live Score Predictions</h3>
+{% if committed_a_bet %}
     <hr>
     <body>
      {% for key, plot in plots.items %}
@@ -74,5 +75,7 @@
     {% endfor %}
      <hr class="bold">
 </body>
-
+{% else %}
+    Please commit your bets first.
+{% endif %}
 {% endblock %}

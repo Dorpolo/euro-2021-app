@@ -5,6 +5,7 @@ from django.views.generic import CreateView, UpdateView, TemplateView
 from .forms import *
 from .models import *
 from data.teams import team_game_map
+from data.knockout import KNOCK_OUT_LOGOS
 from django.urls import reverse
 from .filters import *
 from django.shortcuts import render
@@ -168,7 +169,7 @@ class AddBetsView(TemplateView):
                 league_user_email = [LeagueMember.objects.filter(user_name_id=request.user.id)[0].email]
                 if league_user_email[0] != env('EMAIL_HOST_USER'):
                     league_user_email.append(env('EMAIL_HOST_USER'))
-                email_data = MailTemplate().prepare_bet_submission_email(request, form)
+                email_data = MailTemplate().group_stage_bet_submission(request, form)
                 send_mail(
                      email_data['subject'],
                      email_data['message'],
@@ -189,45 +190,213 @@ class AddBetsTop16View(TemplateView):
     template_name = "add_bets_top_16.html"
 
     def get(self, request):
-        pass
+        form = BetFormTop16()
+        return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        pass
+        form = BetFormTop16(request.POST)
+        if form.is_valid():
+            obj = GameTop16(
+                    user_name=form.cleaned_data['user_name'],
+                    gid_a0_0=form.cleaned_data['gid_a0_0'],
+                    gid_a0_1=form.cleaned_data['gid_a0_1'],
+                    gid_a0_w=form.cleaned_data['gid_a0_w'],
+                    # gid_a0_alt=form.cleaned_data['gid_a0_alt'],
+                    gid_a1_0=form.cleaned_data['gid_a1_0'],
+                    gid_a1_1=form.cleaned_data['gid_a1_1'],
+                    gid_a1_w=form.cleaned_data['gid_a1_w'],
+                    # gid_a1_alt=form.cleaned_data['gid_a1_alt'],
+                    gid_a2_0=form.cleaned_data['gid_a2_0'],
+                    gid_a2_1=form.cleaned_data['gid_a2_1'],
+                    gid_a2_w=form.cleaned_data['gid_a2_w'],
+                    # gid_a2_alt=form.cleaned_data['gid_a2_alt'],
+                    gid_a3_0=form.cleaned_data['gid_a3_0'],
+                    gid_a3_1=form.cleaned_data['gid_a3_1'],
+                    gid_a3_w=form.cleaned_data['gid_a3_w'],
+                    # gid_a3_alt=form.cleaned_data['gid_a3_alt'],
+                    gid_a4_0=form.cleaned_data['gid_a4_0'],
+                    gid_a4_1=form.cleaned_data['gid_a4_1'],
+                    gid_a4_w=form.cleaned_data['gid_a4_w'],
+                    # gid_a4_alt=form.cleaned_data['gid_a4_alt'],
+                    gid_a5_0=form.cleaned_data['gid_a5_0'],
+                    gid_a5_1=form.cleaned_data['gid_a5_1'],
+                    gid_a5_w=form.cleaned_data['gid_a5_w'],
+                    # gid_a5_alt=form.cleaned_data['gid_a5_alt'],
+                    gid_a6_0=form.cleaned_data['gid_a6_0'],
+                    gid_a6_1=form.cleaned_data['gid_a6_1'],
+                    gid_a6_w=form.cleaned_data['gid_a6_w'],
+                    # gid_a6_alt=form.cleaned_data['gid_a6_alt'],
+                    gid_a7_0=form.cleaned_data['gid_a7_0'],
+                    gid_a7_1=form.cleaned_data['gid_a7_1'],
+                    gid_a7_w=form.cleaned_data['gid_a7_w'],
+                    # gid_a7_alt=form.cleaned_data['gid_a7_alt'],
+            )
+            obj.save()
+            try:
+                league_user_email = [LeagueMember.objects.filter(user_name_id=request.user.id)[0].email]
+                if league_user_email[0] != env('EMAIL_HOST_USER'):
+                    league_user_email.append(env('EMAIL_HOST_USER'))
+                email_data = MailTemplate().knockout_bet_submission(request, form, stage='1/16 Final')
+                print(email_data)
+                send_mail(
+                     email_data['subject'],
+                     email_data['message'],
+                     env('EMAIL_HOST_USER'),
+                     league_user_email,
+                     fail_silently=False
+                    )
+                print(f"Email has been sent successfully to {', '.join(league_user_email)}")
+            except Exception as exc:
+                print(exc)
+            return redirect('home')
+        else:
+            print(form.errors)
+        return render(request, self.template_name, {'form': form})
 
 
 class AddBetsTop8View(TemplateView):
     template_name = "add_bets_top_8.html"
 
     def get(self, request):
-        pass
+        form = BetForm()
+        return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        pass
+        form = BetForm(request.POST)
+        if form.is_valid():
+            obj = GameTop8(
+                    user_name=form.cleaned_data['user_name'],
+                    gid_a0_0=form.cleaned_data['gid_a0_0'],
+                    gid_a0_1=form.cleaned_data['gid_a0_1'],
+                    gid_a0_w=form.cleaned_data['gid_a0_w'],
+                    # gid_a0_alt=form.cleaned_data['gid_a0_alt'],
+                    gid_a1_0=form.cleaned_data['gid_a1_0'],
+                    gid_a1_1=form.cleaned_data['gid_a1_1'],
+                    gid_a1_w=form.cleaned_data['gid_a1_w'],
+                    # gid_a1_alt=form.cleaned_data['gid_a1_alt'],
+                    gid_a2_0=form.cleaned_data['gid_a2_0'],
+                    gid_a2_1=form.cleaned_data['gid_a2_1'],
+                    gid_a2_w=form.cleaned_data['gid_a2_w'],
+                    # gid_a2_alt=form.cleaned_data['gid_a2_alt'],
+                    gid_a3_0=form.cleaned_data['gid_a3_0'],
+                    gid_a3_1=form.cleaned_data['gid_a3_1'],
+                    gid_a3_w=form.cleaned_data['gid_a3_w'],
+                    # gid_a3_alt=form.cleaned_data['gid_a3_alt'],
+            )
+            obj.save()
+            try:
+                league_user_email = [LeagueMember.objects.filter(user_name_id=request.user.id)[0].email]
+                if league_user_email[0] != env('EMAIL_HOST_USER'):
+                    league_user_email.append(env('EMAIL_HOST_USER'))
+                email_data = MailTemplate().knockout_bet_submission(request, form, '1/8 Final')
+                send_mail(
+                     email_data['subject'],
+                     email_data['message'],
+                     env('EMAIL_HOST_USER'),
+                     league_user_email,
+                     fail_silently=False
+                    )
+                print(f"Email has been sent successfully to {', '.join(league_user_email)}")
+            except Exception as exc:
+                print(exc)
+            return redirect('home')
+        else:
+            print(form.errors)
+        return render(request, self.template_name, {'form': form})
+
 
 class AddBetsTop4View(TemplateView):
     template_name = "add_bets_top_4.html"
 
     def get(self, request):
-        pass
+        form = BetForm()
+        return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        pass
+        form = BetForm(request.POST)
+        if form.is_valid():
+            obj = GameTop4(
+                    user_name=form.cleaned_data['user_name'],
+                    gid_a0_0=form.cleaned_data['gid_a0_0'],
+                    gid_a0_1=form.cleaned_data['gid_a0_1'],
+                    gid_a0_w=form.cleaned_data['gid_a0_w'],
+                    # gid_a0_alt=form.cleaned_data['gid_a0_alt'],
+                    gid_a1_0=form.cleaned_data['gid_a1_0'],
+                    gid_a1_1=form.cleaned_data['gid_a1_1'],
+                    gid_a1_w=form.cleaned_data['gid_a1_w'],
+                    # gid_a1_alt=form.cleaned_data['gid_a1_alt'],
+            )
+            obj.save()
+            try:
+                league_user_email = [LeagueMember.objects.filter(user_name_id=request.user.id)[0].email]
+                if league_user_email[0] != env('EMAIL_HOST_USER'):
+                    league_user_email.append(env('EMAIL_HOST_USER'))
+                email_data = MailTemplate().knockout_bet_submission(request, form, '1/2 Final')
+                send_mail(
+                     email_data['subject'],
+                     email_data['message'],
+                     env('EMAIL_HOST_USER'),
+                     league_user_email,
+                     fail_silently=False
+                    )
+                print(f"Email has been sent successfully to {', '.join(league_user_email)}")
+            except Exception as exc:
+                print(exc)
+            return redirect('home')
+        else:
+            print(form.errors)
+        return render(request, self.template_name, {'form': form})
+
 
 class AddBetsTop2View(TemplateView):
     template_name = "add_bets_top_2.html"
 
     def get(self, request):
-        pass
+        form = BetForm()
+        return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        pass
-
+        form = BetForm(request.POST)
+        if form.is_valid():
+            obj = GameTop2(
+                    user_name=form.cleaned_data['user_name'],
+                    gid_a0_0=form.cleaned_data['gid_a0_0'],
+                    gid_a0_1=form.cleaned_data['gid_a0_1'],
+                    gid_a0_w=form.cleaned_data['gid_a0_w'],
+                    # gid_a0_alt=form.cleaned_data['gid_a0_alt'],
+            )
+            obj.save()
+            try:
+                league_user_email = [LeagueMember.objects.filter(user_name_id=request.user.id)[0].email]
+                if league_user_email[0] != env('EMAIL_HOST_USER'):
+                    league_user_email.append(env('EMAIL_HOST_USER'))
+                email_data = MailTemplate().knockout_bet_submission(request, form, 'Final')
+                send_mail(
+                     email_data['subject'],
+                     email_data['message'],
+                     env('EMAIL_HOST_USER'),
+                     league_user_email,
+                     fail_silently=False
+                    )
+                print(f"Email has been sent successfully to {', '.join(league_user_email)}")
+            except Exception as exc:
+                print(exc)
+            return redirect('home')
+        else:
+            print(form.errors)
+        return render(request, self.template_name, {'form': form})
 
 
 class UpdateBetView(UpdateView):
     model = Game
     form_class = BetForm
     template_name = 'update_bets.html'
+
+
+class UpdateBetViewThirdRound(UpdateView):
+    model = Game
+    form_class = BetFormUpdate3Round
+    template_name = 'update_bets_third_round.html'
 
 
 class UpdateLeagueMember(UpdateView):
@@ -256,7 +425,7 @@ class CreateLeagueMemberView(CreateView):
                 )
             obj.save()
             league_user_email = LeagueMember.objects.filter(user_name_id=request.user.id)[0].email
-            email_data = MailTemplate.prepare_league_user_email(request, form)
+            email_data = MailTemplate.user_joined_a_league( request, form )
             recipient_list = [league_user_email, env('EMAIL_HOST_USER')]
             try:
                send_mail(
@@ -361,14 +530,19 @@ class LiveGameView:
         Match = GetMatchData()
         match = Match.next_match() if is_next else Match.prev_match()
         status = match.match_status[0]
-        LiveOutput = TopPlayerStats(request.user.id).live_game_plot( match_label=match.match_label[0])
+        onboarding = BaseViewUserControl(request.user.id).onboarding()
+        if onboarding['bet']:
+            LiveOutput = TopPlayerStats(request.user.id).live_game_plot( match_label=match.match_label[0])
+        else:
+            LiveOutput = [None, None]
         context = {
             'title': match.match_label[0],
             'real_score': f"{match.home_team_score[0]}-{match.away_team_score[0]}",
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
             'plots': LiveOutput[0],
             'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
-            'entitled_users': LiveOutput[1]
+            'entitled_users': LiveOutput[1],
+            'committed_a_bet': onboarding['bet'],
         }
         template_name = f"stats_live_game_{'next' if is_next else 'prev'}.html"
         return render(request, template_name, context)

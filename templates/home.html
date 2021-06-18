@@ -110,6 +110,12 @@
                     </div>
                 </center>
             <hr>
+     <h6>Required Actions</h6>
+    {% if committed_a_bet %}
+              <li> <a href= {% url 'update_your_bet_3_tound' bet_id %}>Edit your 3'rd round predictions.</a></li>
+    * Available until 06-19-2021 23:59
+          <hr>
+    {% endif %}
       {% endif %}
   <div>
   {% if committed_a_bet %}

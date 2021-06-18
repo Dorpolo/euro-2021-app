@@ -20,59 +20,63 @@
 </head>
     <h3>Live Score Predictions</h3>
     <hr>
-    <body>
-     {% for key, plot in plots.items %}
-             <center>
-                {% for subkey, obj in logos.items %}
-                    <style>
-                        img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
-                        h4.liketext { display:inline }
-                    </style>
-                        <img class='likeordislike' src='{{ obj }}' width="40" height="40"/><h4 class='liketext'>{{ subkey }}</h4>
-                    {% if forloop.counter == 1 %} - {% endif %}
-                {% endfor %}
-                    <p> Status: {{ status }} <br> {{ real_score }}</p>
-            </center>
-          <hr class="bold">
-            <center> <p> {{ key }}</p> </center>
-          <hr class="bold">
-            <body>
-                 <style>
-                     .modebar{
-                        display: none !important;
-                     }
-                     hr.bold {
-                            border: 1px solid #DE3163;
-                            border-radius: 1px;
-                        }
-                 </style>
-                  {% autoescape off %}
-                    {{ plot|safe }}
-                  {% endautoescape %}
+    {% if committed_a_bet %}
+        <body>
+         {% for key, plot in plots.items %}
                  <center>
-                     <div>
-                        {% for entitled_key, entitled_val in entitled_users.items %}
-                            {% if key == entitled_key %}
-                                {% for item_key, item_val in entitled_val.items %}
-                                    {% if item_val|length > 0 %}
-                                        <h6>{{ item_key }}</h6>
-                                            {% for subitem_val in item_val %}
-                                                <img class="dp-styled-img" src="{{subitem_val.2}}">
-                                            {% endfor %}
-                                            <br>
-                                    {% endif %}
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                        <hr>
-                        Can't see yourself? <a href={% url 'add_image' %}>upload your photo</a>
-                     </div>
-                 </center>
-             </body>
-         <hr>
-    {% endfor %}
-     <hr class="bold">
-</body>
+                    {% for subkey, obj in logos.items %}
+                        <style>
+                            img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
+                            h4.liketext { display:inline }
+                        </style>
+                            <img class='likeordislike' src='{{ obj }}' width="40" height="40"/><h4 class='liketext'>{{ subkey }}</h4>
+                        {% if forloop.counter == 1 %} - {% endif %}
+                    {% endfor %}
+                        <p> Status: {{ status }} <br> {{ real_score }}</p>
+                </center>
+              <hr class="bold">
+                <center> <p> {{ key }}</p> </center>
+              <hr class="bold">
+                <body>
+                     <style>
+                         .modebar{
+                            display: none !important;
+                         }
+                         hr.bold {
+                                border: 1px solid #DE3163;
+                                border-radius: 1px;
+                            }
+                     </style>
+                      {% autoescape off %}
+                        {{ plot|safe }}
+                      {% endautoescape %}
+                     <center>
+                         <div>
+                            {% for entitled_key, entitled_val in entitled_users.items %}
+                                {% if key == entitled_key %}
+                                    {% for item_key, item_val in entitled_val.items %}
+                                        {% if item_val|length > 0 %}
+                                            <h6>{{ item_key }}</h6>
+                                                {% for subitem_val in item_val %}
+                                                    <img class="dp-styled-img" src="{{subitem_val.2}}">
+                                                {% endfor %}
+                                                <br>
+                                        {% endif %}
+                                        <br>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                            <hr>
+                            Can't see yourself? <a href={% url 'add_image' %}>upload your photo</a>
+                         </div>
+                     </center>
+                 </body>
+             <hr>
+        {% endfor %}
+         <hr class="bold">
+    </body>
+{% else %}
+    Please commit your bets first.
+{% endif %}
 
 {% endblock %}

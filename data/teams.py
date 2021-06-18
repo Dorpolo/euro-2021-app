@@ -97,6 +97,74 @@ teams = {
           'logo': 'https://api.statorium.com/media/bearleague/bl15773717391677.png'}
 }
 
+
+teams_mock = {
+    'AFC Ajax': {
+        'teamId': 'AFC Ajax',
+        'logo': 'https://api.statorium.com/media/bearleague/bl15737307582317.png'
+    },
+    'BSC Young Boys': {
+        'teamId': 'BSC Young Boys',
+        'logo': 'https://api.statorium.com/media/bearleague/bl15680290942844.png'
+    },
+    'FC Dynamo Kyiv': {
+        'teamId': 'FC Dynamo Kyiv',
+        'logo': 'https://api.statorium.com/media/bearleague/bl1568030730713.png'
+    },
+    'Villarreal CF': {
+        'teamId': 'Villarreal CF',
+        'logo': 'https://api.statorium.com/media/bearleague/bl15529040772871.png'
+    },
+    'Manchester United': {
+        'teamId': 'Manchester United',
+        'logo': 'https://api.statorium.com/media/bearleague/bl1552486381728.png'
+    },
+    'AC Milan': {
+        'teamId': 'AC Milan',
+        'logo': 'https://api.statorium.com/media/bearleague/bl15529152022759.png'
+    },
+    'SK Slavia Praha': {
+        'teamId': 'SK Slavia Praha',
+        'logo': 'https://api.statorium.com/media/bearleague/bl15671684112514.png'
+    },
+    'Rangers FC': {
+        'teamId': 'Rangers FC',
+        'logo': 'https://api.statorium.com/media/bearleague/bl1568030321726.png'
+    },
+    'AS Roma': {
+        'teamId': 'AS Roma',
+        'logo': 'https://api.statorium.com/media/bearleague/bl15529154451730.png'
+    },
+    'FC Shakhtar Donetsk': {
+        'teamId': 'FC Shakhtar Donetsk',
+        'logo': 'https://api.statorium.com/media/bearleague/bl1567163861262.png'
+    },
+    'Granada CF': {
+        'teamId': 'Granada CF',
+        'logo': 'https://api.statorium.com/media/bearleague/bl15650934852965.png'
+    },
+    'Molde FK': {
+        'teamId': 'Molde FK',
+        'logo': 'https://api.statorium.com/media/bearleague/bl16021405692518.png'
+    },
+    'Olympiacos FC': {
+        'teamId': 'Olympiacos FC',
+        'logo': 'https://api.statorium.com/media/bearleague/bl15671634791925.png'
+    },
+    'Arsenal FC': {
+        'teamId': 'Arsenal FC',
+        'logo': 'https://api.statorium.com/media/bearleague/bl15669942151527.png'
+    },
+    'Tottenham Hotspur FC': {
+        'teamId': 'Tottenham Hotspur FC',
+        'logo': 'https://api.statorium.com/media/bearleague/bl1552486480602.png'
+    },
+    'GNK Dinamo Zagreb': {
+        'teamId': 'GNK Dinamo Zagreb',
+        'logo': 'https://api.statorium.com/media/bearleague/bl1567164911213.png'
+    }
+}
+
 groups = {
     'Italy': {
           'groupID': '21',

@@ -149,6 +149,211 @@ class BetForm(forms.ModelForm):
         return data
 
 
+class BetFormUpdate3Round(forms.ModelForm):
+    class Meta:
+        model = Game
+        fields = (
+            'user_name',
+            'gid_8213_0', 'gid_8213_1',
+            'gid_8214_0', 'gid_8214_1',
+
+            'gid_8216_0', 'gid_8216_1',
+            'gid_8217_0', 'gid_8217_1',
+
+            'gid_19957_0', 'gid_19957_1',
+            'gid_8215_0', 'gid_8215_1',
+
+            'gid_19958_0', 'gid_19958_1',
+            'gid_8218_0', 'gid_8218_1',
+
+            'gid_19959_0', 'gid_19959_1',
+            'gid_8219_0', 'gid_8219_1',
+
+            'gid_19960_0', 'gid_19960_1',
+            'gid_8220_0', 'gid_8220_1'
+        )
+
+        widgets = {
+            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
+            'gid_8213_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8213_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8214_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8214_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+
+            'gid_8216_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8216_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8217_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8217_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+
+            'gid_19957_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_19957_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8215_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8215_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+
+            'gid_19958_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_19958_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8218_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8218_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+
+            'gid_19959_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_19959_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8219_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8219_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+
+            'gid_19960_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_19960_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8220_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_8220_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+        }
+
+    def more_data(self):
+        sorted_fixtures = logos
+        data = [
+            list(
+                set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
+            ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
+        return data
+
+class BetFormTop16(forms.ModelForm):
+    class Meta:
+        model = GameTop16
+        fields = (
+            'user_name',
+            'gid_a0_0', 'gid_a0_1', 'gid_a0_w',
+            'gid_a1_0', 'gid_a1_1', 'gid_a1_w',
+            'gid_a2_0', 'gid_a2_1', 'gid_a2_w',
+            'gid_a3_0', 'gid_a3_1', 'gid_a3_w',
+            'gid_a4_0', 'gid_a4_1', 'gid_a4_w',
+            'gid_a5_0', 'gid_a5_1', 'gid_a5_w',
+            'gid_a6_0', 'gid_a6_1', 'gid_a6_w',
+            'gid_a7_0', 'gid_a7_1', 'gid_a7_w',
+        )
+
+        widgets = {
+            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
+            'gid_a0_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a0_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a0_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a1_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a1_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a1_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a2_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a2_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a2_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a3_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a3_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a3_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a4_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a4_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a4_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a5_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a5_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a5_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a6_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a6_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a6_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a7_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a7_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a7_w': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def more_data(self):
+        sorted_fixtures = logos
+        data = [
+            list(
+                set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
+            ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
+        return data
+
+
+class BetFormTop8(forms.ModelForm):
+    class Meta:
+        model = GameTop8
+        fields = (
+            'user_name',
+            'gid_a0_0', 'gid_a0_1', 'gid_a0_w',
+            'gid_a1_0', 'gid_a1_1', 'gid_a1_w',
+            'gid_a2_0', 'gid_a2_1', 'gid_a2_w',
+            'gid_a3_0', 'gid_a3_1', 'gid_a3_w',
+        )
+
+        widgets = {
+            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
+            'gid_a0_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a0_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a0_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a1_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a1_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a1_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a2_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a2_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a2_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a3_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a3_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a3_w': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def more_data(self):
+        sorted_fixtures = logos
+        data = [
+            list(
+                set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
+            ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
+        return data
+
+
+class BetFormTop4(forms.ModelForm):
+    class Meta:
+        model = GameTop4
+        fields = (
+            'user_name',
+            'gid_a0_0', 'gid_a0_1', 'gid_a0_w',
+            'gid_a1_0', 'gid_a1_1', 'gid_a1_w',
+        )
+
+        widgets = {
+            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
+            'gid_a0_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a0_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a0_w': forms.Select(attrs={'class': 'form-select'}),
+            'gid_a1_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a1_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a1_w': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def more_data(self):
+        sorted_fixtures = logos
+        data = [
+            list(
+                set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
+            ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
+        return data
+
+
+class BetFormTop2(forms.ModelForm):
+    class Meta:
+        model = GameTop2
+        fields = (
+            'user_name',
+            'gid_a0_0', 'gid_a0_1', 'gid_a0_w',
+        )
+
+        widgets = {
+            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
+            'gid_a0_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a0_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
+            'gid_a0_w': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def more_data(self):
+        sorted_fixtures = logos
+        data = [
+            list(
+                set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
+            ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
+        return data
+
+
 class LeagueForm(forms.ModelForm):
     class Meta:
         model = League
