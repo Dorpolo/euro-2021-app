@@ -75,6 +75,11 @@
                 <li><a class="dropdown-item" href={% url 'top_players' %}>Top Players</a></li>
               </ul>
         </li>
+              {% if is_cup_user %}
+                  <li class="nav-item">
+                      <a class="nav-link" href={% url 'the_cup' %}>Cup</a>
+                  </li>
+              {% endif %}
           <li class="nav-item">
             <a class="nav-link" href={% url 'terms' %}>Terms</a>
          </li>

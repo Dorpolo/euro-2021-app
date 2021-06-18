@@ -14,7 +14,7 @@ import data.viz_variables as vis
 import plotly.express as px
 import plotly.offline as opy
 import plotly.graph_objects as go
-from data.knockout import TEAM_GAME_MAP as TGM
+from data.knockout import TEAM_GAME_MAP as TGM, CUP_GAMES
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(SECRET_KEY=str,)
@@ -85,12 +85,22 @@ class BaseViewUserControl:
 
     def onboarding(self) -> dict:
         league_data = LeagueMember.objects.filter(user_name_id=self.user_id)
-        bet_data = Game.objects.filter(user_name_id=self.user_id)
         image = UserImage.objects.filter(user_name_id=self.user_id)
-        league_assigned = True if len(league_data) > 0 else False
-        bet_assigned = True if len(bet_data) > 0 else False
-        image_uploaded = True if len(image) > 0 else False
-        return {'league': league_assigned, 'bet': bet_assigned, 'image': image_uploaded}
+        bet_data_group_stage = Game.objects.filter(user_name_id=self.user_id)
+        bet_16 = GameTop16.objects.filter(user_name_id=self.user_id)
+        bet_8 = GameTop8.objects.filter(user_name_id=self.user_id)
+        bet_4 = GameTop4.objects.filter(user_name_id=self.user_id)
+        bet_2 = GameTop2.objects.filter(user_name_id=self.user_id)
+        context = {
+            'league': True if len(league_data) > 0 else False,
+            'bet': True if len(bet_data_group_stage) > 0 else False,
+            'image': True if len(image) > 0 else False,
+            'bet_top_16': True if len(bet_16) > 0 else False,
+            'bet_top_8': True if len(bet_8) > 0 else False,
+            'bet_top_4': True if len(bet_4) > 0 else False,
+            'bet_top_2': True if len(bet_2) > 0 else False,
+        }
+        return context
 
 
 class UserPredictionBase:
@@ -147,6 +157,16 @@ class UserPredictionBase:
             return True, leagues
         else:
             return False, None
+
+    def is_cup_user(self) -> tuple:
+        leagues = list(LeagueMember.objects.filter(user_name_id=self.user_id).values('league_name_id'))
+        if len(leagues) > 0:
+            league_list = [item['league_name_id'] for item in leagues]
+            output = True if sum([('Conference League' in item) or
+                                 ('Beta Coffee' in item) for item in league_list]) > 0 else False
+            return output
+        else:
+            return None
 
     def get_league_members(self):
         leagues = self.get_user_leagues()
@@ -509,9 +529,9 @@ class UserPredictionBase:
         adj_df = []
         for item in data.values.tolist():
             nick = [item[0]]
-            values = [int(sub) for sub in item[1:]]
-            values[4] = f"{values[4]}%"
-            adj_df.append(nick + values)
+            values1 = [int(sub) for sub in item[1:5]]
+            values2 = [int(sub) for sub in item[6:]]
+            adj_df.append(nick + values1 + [f"{item[5]}%"] + values2)
         return adj_df
 
     def league_member_points(self):
@@ -521,6 +541,21 @@ class UserPredictionBase:
             for key, obj in metadata[0].items():
                 df = pd.DataFrame(obj, columns=metadata[1])
                 output[key] = self.get_game_points_group_stage(df)
+            return output
+        else:
+            return None
+
+    def league_member_points_cup(self, stage: str = None):
+        metadata = self.present_predictions()
+        output = {}
+        if metadata[0] is not None:
+            for key, obj in metadata[0].items():
+                df = pd.DataFrame(obj, columns=metadata[1])
+                df = df[df.match_label.isin(CUP_GAMES[stage])]
+                if df.shape[0] > 0:
+                    output[key] = self.get_game_points_group_stage(df)
+                else:
+                    output[key] = None
             return output
         else:
             return None

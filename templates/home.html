@@ -98,6 +98,11 @@
               <h6>Quick Access</h6>
                 <center>
                 <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                            {% if is_cup_user %}
+                            <a href="{% url 'the_cup' %}">
+                                 <button type="button" class="btn btn-dark">Cup</button>
+                             </a>
+                            {% endif %}
                              <a href="{% url 'my_predictions' %}">
                                  <button type="button" class="btn btn-dark">My Bets</button>
                              </a>

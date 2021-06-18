@@ -37,10 +37,73 @@ class HomeView(TemplateView):
                         'league_signup': onboarding['league'],
                         'committed_a_bet': onboarding['bet'],
                         'image_uploaded': onboarding['image'],
+                        'committed_a_bet_16': onboarding['bet_top_16'],
+                        'committed_a_bet_8': onboarding['bet_top_8'],
+                        'committed_a_bet_4': onboarding['bet_top_4'],
+                        'committed_a_bet_2': onboarding['bet_top_2'],
                         'bet_id': UserPred.user_game_bet_id(),
                         'league_member_points': UserPred.league_member_points(),
                         'league_memberships': UserPred.get_league_members_data(),
-                        'games_started': games_started
+                        'games_started': games_started,
+                        'is_cup_user': UserPred.is_cup_user()
+                    }
+               presented_data = UserPred.home_screen_match_relevant_data()
+               if presented_data[0] is not None:
+                    context['user_game_points'] = presented_data[2]
+                    context['next_match'] = presented_data[1]
+                    context['prev_match'] = presented_data[0]
+               return render(request, self.template_name, context)
+            else:
+                return render(request, self.template_name, {'data': None})
+        else:
+            return render(request, self.template_name, {'data': None})
+
+
+class CupView(TemplateView):
+    template_name = "the_cup.html"
+    GetAPIData = GetMatchData()
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            UserPred = UserPredictionBase(request.user.id)
+            games_started = self.GetAPIData.started_games()
+            league_data_output = UserPred.get_league_members()
+            print(league_data_output)
+            onboarding = BaseViewUserControl(request.user.id).onboarding()
+
+            qualification_1_data = UserPred.league_member_points_cup('qualification_1')
+            relevant_key = [item for item in qualification_1_data.keys() if 'Conference' in item
+                            or 'Beta Coffee' in item][0]
+            qualification_1_df = pd.DataFrame(qualification_1_data[relevant_key][0:15])
+            qualification_1_images_df = pd.DataFrame(league_data_output[relevant_key])
+            images_qualification_1 = list(
+                    pd.merge(qualification_1_df, qualification_1_images_df, on=[0], how='inner')['1_y']
+                    )
+
+            if league_data_output is not None:
+               context = {
+                         'is_cup_user': UserPred.is_cup_user(),
+                         'qualification_1_points': qualification_1_data,
+                         'qualification_1_images': images_qualification_1,
+                         'qualification_2_points': UserPred.league_member_points_cup('qualification_2'),
+                         'top_16_points': UserPred.league_member_points_cup('1/8 Final'),
+                         'top_8_points': UserPred.league_member_points_cup('1/4 Final'),
+                         'top_4_points': UserPred.league_member_points_cup('1/2 Final'),
+                         'top_2_points': UserPred.league_member_points_cup('Final'),
+                         'league_members': league_data_output,
+                         'next_match_logos': self.GetAPIData.next_match_logos(),
+                         'prev_match_logos': self.GetAPIData.prev_match_logos(),
+                         'league_signup': onboarding['league'],
+                         'committed_a_bet': onboarding['bet'],
+                         'image_uploaded': onboarding['image'],
+                         'committed_a_bet_16': onboarding['bet_top_16'],
+                         'committed_a_bet_8': onboarding['bet_top_8'],
+                         'committed_a_bet_4': onboarding['bet_top_4'],
+                         'committed_a_bet_2': onboarding['bet_top_2'],
+                         'bet_id': UserPred.user_game_bet_id(),
+                         'league_member_points': UserPred.league_member_points(),
+                         'league_memberships': UserPred.get_league_members_data(),
+                         'games_started': games_started,
                     }
                presented_data = UserPred.home_screen_match_relevant_data()
                if presented_data[0] is not None:
@@ -67,9 +130,15 @@ class BaseView(TemplateView):
 
     def get(self, request):
         onboarding = BaseViewUserControl(request.user.id).onboarding()
+        UserPred = UserPredictionBase(request.user.id)
         context = {
             'league_signup': onboarding['league'],
-            'committed_a_bet': onboarding['bet']
+            'committed_a_bet': onboarding['bet'],
+            'committed_a_bet_16': onboarding['bet_top_16'],
+            'committed_a_bet_8': onboarding['bet_top_8'],
+            'committed_a_bet_4': onboarding['bet_top_4'],
+            'committed_a_bet_2': onboarding['bet_top_2'],
+            'is_cup_user': UserPred.is_cup_user(),
         }
         return render(request, self.template_name, context)
 
@@ -191,7 +260,11 @@ class AddBetsTop16View(TemplateView):
 
     def get(self, request):
         form = BetFormTop16()
-        return render(request, self.template_name, {'form': form})
+        context = {
+            'form': form,
+            'logos': KNOCK_OUT_LOGOS['1/8 Final']
+        }
+        return render(request, self.template_name, context)
 
     def post(self, request):
         form = BetFormTop16(request.POST)
@@ -258,11 +331,15 @@ class AddBetsTop8View(TemplateView):
     template_name = "add_bets_top_8.html"
 
     def get(self, request):
-        form = BetForm()
-        return render(request, self.template_name, {'form': form})
+        form = BetFormTop8()
+        context = {
+            'form': form,
+            'logos': KNOCK_OUT_LOGOS['1/4 Final']
+        }
+        return render(request, self.template_name, context)
 
     def post(self, request):
-        form = BetForm(request.POST)
+        form = BetFormTop8(request.POST)
         if form.is_valid():
             obj = GameTop8(
                     user_name=form.cleaned_data['user_name'],
@@ -309,11 +386,15 @@ class AddBetsTop4View(TemplateView):
     template_name = "add_bets_top_4.html"
 
     def get(self, request):
-        form = BetForm()
-        return render(request, self.template_name, {'form': form})
+       form = BetFormTop4()
+       context = {
+            'form': form,
+            'logos': KNOCK_OUT_LOGOS['1/2 Final']
+        }
+       return render(request, self.template_name, context)
 
     def post(self, request):
-        form = BetForm(request.POST)
+        form = BetFormTop4(request.POST)
         if form.is_valid():
             obj = GameTop4(
                     user_name=form.cleaned_data['user_name'],
@@ -352,11 +433,15 @@ class AddBetsTop2View(TemplateView):
     template_name = "add_bets_top_2.html"
 
     def get(self, request):
-        form = BetForm()
-        return render(request, self.template_name, {'form': form})
+       form = BetFormTop2()
+       context = {
+            'form': form,
+            'logos': KNOCK_OUT_LOGOS['Final']
+        }
+       return render(request, self.template_name, context)
 
     def post(self, request):
-        form = BetForm(request.POST)
+        form = BetFormTop2(request.POST)
         if form.is_valid():
             obj = GameTop2(
                     user_name=form.cleaned_data['user_name'],
@@ -398,6 +483,29 @@ class UpdateBetViewThirdRound(UpdateView):
     form_class = BetFormUpdate3Round
     template_name = 'update_bets_third_round.html'
 
+
+class UpdateBetViewTop16(UpdateView):
+    model = GameTop16
+    form_class = BetFormTop16
+    template_name = 'update_bets_top_16.html'
+
+
+class UpdateBetViewTop8(UpdateView):
+    model = GameTop8
+    form_class = BetFormTop8
+    template_name = 'update_bets_top_8.html'
+
+
+class UpdateBetViewTop4(UpdateView):
+    model = GameTop4
+    form_class = BetFormTop4
+    template_name = 'update_bets_top_4.html'
+
+
+class UpdateBetViewTop2(UpdateView):
+    model = GameTop2
+    form_class = BetFormTop2
+    template_name = 'update_bets_top_2.html'
 
 class UpdateLeagueMember(UpdateView):
     model = LeagueMember
@@ -480,6 +588,10 @@ class AllPredictionsView(TemplateView):
             'league_signup': onboarding['league'],
             'committed_a_bet': onboarding['bet'],
             'image_uploaded': onboarding['image'],
+            'committed_a_bet_16': onboarding['bet_top_16'],
+            'committed_a_bet_8': onboarding['bet_top_8'],
+            'committed_a_bet_4': onboarding['bet_top_4'],
+            'committed_a_bet_2': onboarding['bet_top_2'],
             'league_member_points': league_table_output
         }
         return render(request, self.template_name, context)
@@ -519,6 +631,10 @@ class LeagueTableView(TemplateView):
             'league_signup': onboarding['league'],
             'committed_a_bet': onboarding['bet'],
             'image_uploaded': onboarding['image'],
+            'committed_a_bet_16': onboarding['bet_top_16'],
+            'committed_a_bet_8': onboarding['bet_top_8'],
+            'committed_a_bet_4': onboarding['bet_top_4'],
+            'committed_a_bet_2': onboarding['bet_top_2'],
             'league_member_points': league_table_output
         }
         return render(request, self.template_name, context)

@@ -10,6 +10,7 @@ env = environ.Env(SECRET_KEY=str,)
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 BETA_MODE = True #TODO - Change once knockout starting
 
+
 class BuildKnockOutForm:
     def __init__(self):
         self.TOKEN = env('API_TOKEN')
@@ -57,18 +58,20 @@ class BuildKnockOutForm:
         return metadata
 
     def get_knockout_matches(self) -> dict:
-        data = {key: val for key, val in self.get_api_data(beta_mode=True).items() if val['is_playoff'] == '1'}
+        data = {key: val for key, val in self.get_api_data(beta_mode=True).items()
+                if val['is_playoff'] == '1' and val['match_type'] != '1/16 Final'}
         output = {}
         for item in [f"{j}Final" for j in ['1/8 ', '1/4 ', '1/2 ', '']]:
             output[item] = {}
             for key, val in data.items():
-                output[item][val['game_id']] = {
-                        'home': val['home_team'],
-                        'away': val['away_team'],
-                        'label': val['match_label'],
-                        'date': val['date'],
-                        'time': val['time']
-                    }
+                if val['match_type'] == item:
+                    output[item][val['game_id']] = {
+                            'home': val['home_team'],
+                            'away': val['away_team'],
+                            'label': val['match_label'],
+                            'date': val['date'],
+                            'time': val['time']
+                        }
         return output
 
     def get_knockout_team(self, beta_mode: bool = True) -> dict:
@@ -125,5 +128,14 @@ TOP_8 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for 
 TOP_4 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/2 Final'].values()][0:8])
 TOP_2 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['Final'].values()][0:8])
 
+cup_meta = GetAPI.get_api_data().values()
+qualification_labels = [item['match_label'] for item in cup_meta if item['match_type'] == '3rd Round']
 
-
+CUP_GAMES = {
+    'qualification_1': qualification_labels[0:6],
+    'qualification_2': qualification_labels[6:],
+    '1/8 Final': [item['match_label'] for item in cup_meta if item['match_type'] == '1/8 Final'],
+    '1/4 Final': [item['match_label'] for item in cup_meta if item['match_type'] == '1/4 Final'],
+    '1/2 Final': [item['match_label'] for item in cup_meta if item['match_type'] == '1/2 Final'],
+    'Final': [item['match_label'] for item in cup_meta if item['match_type'] == 'Final']
+}

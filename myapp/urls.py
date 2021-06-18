@@ -27,5 +27,10 @@ urlpatterns = [
     path('add-your-prediction-quarter-finals/', views.AddBetsTop8View.as_view(), name='add_your_bet_quarter'),
     path('add-your-prediction-semi-finals/', views.AddBetsTop4View.as_view(), name='add_your_bet_semi'),
     path('add-your-prediction-final/', views.AddBetsTop2View.as_view(), name='add_your_bet_final'),
+    path('add-your-prediction-top-16/edit/<int:pk>', views.AddBetsTop16View.as_view(), name='update_bets_top_16'),
+    path('add-your-prediction-quarter-finals/edit/<int:pk>', views.AddBetsTop8View.as_view(), name='update_bets_quarter'),
+    path('add-your-prediction-semi-finals/edit/<int:pk>', views.AddBetsTop4View.as_view(), name='update_bets_semi'),
+    path('add-your-prediction-final/edit/<int:pk>', views.AddBetsTop2View.as_view(), name='update_bets_final'),
+     path('cup/', views.CupView.as_view(), name='the_cup'),
 ]
 
