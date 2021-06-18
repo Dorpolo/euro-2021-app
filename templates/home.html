@@ -97,22 +97,47 @@
             <hr>
               <h6>Quick Access</h6>
                 <center>
-                <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
-                            {% if is_cup_user %}
-                            <a href="{% url 'the_cup' %}">
-                                 <button type="button" class="btn btn-dark">Cup</button>
-                             </a>
-                            {% endif %}
-                             <a href="{% url 'my_predictions' %}">
-                                 <button type="button" class="btn btn-dark">My Bets</button>
-                             </a>
-                            <a href="{% url 'predictions' %}">
-                                <button type="button" class="btn btn-dark">All Bets</button>
-                            </a>
-                             <a href="{% url 'top_players' %}">
-                                 <button type="button" class="btn btn-dark">Players</button>
-                             </a>
-                    </div>
+           <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                    {% if is_cup_user %}
+                    <a href="{% url 'the_cup' %}">
+                         <button type="button" class="btn btn-dark">Cup</button>
+                     </a>
+                    {% endif %}
+                     <a href="{% url 'my_predictions' %}">
+                         <button type="button" class="btn btn-dark">My Bets</button>
+                     </a>
+                    <a href="{% url 'predictions' %}">
+                        <button type="button" class="btn btn-dark">All Bets</button>
+                    </a>
+                     <a href="{% url 'top_players' %}">
+                         <button type="button" class="btn btn-dark">Players</button>
+                     </a>
+            </div>
+
+{#                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">#}
+{#                    <a href="{% url 'the_cup' %}">#}
+{#                      <button type="button" class="btn btn-primary">Cup</button>#}
+{#                    </a>#}
+{#                    <a href="{% url 'top_players' %}">#}
+{#                     <button type="button" class="btn btn-primary">Players</button>#}
+{#                    </a>#}
+{##}
+{#                  <div class="btn-group" role="group">#}
+{#                    <button#}
+{#                      id="btnGroupDrop1"#}
+{#                      type="button"#}
+{#                      class="btn btn-primary dropdown-toggle"#}
+{#                      data-mdb-toggle="dropdown"#}
+{#                      aria-expanded="false"#}
+{#                    >#}
+{#                      Predictions#}
+{#                    </button>#}
+{#                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">#}
+{#                      <li><a class="dropdown-item" href="{% url 'my_predictions' %}">My Predictions</a></li>#}
+{#                      <li><a class="dropdown-item" href="{% url 'predictions' %}">All Predictions</a></li>#}
+{#                    </ul>#}
+{#                  </div>#}
+{#                </div>#}
                 </center>
             <hr>
      <h6>Required Actions</h6>

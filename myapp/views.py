@@ -648,7 +648,7 @@ class LiveGameView:
         status = match.match_status[0]
         onboarding = BaseViewUserControl(request.user.id).onboarding()
         if onboarding['bet']:
-            LiveOutput = TopPlayerStats(request.user.id).live_game_plot( match_label=match.match_label[0])
+            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match.match_label[0])
         else:
             LiveOutput = [None, None]
         context = {
@@ -668,14 +668,17 @@ class LiveGameView:
         Match = GetMatchData()
         match = Match.next_match() if is_next else Match.prev_match()
         status = match.match_status[0]
-        LiveOutput = TopPlayerStats(request.user.id).live_game_plot( match_label=match.match_label[0])
+        onboarding = BaseViewUserControl(request.user.id).onboarding()
+        if onboarding['bet']:
+            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match.match_label[0])
         context = {
             'title': match.match_label[0],
             'real_score': f"{match.home_team_score[0]}-{match.away_team_score[0]}",
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
             'plots': LiveOutput[0],
             'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
-            'entitled_users': LiveOutput[1]
+            'entitled_users': LiveOutput[1],
+            'committed_a_bet': onboarding['bet'],
         }
         template_name = f"stats_live_game_{'next' if is_next else 'prev'}.html"
         return render(request, template_name, context)
