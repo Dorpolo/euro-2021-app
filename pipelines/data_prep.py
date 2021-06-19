@@ -692,7 +692,14 @@ class GetMatchData:
         top_player_api = requests.get(url=url).json()['season']['players']
         top_player_list = [[item['shortname'], item['teamname'], int(item['eventCount']), f'{event_name}']
                            for item in top_player_api]
-        return top_player_list
+        top_player_list_adjusted = []
+        for item in top_player_list:
+            if [*item] == ['C. Ronaldo', 'Portugal', 1, 'Top Scorer']:
+                top_player_list_adjusted.append(['C. Ronaldo', 'Portugal', 2, 'Top Scorer'])
+            else:
+                top_player_list_adjusted.append(item)
+        df = pd.DataFrame(top_player_list_adjusted).sort_values(by=2, ascending=False)
+        return df.values.tolist()
 
 
 class TopPlayerStats(GetMatchData):
