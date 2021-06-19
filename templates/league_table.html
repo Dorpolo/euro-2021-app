@@ -71,13 +71,14 @@
                                 <th>Winners</th>
                                 <th>Success</th>
                                 <th>B-Goals</th>
+                                <th>Extra</th>
                             </tr>
                         <thead/>
                         <tbody>
                           {% for item in obj %}
                               {% if forloop.counter == 1 %}
                                     <tr class="active-row">
-                                      <th>{{ item.9 }}</th>
+                                      <th>{{ item.10 }}</th>
                                       <td>{{ item.0 }}</td>
                                       <td>{{ item.1 }}</td>
                                       <td>{{ item.2 }}</td>
@@ -85,10 +86,11 @@
                                       <td>{{ item.4 }}</td>
                                       <td>{{ item.5 }}</td>
                                       <td>{{ item.6 }}</td>
+                                      <td>{{ item.9 }}</td>
                                   </tr>
                               {% else %}
                                   <tr>
-                                      <th>{{ item.9 }}</th>
+                                      <th>{{ item.10 }}</th>
                                       <td>{{ item.0}}</td>
                                       <td>{{ item.1 }}</td>
                                       <td>{{ item.2 }}</td>
@@ -96,6 +98,7 @@
                                       <td>{{ item.4 }}</td>
                                       <td>{{ item.5 }}</td>
                                       <td>{{ item.6 }}</td>
+                                      <td>{{ item.9 }}</td>
                                   </tr>
                               {% endif %}
                           {% endfor %}

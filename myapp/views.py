@@ -68,7 +68,6 @@ class CupView(TemplateView):
             UserPred = UserPredictionBase(request.user.id)
             games_started = self.GetAPIData.started_games()
             league_data_output = UserPred.get_league_members()
-            print(league_data_output)
             onboarding = BaseViewUserControl(request.user.id).onboarding()
 
             qualification_1_data = UserPred.league_member_points_cup('qualification_1')

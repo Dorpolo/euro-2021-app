@@ -317,7 +317,7 @@ class UserPredictionBase:
         df['event_type'] = df.variable.str[:-2]
         df_predictions = df[['user_name_id', 'event_type', 'player_name', 'value']]
         df_predictions['event_type'] = np.where(df_predictions['event_type'] == 'top_scorer', 'Top Scorer', 'Top Assist')
-        df_real_players = TopPlayerStats( self.user_id ).top_players_real()
+        df_real_players = TopPlayerStats(self.user_id).top_players_real()
         df_output = pd.merge(df_predictions, df_real_players[1], on=['player_name', 'event_type'], how='left')
         output = {item: df_output[df_output.event_type == item][['player_name', 'team', 'count']].values.tolist()
                   for item in ['Top Scorer', 'Top Assist']}
@@ -520,8 +520,9 @@ class UserPredictionBase:
             round((x['started'] * x['points']).sum()*100/(x['started'] * 3).sum(), 1),
             int((x['started'] * x['is_boom'] * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()),
             int((x['is_live'] * x['points']).sum()),
+            int(1)
         ]
-        index_names = ['games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points']
+        index_names = ['games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'players']
         return pd.Series(d, index=[index_names])
 
     @staticmethod
@@ -537,10 +538,11 @@ class UserPredictionBase:
     def league_member_points(self):
         metadata = self.present_predictions()
         output = {}
+        points_from_players = self.get_game_points_players()
         if metadata[0] is not None:
             for key, obj in metadata[0].items():
                 df = pd.DataFrame(obj, columns=metadata[1])
-                output[key] = self.get_game_points_group_stage(df)
+                output[key] = self.get_game_points_group_stage(df, points_from_players[key])
             return output
         else:
             return None
@@ -553,21 +555,31 @@ class UserPredictionBase:
                 df = pd.DataFrame(obj, columns=metadata[1])
                 df = df[df.match_label.isin(CUP_GAMES[stage])]
                 if df.shape[0] > 0:
-                    output[key] = self.get_game_points_group_stage(df)
+                    output[key] = self.get_game_points_cup(df)
                 else:
                     output[key] = None
             return output
         else:
             return None
 
-    def get_game_points_group_stage(self, df):
-        data = df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).\
-            reset_index().sort_values(
-                    by=[('points',), ('boom',), ('direction', ), ('predicted_goals', )], ascending=[False]*4
-                    )[['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate',
-                       'predicted_goals', 'live_points', 'user_name_id']]
-        data['rn'] = np.arange(len(data)) + 1
-        return self.adjust_table_column_type(data)
+    def get_game_points_group_stage(self, df, player_points: dict):
+        required_cols = ['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'user_name_id']
+        data = pd.DataFrame(df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).reset_index())
+        df = pd.DataFrame(self.adjust_table_column_type(data[required_cols]), columns=required_cols)
+        df['player_point_col'] = [int(player_points[item[1]]) for item in data.values.tolist()]
+        df['points'] = df['player_point_col'] + df['points']
+        cleaner_data = df.sort_values(by=['points', 'boom', 'direction', 'predicted_goals'], ascending=[False]*4)
+        cleaner_data['rn'] = np.arange(len(cleaner_data)) + 1
+        return cleaner_data.values.tolist()
+
+    def get_game_points_cup(self, df):
+        required_cols = ['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'user_name_id']
+        data = pd.DataFrame(df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).reset_index())
+        cleaner_data = data.sort_values(
+                            by=[('points',), ('boom',), ('direction', ), ('predicted_goals', )], ascending=[False]*4
+                        )[required_cols]
+        cleaner_data['rn'] = np.arange(len(cleaner_data)) + 1
+        return self.adjust_table_column_type(cleaner_data)
 
     def get_user_league_rank(self) -> dict:
         get_user_points = self.league_member_points()
@@ -576,8 +588,31 @@ class UserPredictionBase:
     def get_game_points_knockout(self) -> tuple:
         pass
 
-    def get_game_points_players(self) -> tuple:
-        pass
+    def get_game_points_players(self) -> dict:
+        PlayerPrediction = self.get_top_players_predictions()
+        PlayerReal = TopPlayerStats(self.user_id).get_relevant_players_for_league_points()
+        output = {}
+        league_map = {
+                    item['league_name']: item['id']
+                    for item in League.objects.all().values('id', 'league_name')
+                }
+        cols = ['user_id', 'event_type', 'player_name', 'player_name_long', 'nick_name', 'league_name']
+        excluded_league_list = [24, 19]
+        for key, val in PlayerPrediction.items():
+            user_list = {item['nick_name']: 0 for item in LeagueMember.objects.filter(league_name_id=key).values('nick_name')}
+            if league_map[key] not in excluded_league_list:
+                df_prediction = pd.DataFrame(PlayerPrediction[key], columns=cols)
+                df_prediction['event_type'] = np.where(df_prediction['event_type'] == 'top_scorer', 'Top Scorer',
+                                                   np.where(df_prediction['event_type'] == 'top_assist', 'Top Assist', None))
+                new_cols = ['user_id', 'nick_name', 'event_type', 'player_name', 'count']
+                df_merged = pd.merge(df_prediction, PlayerReal, on=['player_name', 'event_type'], how='inner')[new_cols]
+                df_output = df_merged.groupby(['user_id', 'nick_name', 'event_type', 'player_name']).first().reset_index()
+                elm_count = list(df_output['nick_name'].values)
+                output[key] = {item: elm_count.count(item)*3 if item in list(set(elm_count)) else 0
+                               for item in user_list}
+            else:
+                output[key] = user_list
+        return output
 
 
 class GetMatchData:
@@ -665,6 +700,16 @@ class TopPlayerStats(GetMatchData):
         super().__init__()
         self.user_id = user_id
 
+    @staticmethod
+    def get_minimal_count_value(df) -> int:
+        sorted_df = pd.DataFrame(df['count'].value_counts()).reset_index().sort_values(by='index', ascending=False)
+        event_details = {item[0]: item[1] for item in sorted_df.values.tolist()}
+        agg = 0
+        for key, val in event_details.items():
+            agg += val
+            if agg >= 3:
+                return int(key)
+
     def top_players_real(self) -> tuple:
         scorers = self.top_players(1)
         assists = self.top_players(2)
@@ -672,6 +717,14 @@ class TopPlayerStats(GetMatchData):
         cols = ['player_name', 'team', 'count', 'event_type']
         df = pd.DataFrame(scorers + assists, columns=cols)
         return players_dict, df
+
+    def get_relevant_players_for_league_points(self) -> dict:
+        df = self.top_players_real()[1]
+        df_goal = df[df.event_type == 'Top Scorer']
+        df_assists = df[df.event_type == 'Top Assist']
+        adj_df_scorers = df_goal[df_goal['count'] >= self.get_minimal_count_value(df_goal)]
+        adj_df_df_assists = df_assists[df_assists['count'] >= self.get_minimal_count_value(df_assists)]
+        return pd.concat([adj_df_scorers, adj_df_df_assists])
 
     @staticmethod
     def build_plot(data: dict):

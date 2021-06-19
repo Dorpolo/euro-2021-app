@@ -113,31 +113,6 @@
                          <button type="button" class="btn btn-dark">Players</button>
                      </a>
             </div>
-
-{#                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">#}
-{#                    <a href="{% url 'the_cup' %}">#}
-{#                      <button type="button" class="btn btn-primary">Cup</button>#}
-{#                    </a>#}
-{#                    <a href="{% url 'top_players' %}">#}
-{#                     <button type="button" class="btn btn-primary">Players</button>#}
-{#                    </a>#}
-{##}
-{#                  <div class="btn-group" role="group">#}
-{#                    <button#}
-{#                      id="btnGroupDrop1"#}
-{#                      type="button"#}
-{#                      class="btn btn-primary dropdown-toggle"#}
-{#                      data-mdb-toggle="dropdown"#}
-{#                      aria-expanded="false"#}
-{#                    >#}
-{#                      Predictions#}
-{#                    </button>#}
-{#                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">#}
-{#                      <li><a class="dropdown-item" href="{% url 'my_predictions' %}">My Predictions</a></li>#}
-{#                      <li><a class="dropdown-item" href="{% url 'predictions' %}">All Predictions</a></li>#}
-{#                    </ul>#}
-{#                  </div>#}
-{#                </div>#}
                 </center>
             <hr>
      <h6>Required Actions</h6>
@@ -165,29 +140,32 @@
                                 <th>Winners</th>
                                 <th>Success</th>
                                 <th>B-Goals</th>
+                                <th>Extra</th>
                             </tr>
                         <thead/>
                         <tbody>
                           {% for item in obj %}
                               {% if forloop.counter == 1 %}
                                     <tr class="active-row">
-                                      <th>{{ item.9 }}</th>
+                                      <th>{{ item.10 }}</th>
                                       <td>{{ item.0 }}</td>
                                       <td>{{ item.2 }}</td>
                                       <td>{{ item.3 }}</td>
                                       <td>{{ item.4 }}</td>
                                       <td>{{ item.5 }}</td>
                                       <td>{{ item.6 }}</td>
+                                      <th>{{ item.9 }}</th>
                                   </tr>
                           {% else %}
                                   <tr>
-                                      <th>{{ item.9 }}</th>
+                                      <th>{{ item.10 }}</th>
                                       <td>{{ item.0 }}</td>
                                       <td>{{ item.2 }}</td>
                                       <td>{{ item.3 }}</td>
                                       <td>{{ item.4 }}</td>
                                       <td>{{ item.5 }}</td>
                                       <td>{{ item.6 }}</td>
+                                      <th>{{ item.9 }}</th>
                                   </tr>
                               {% endif %}
                           {% endfor %}
@@ -260,7 +238,6 @@
               <li><a href= {% url 'update_league_member' obj %}>{{ key }}</a></li>
           {% endfor %}
         </ul>
-{#      * Available until 06-10-2021 23:59#}
       <hr>
 {% endif %}
 
@@ -269,7 +246,7 @@
     .styled-table {
         border-collapse: collapse;
         margin: 20px 0;
-        font-size: 0.6em;
+        font-size: 0.5em;
         font-family: sans-serif;
         min-width: 300px;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
