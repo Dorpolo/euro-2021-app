@@ -597,7 +597,7 @@ class UserPredictionBase:
                     for item in League.objects.all().values('id', 'league_name')
                 }
         cols = ['user_id', 'event_type', 'player_name', 'player_name_long', 'nick_name', 'league_name']
-        excluded_league_list = [24, 19]
+        excluded_league_list = [24, 19, 31]
         for key, val in PlayerPrediction.items():
             user_list = {item['nick_name']: 0 for item in LeagueMember.objects.filter(league_name_id=key).values('nick_name')}
             if league_map[key] not in excluded_league_list:
