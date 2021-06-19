@@ -583,7 +583,7 @@ class UserPredictionBase:
 
     def get_user_league_rank(self) -> dict:
         get_user_points = self.league_member_points()
-        return {key: {sub[0]: sub[9] for sub in val} for key, val in get_user_points.items()}
+        return {key: {sub[0]: sub[10] for sub in val} for key, val in get_user_points.items()}
 
     def get_game_points_knockout(self) -> tuple:
         pass

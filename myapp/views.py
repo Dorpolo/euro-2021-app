@@ -477,6 +477,14 @@ class UpdateBetView(UpdateView):
     template_name = 'update_bets.html'
 
 
+class CupBracket(TemplateView):
+    template_name = 'cup_bracket.html'
+
+    def get(self, request):
+        context = {'data': None}
+        return render(request, self.template_name, context)
+
+
 class UpdateBetViewThirdRound(UpdateView):
     model = Game
     form_class = BetFormUpdate3Round
