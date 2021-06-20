@@ -656,6 +656,18 @@ class GetMatchData:
                   'home_team_id', 'home_team_score', 'away_team', 'away_team_id', 'away_team_score', 'match_label']
         return output, fields
 
+    def current_live_game(self):
+        df_input = self.all_matches()
+        df = pd.DataFrame(df_input[0], columns=df_input[1])
+        print(df[['match_label', 'match_status']])
+        output = df[df.match_status == '-1']
+        if output.shape[0] > 1:
+            return 'double'
+        elif output.shape[0] == 1:
+            return 'single'
+        else:
+            return 'zero'
+
     def next_match(self):
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
@@ -665,8 +677,14 @@ class GetMatchData:
     def prev_match(self):
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
-        output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
-        return output.head(2).tail(1).reset_index()
+        status = self.current_live_game()
+        if status == 'double':
+            output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
+            return output.head(2).tail(1).reset_index()
+        else:
+            output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
+            return output.head(1).reset_index()
+
 
     def next_match_logos(self):
         teams_data = self.next_match()
