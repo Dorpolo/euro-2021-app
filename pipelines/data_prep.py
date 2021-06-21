@@ -512,8 +512,8 @@ class UserPredictionBase:
                                x['knockout_points'])
         x['started'] = np.where(x.game_status != 'Fixture', 1, 0)
         x['is_live'] = np.where(x.game_status == 'live', 1, 0)
-        x['distance'] = abs(x.pred_score_home.astype(int) - x.pred_score_away.astype(int)) + \
-                        abs(x.pred_score_home.astype(int) - x.pred_score_away.astype(int))
+        x['distance'] = (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + \
+                        (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int)))
         d = [
             int(x['started'].sum()),
             int((x['started'] * x['points']).sum()),
