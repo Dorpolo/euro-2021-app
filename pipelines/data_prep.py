@@ -523,7 +523,7 @@ class UserPredictionBase:
             int((x['started'] * x['is_boom'] * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()),
             int((x['is_live'] * x['points']).sum()),
             int(1),
-            int(x['started'] * x['distance'].sum())
+            int(x['started'] * x['distance']).sum()
         ]
         index_names = ['games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'players', 'distance']
         return pd.Series(d, index=[index_names])
