@@ -681,12 +681,17 @@ class GetMatchData:
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
         status = self.current_live_game()
+        print(status)
         if status == 'double':
             output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
             return output.head(2).tail(1).reset_index()
-        else:
+        elif status == 'single':
             output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
             return output.head(1).reset_index()
+        else:
+            output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
+            return output.head(2).tail(1).reset_index()
+
 
     def next_match_logos(self):
         teams_data = self.next_match()
@@ -993,6 +998,14 @@ class GameStats(UserPredictionBase):
             return None
 
 
+class CupKnockOut(UserPredictionBase):
+    def __init__(self, user_id, match_label):
+        super().__init__(user_id)
+        self.match_label = match_label
+
+    def cup_top_16_data(self, pairs):
+        data = self.league_member_points_cup(stage='1/8 Final')
+        return None
 
 
 
