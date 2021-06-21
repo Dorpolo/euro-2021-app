@@ -24,12 +24,15 @@
 </style>
 
 {% if committed_a_bet %}
-          <div>
-          <h3>Qualification - Round I Table</h3>
-          <h6>Top 15 players will get the ticket for the next stage</h6>
-          <p>Points are calculated based on group stage 3rd round games (1-6)</p>
+      <div>
+          <h3>Qualification - Round I</h3>
+          <p>
+            <li>Top 15 players will get the ticket for the next stage.</li>
+            <li>Points are calculated based on the group stage 3rd round games (1-6).</li>
+          </p>
           {% for key, obj in qualification_1_points.items %}
               {%  if 'Conference League' in key or 'Beta Coffee' in key%}
+                  <hr>
                 <p>{{ key }}</p>
                   <hr>
                   <div>
@@ -41,31 +44,28 @@
                                     <th>Points</th>
                                     <th>Booms</th>
                                     <th>Winners</th>
-                                    <th>Success</th>
-                                    <th>B-Goals</th>
+                                    <th>Distance</th>
                                 </tr>
                             <thead/>
                             <tbody>
                               {% for item in obj %}
                                   {% if forloop.counter < 16 %}
                                         <tr class="active-row">
-                                          <th>{{ item.9 }}</th>
+                                          <th>{{ item.10 }}</th>
                                           <td>{{ item.0 }}</td>
                                           <td>{{ item.2 }}</td>
                                           <td>{{ item.3 }}</td>
                                           <td>{{ item.4 }}</td>
-                                          <td>{{ item.5 }}</td>
-                                          <td>{{ item.6 }}</td>
+                                          <td>{{ item.8 }}</td>
                                       </tr>
                               {% else %}
                                       <tr>
-                                          <th>{{ item.9 }}</th>
+                                          <th>{{ item.10 }}</th>
                                           <td>{{ item.0 }}</td>
                                           <td>{{ item.2 }}</td>
                                           <td>{{ item.3 }}</td>
                                           <td>{{ item.4 }}</td>
-                                          <td>{{ item.5 }}</td>
-                                          <td>{{ item.6 }}</td>
+                                          <td>{{ item.8 }}</td>
                                       </tr>
                                   {% endif %}
                               {% endfor %}
@@ -82,6 +82,67 @@
               {% endif %}
         {% endfor %}
       </div>
+    <hr>
+    <div>
+          <h3>Qualification - Round II</h3>
+          <p>
+                <li>The Top player will get the last ticket for the next stage.</li>
+                <li>Points are calculated based on the group stage 3rd round games (7-12).</li>
+            </p>
+         {% for key, obj in qualification_2_points.items %}
+              {%  if 'Conference League' in key or 'Beta Coffee' in key%}
+                  <hr>
+                <p>{{ key }}</p>
+                  <hr>
+                  <div>
+                      <table class="styled-table2" style="width: 100%; height: 100%; text-align: center">
+                            <thead>
+                                <tr style="text-align: center">
+                                    <th>#</th>
+                                    <th>User</th>
+                                    <th>Points</th>
+                                    <th>Booms</th>
+                                    <th>Winners</th>
+                                    <th>Distance</th>
+                                </tr>
+                            <thead/>
+                            <tbody>
+                              {% for item in obj %}
+                                  {% if forloop.counter < 2 %}
+                                        <tr class="active-row">
+                                          <th>{{ forloop.counter }}</th>
+                                          <td>{{ item.0 }}</td>
+                                          <td>{{ item.2 }}</td>
+                                          <td>{{ item.3 }}</td>
+                                          <td>{{ item.4 }}</td>
+                                          <td>{{ item.8 }}</td>
+                                      </tr>
+                              {% else %}
+                                      <tr>
+                                          <th>{{ forloop.counter }}</th>
+                                          <td>{{ item.0 }}</td>
+                                          <td>{{ item.2 }}</td>
+                                          <td>{{ item.3 }}</td>
+                                          <td>{{ item.4 }}</td>
+                                          <td>{{ item.8 }}</td>
+                                      </tr>
+                                  {% endif %}
+                              {% endfor %}
+                            </tbody>
+                      </table>
+                    </div>
+                 <hr>
+                  <center>
+                  <p>The Last Chancer</p>
+                     {% for item in qualification_2_images %}
+                         {% if forloop.first %}
+                            <img class="dp-styled-img" src="{{item}}">
+                         {% endif %}
+                     {% endfor %}
+                  </center>
+              {% endif %}
+        {% endfor %}
+    </div>
   {% endif %}
   <hr>
 
@@ -124,6 +185,47 @@
     }
 
     .styled-table tbody tr.active-row {
+        font-weight: bold;
+        color: #090f18;
+    }
+
+        .styled-table2 {
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 0.6em;
+        font-family: sans-serif;
+        min-width: 300px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .styled-table2 thead tr {
+        background-color: #1C2833;
+        color: #ffffff;
+        text-align: left;
+    }
+
+    .styled-table2 th,
+    .styled-table2 td {
+        padding: 2px 3px;
+    }
+
+    .styled-table2 tbody tr {
+        border-bottom: 1px solid #dddddd;
+    }
+
+    .styled-table2 tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3;
+    }
+
+    .styled-table2 tbody tr:last-of-type {
+        border-bottom: 1px solid #090f18;
+    }
+
+    .styled-table2 tbody tr:first-of-type {
+        border-bottom: 2px solid #009879;
+    }
+
+    .styled-table2 tbody tr.active-row {
         font-weight: bold;
         color: #090f18;
     }

@@ -71,12 +71,23 @@ class CupView(TemplateView):
             onboarding = BaseViewUserControl(request.user.id).onboarding()
 
             qualification_1_data = UserPred.league_member_points_cup('qualification_1')
-            relevant_key = [item for item in qualification_1_data.keys() if 'Conference' in item
-                            or 'Beta Coffee' in item][0]
-            qualification_1_df = pd.DataFrame(qualification_1_data[relevant_key][0:15])
+            relevant_key = [item for item in qualification_1_data.keys()
+                            if 'Conference' in item or 'Beta Coffee' in item][0]
+            qualification_1 = qualification_1_data[relevant_key]
+            qualification_1_df = pd.DataFrame(qualification_1[0:15])
             qualification_1_images_df = pd.DataFrame(league_data_output[relevant_key])
             images_qualification_1 = list(
                     pd.merge(qualification_1_df, qualification_1_images_df, on=[0], how='inner')['1_y']
+                    )
+            qualification_1_losers_df = pd.DataFrame(qualification_1[3:]) #TODO - change 2 to 15
+            qualification_2_nick_names = list(qualification_1_losers_df[0])
+            qualification_2_data = {key: [item for item in val if item[0] in qualification_2_nick_names]
+                                    for key, val in UserPred.league_member_points_cup('qualification_2').items()
+                                    if key in relevant_key}
+            qualification_2 = qualification_2_data[relevant_key]
+            qualification_2_df = pd.DataFrame(qualification_2)
+            images_qualification_2 = list(
+                    pd.merge(qualification_2_df, qualification_1_images_df, on=[0], how='inner')['1_y']
                     )
 
             if league_data_output is not None:
@@ -84,7 +95,8 @@ class CupView(TemplateView):
                          'is_cup_user': UserPred.is_cup_user(),
                          'qualification_1_points': qualification_1_data,
                          'qualification_1_images': images_qualification_1,
-                         'qualification_2_points': UserPred.league_member_points_cup('qualification_2'),
+                         'qualification_2_points': qualification_2_data,
+                         'qualification_2_images': images_qualification_2,
                          'top_16_points': UserPred.league_member_points_cup('1/8 Final'),
                          'top_8_points': UserPred.league_member_points_cup('1/4 Final'),
                          'top_4_points': UserPred.league_member_points_cup('1/2 Final'),

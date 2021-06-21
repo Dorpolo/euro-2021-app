@@ -512,6 +512,8 @@ class UserPredictionBase:
                                x['knockout_points'])
         x['started'] = np.where(x.game_status != 'Fixture', 1, 0)
         x['is_live'] = np.where(x.game_status == 'live', 1, 0)
+        x['distance'] = abs(x.pred_score_home.astype(int) - x.pred_score_away.astype(int)) + \
+                        abs(x.pred_score_home.astype(int) - x.pred_score_away.astype(int))
         d = [
             int(x['started'].sum()),
             int((x['started'] * x['points']).sum()),
@@ -520,9 +522,10 @@ class UserPredictionBase:
             round((x['started'] * x['points']).sum()*100/(x['started'] * 3).sum(), 1),
             int((x['started'] * x['is_boom'] * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()),
             int((x['is_live'] * x['points']).sum()),
-            int(1)
+            int(1),
+            int(x['distance'].sum())
         ]
-        index_names = ['games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'players']
+        index_names = ['games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'players', 'distance']
         return pd.Series(d, index=[index_names])
 
     @staticmethod
@@ -563,21 +566,22 @@ class UserPredictionBase:
             return None
 
     def get_game_points_group_stage(self, df, player_points: dict):
-        required_cols = ['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'user_name_id']
+        required_cols = ['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'distance', 'user_name_id']
         data = pd.DataFrame(df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).reset_index())
         df = pd.DataFrame(self.adjust_table_column_type(data[required_cols]), columns=required_cols)
         df['player_point_col'] = [int(player_points[item[1]]) for item in data.values.tolist()]
         df['points'] = df['player_point_col'] + df['points']
-        cleaner_data = df.sort_values(by=['points', 'boom', 'direction', 'predicted_goals'], ascending=[False]*4)
+        cleaner_data = df.sort_values(by=['points', 'boom', 'direction', 'predicted_goals', 'distance'],
+                                      ascending=[False]*4 + [True])
         cleaner_data['rn'] = np.arange(len(cleaner_data)) + 1
         return cleaner_data.values.tolist()
 
     def get_game_points_cup(self, df):
-        required_cols = ['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'user_name_id']
+        required_cols = ['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'distance',  'user_name_id']
         data = pd.DataFrame(df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).reset_index())
         cleaner_data = data.sort_values(
-                            by=[('points',), ('boom',), ('direction', ), ('predicted_goals', )], ascending=[False]*4
-                        )[required_cols]
+                            by=[('points',), ('boom',), ('direction', ), ('predicted_goals', ), ('distance', )],
+                            ascending=[False]*4 + [True])[required_cols]
         cleaner_data['rn'] = np.arange(len(cleaner_data)) + 1
         return self.adjust_table_column_type(cleaner_data)
 
@@ -659,7 +663,6 @@ class GetMatchData:
     def current_live_game(self):
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
-        print(df[['match_label', 'match_status']])
         output = df[df.match_status == '-1']
         if output.shape[0] > 1:
             return 'double'
@@ -684,7 +687,6 @@ class GetMatchData:
         else:
             output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
             return output.head(1).reset_index()
-
 
     def next_match_logos(self):
         teams_data = self.next_match()
