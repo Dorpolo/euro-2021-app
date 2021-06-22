@@ -16,8 +16,6 @@ jmespath==0.10.0
 numpy==1.19.4
 pandas==1.1.5
 patsy==0.5.1
-psycopg2==2.8.6
-psycopg2-binary==2.8.6
 py==1.10.0
 PyHive==0.5.2
 PyJWT==1.7.1

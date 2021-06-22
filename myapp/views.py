@@ -27,8 +27,8 @@ class HomeView(TemplateView):
         if request.user.is_authenticated:
             UserPred = UserPredictionBase(request.user.id)
             games_started = self.GetAPIData.started_games()
-            league_data_output = UserPred.get_league_members()
             onboarding = BaseViewUserControl(request.user.id).onboarding()
+            league_data_output = UserPred.get_league_members()
             if league_data_output is not None:
                context = {
                         'league_members': league_data_output,
@@ -42,16 +42,18 @@ class HomeView(TemplateView):
                         'committed_a_bet_4': onboarding['bet_top_4'],
                         'committed_a_bet_2': onboarding['bet_top_2'],
                         'bet_id': UserPred.user_game_bet_id(),
-                        'league_member_points': UserPred.league_member_points(),
-                        'league_memberships': UserPred.get_league_members_data(),
+                        # 'league_member_points': UserPred.league_member_points(),
+                        # 'league_memberships': UserPred.get_league_members_data(),
                         'games_started': games_started,
                         'is_cup_user': UserPred.is_cup_user()
                     }
-               presented_data = UserPred.home_screen_match_relevant_data()
-               if presented_data[0] is not None:
+               if onboarding['bet']:
+                    presented_data = UserPred.home_screen_match_relevant_data()
                     context['user_game_points'] = presented_data[2]
                     context['next_match'] = presented_data[1]
                     context['prev_match'] = presented_data[0]
+                    context['league_member_points'] = UserPred.league_member_points()
+                    context['league_memberships'] = UserPred.get_league_members_data()
                return render(request, self.template_name, context)
             else:
                 return render(request, self.template_name, {'data': None})
@@ -69,16 +71,13 @@ class CupView(TemplateView):
             games_started = self.GetAPIData.started_games()
             league_data_output = UserPred.get_league_members()
             onboarding = BaseViewUserControl(request.user.id).onboarding()
-
             qualification_1_data = UserPred.league_member_points_cup('qualification_1')
             relevant_key = [item for item in qualification_1_data.keys()
                             if 'Conference' in item or 'Beta Coffee' in item][0]
             qualification_1 = qualification_1_data[relevant_key]
             qualification_1_df = pd.DataFrame(qualification_1[0:15])
             qualification_1_images_df = pd.DataFrame(league_data_output[relevant_key])
-            images_qualification_1 = list(
-                    pd.merge(qualification_1_df, qualification_1_images_df, on=[0], how='inner')['1_y']
-                    )
+            images_qualification_1 = list(pd.merge(qualification_1_df, qualification_1_images_df, on=[0], how='inner')['1_y'])
             qualification_1_losers_df = pd.DataFrame(qualification_1[15:])
             qualification_2_nick_names = list(qualification_1_losers_df[0])
             qualification_2_data = {key: [item for item in val if item[0] in qualification_2_nick_names]
@@ -86,9 +85,7 @@ class CupView(TemplateView):
                                     if key in relevant_key}
             qualification_2 = qualification_2_data[relevant_key]
             qualification_2_df = pd.DataFrame(qualification_2)
-            images_qualification_2 = list(
-                    pd.merge(qualification_2_df, qualification_1_images_df, on=[0], how='inner')['1_y']
-                    )
+            images_qualification_2 = list(pd.merge(qualification_2_df, qualification_1_images_df, on=[0], how='inner')['1_y'])
 
             if league_data_output is not None:
                context = {
@@ -552,7 +549,7 @@ class CreateLeagueMemberView(CreateView):
                 )
             obj.save()
             league_user_email = LeagueMember.objects.filter(user_name_id=request.user.id)[0].email
-            email_data = MailTemplate.user_joined_a_league( request, form )
+            email_data = MailTemplate().user_joined_a_league(request, form)
             recipient_list = [league_user_email, env('EMAIL_HOST_USER')]
             try:
                send_mail(

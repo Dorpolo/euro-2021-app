@@ -679,18 +679,20 @@ class GetMatchData:
 
     def prev_match(self):
         df_input = self.all_matches()
-        df = pd.DataFrame(df_input[0], columpwdns=df_input[1])
-        status = self.current_live_game()
-        print(status)
-        if status == 'double':
-            output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
-            return output.head(2).tail(1).reset_index()
-        elif status == 'single':
-            output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
-            return output.head(1).reset_index()
+        df = pd.DataFrame(df_input[0], columns=df_input[1])
+        if df.shape[0] > 0:
+            status = self.current_live_game()
+            if status == 'double':
+                output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
+                return output.head(2).tail(1).reset_index()
+            elif status == 'single':
+                output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
+                return output.head(1).reset_index()
+            else:
+                output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
+                return output.head(2).tail(1).reset_index()
         else:
-            output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
-            return output.head(2).tail(1).reset_index()
+            return None
 
     def next_match_logos(self):
         teams_data = self.next_match()
