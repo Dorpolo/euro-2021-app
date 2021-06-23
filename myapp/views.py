@@ -42,8 +42,6 @@ class HomeView(TemplateView):
                         'committed_a_bet_4': onboarding['bet_top_4'],
                         'committed_a_bet_2': onboarding['bet_top_2'],
                         'bet_id': UserPred.user_game_bet_id(),
-                        # 'league_member_points': UserPred.league_member_points(),
-                        # 'league_memberships': UserPred.get_league_members_data(),
                         'games_started': games_started,
                         'is_cup_user': UserPred.is_cup_user()
                     }
