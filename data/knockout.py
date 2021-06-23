@@ -8,7 +8,7 @@ from data.teams import teams, teams_mock
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(SECRET_KEY=str,)
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-BETA_MODE = True #TODO - Change once knockout starting
+BETA_MODE = False
 
 
 class BuildKnockOutForm:
@@ -83,6 +83,7 @@ class BuildKnockOutForm:
         data = requests.get(url=URL).json()
         output = {}
         playoff_matches = [item for item in data['calendar']['matchdays'] if item['matchdayPlayoff'] == '1']
+        print(playoff_matches)
         for item in playoff_matches:
             stage = item['matchdayName']
             if stage != '1/16 Final':
