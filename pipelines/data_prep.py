@@ -112,7 +112,7 @@ class UserPredictionBase:
 
     def extract_data(self, beta_mode: bool = False):
         if beta_mode:
-            r = requests.get(url=self.URL.replace('_id=40', '_id=82'))
+            r = requests.get(url=self.URL)
         else:
             r = requests.get(url=self.URL)
         data = json.loads(r.text)
@@ -121,6 +121,7 @@ class UserPredictionBase:
     def get_api_data(self, beta_mode: bool = False) -> dict:
         metadata = {}
         data = self.extract_data(beta_mode)
+        print(data)
         for item in data['calendar']['matchdays']:
             matches = item['matches']
             is_playoff = item['matchdayPlayoff']
@@ -428,6 +429,7 @@ class UserPredictionBase:
     @staticmethod
     def add_game_attributes(data, item, game_label):
         x = data[(data.league_name_id == item) & (data.match_label == game_label)]
+        print(data)
         x['pred_dir'] = np.where(x.pred_score_home > x.pred_score_away, 'home',
                                  np.where(x.pred_score_home < x.pred_score_away, 'away', 'draw'))
         x['real_dir'] = np.where(x.real_score_home > x.real_score_away,
@@ -441,18 +443,18 @@ class UserPredictionBase:
     def user_game_points(self):
         data = self.data_enrichment()
         leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
-        next_game = GetMatchData().next_match().match_label[0]
-        prev_game = GetMatchData().prev_match().match_label[0]
+        api_game_router = GetMatchData().game_router()
+        next_game = api_game_router['next']['data']
+        prev_game = api_game_router['prev']['data']
         if len(leagues) > 0:
             output = {}
             for item in leagues:
                 x = {
-                    'next': self.add_game_attributes(data, item, next_game),
-                    'prev': self.add_game_attributes(data, item, prev_game)
+                    'next': self.add_game_attributes(data, item, next_game['match_label']),
+                    'prev': self.add_game_attributes(data, item, prev_game['match_label'])
                 }
                 boomers = {key: list(val[val.is_boom == 1].nick_name) for key, val in x.items()}
                 winners = {key: list(np.setdiff1d(list(val[val.is_direction == 1].nick_name), boomers[key])) for key, val in x.items()}
-
                 user_pred_df_next = x['next'].loc[x['next'].user_name_id == self.user_id]
                 user_pred_df_prev = x['prev'].loc[x['prev'].user_name_id == self.user_id]
                 user_nick = user_pred_df_next.nick_name.values[0]
@@ -481,11 +483,9 @@ class UserPredictionBase:
             return None
 
     def home_screen_match_relevant_data(self):
-        Match = GetMatchData()
-        next_match_df = Match.next_match()
-        prev_match_df = Match.prev_match()
-        next_match = {key: obj[0] for key, obj in next_match_df.head(1).to_dict().items()}
-        prev_match = {key: obj[0] for key, obj in prev_match_df.head(1).to_dict().items()}
+        data = GetMatchData().game_router()
+        next_match = data['next']['data']
+        prev_match = data['prev']['data']
         user_data = self.user_game_points()
         if isinstance(user_data, dict):
             some_league = list(user_data.keys())[0]
@@ -624,6 +624,8 @@ class GetMatchData:
         self.TOKEN = 'bfa132288504de6860c8ae3259d21fa7'
         self.PREFIX = 'https://api.statorium.com/api/v1'
         self.URL = f'{self.PREFIX}/matches/?season_id=40&apikey={self.TOKEN}'
+        self.L_API_PREFIX = f"http://livescore-api.com/api-client/"
+        self.L_API_SUFFIX = f".json&competition_id=387&?key=KDbVwkzQSt1r7tCq&secret=ZS5RT5WXc7HyvUMgyXb4iLVaeWClqfMq"
 
     def extract_data(self):
         data = requests.get(url=self.URL).json()
@@ -631,6 +633,11 @@ class GetMatchData:
 
     def all_matches(self):
         data = self.extract_data()
+        # live_api_history = self.match_history_data()
+        # live_api_realtime = self.match_live_data()
+        live_api_history_matches = None #[item for item in live_api_history.keys()]
+        live_api_realtime_matches = None #[item for item in live_api_realtime.keys()] if live_api_realtime is not None else [ None]
+        live_fields = ['full_time_score', 'match_winner', '90min_home_team_score', '90min_away_team_score']
         output = []
         for item in data['calendar']['matchdays']:
             match_day_id = item['matchdayID']
@@ -653,12 +660,66 @@ class GetMatchData:
                 match_label = f"{home_team}-{away_team}"
                 row = [match_day_id, match_round, match_day_playoff, match_day_type, match_day_start,
                        match_day_end, match_id, match_status, match_date, match_hour, home_team, home_team_id,
-                       home_team_score, away_team, away_team_id, away_team_score, match_label]
+                       home_team_score, away_team, away_team_id, away_team_score, match_label
+                       ]
+                # if match_label in live_api_realtime_matches:
+                #     extra_data = [live_api_realtime[match_label][item] for item in live_fields]
+                # elif match_label in live_api_history_matches:
+                #     extra_data = [live_api_history[match_label][item] for item in live_fields]
+                #     row += extra_data + [True]
+                # else:
+                #     row += [None for item in live_fields] + [False]
                 output.append(row)
         fields = ['match_day_id', 'match_round', 'match_day_playoff', 'match_day_type', 'match_day_start',
                   'match_day_end', 'match_id', 'match_status', 'match_date', 'match_hour', 'home_team',
-                  'home_team_id', 'home_team_score', 'away_team', 'away_team_id', 'away_team_score', 'match_label']
+                  'home_team_id', 'home_team_score', 'away_team', 'away_team_id', 'away_team_score', 'match_label',
+                  #'live_ft_score', 'live_match_winner', 'live_90_home_score', 'live_90_away_score', 'is_enriched'
+                  ]
         return output, fields
+
+    def match_history_data(self):
+        url_history = f"{self.L_API_PREFIX}scores/history{self.L_API_SUFFIX}"
+        data_history = requests.get(url=url_history).json()
+        total_pages = data_history['data']['total_pages']
+        output = {}
+        for j in range(1, total_pages + 1):
+            page_matches = data_history['data']['match']
+            for item in page_matches:
+                match_label = f"{item['home_name']}-{item['away_name']}".replace('FYR', 'North')
+                outcomes = item['outcomes']
+                winner = outcomes['full_time'] if outcomes['extra_time'] is None else outcomes['extra_time']
+                output[match_label] = {
+                    'full_time_score': item['ft_score'].replace(' - ', '-'),
+                    'match_winner': 'home' if winner == '1' else 'away' if winner == '2' else 'draw',
+                    '90min_home_team_score': item['ft_score'].split(' - ')[0],
+                    '90min_away_team_score': item['ft_score'].split(' - ')[1],
+                    '90min_score_label': item['ft_score']
+                }
+            if j < total_pages:
+                next_page = data_history['data']['next_page']
+                data_history = requests.get(url=next_page).json()
+        return output
+
+    def match_live_data(self):
+        url_live = f"{self.L_API_PREFIX}scores/live{self.L_API_SUFFIX}"
+        data_live = requests.get(url=url_live).json()
+        if len(data_live['data']['match']) == 0:
+            return None
+        else:
+            output = {}
+            page_matches = data_live['data']['match']
+            for item in page_matches:
+                match_label = f"{item['home_name']}-{item['away_name']}".replace('FYR', 'North')
+                outcomes = item['outcomes']
+                winner = outcomes['full_time'] if outcomes['extra_time'] is None else outcomes['extra_time']
+                output[match_label] = {
+                    'full_time_score': item['ft_score'].replace(' - ', '-'),
+                    'match_winner': 'home' if winner == '1' else 'away' if winner == '2' else 'draw',
+                    '90min_home_team_score': item['ft_score'].split(' - ')[0],
+                    '90min_away_team_score': item['ft_score'].split(' - ')[1],
+                    '90min_score_label': item['ft_score']
+                }
+            return output
 
     def current_live_game(self):
         df_input = self.all_matches()
@@ -671,46 +732,43 @@ class GetMatchData:
         else:
             return 'zero'
 
-    def next_match(self):
+    def game_router(self):
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
-        output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
-        return output.head(1).reset_index()
-
-    def prev_match(self):
-        df_input = self.all_matches()
-        df = pd.DataFrame(df_input[0], columns=df_input[1])
+        output = df[df.match_status == '-1']
+        status = 'double' if output.shape[0] > 1 else 'single' if output.shape[0] == 1 else 'zero'
+        next_df = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
+        next_output = next_df.head(1).reset_index()
         if df.shape[0] > 0:
-            status = self.current_live_game()
             if status == 'double':
                 output = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
-                return output.head(2).tail(1).reset_index()
+                prev_output = output.head(2).tail(1).reset_index()
             elif status == 'single':
                 output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
-                return output.head(1).reset_index()
+                prev_output = output.head(1).reset_index()
             else:
                 output = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
-                return output.head(2).tail(1).reset_index()
+                prev_output = output.head(2).tail(1).reset_index()
         else:
-            return None
-
-    def next_match_logos(self):
-        teams_data = self.next_match()
-        home = teams[teams_data.home_team[0]]['logo']
-        away = teams[teams_data.away_team[0]]['logo']
-        return {teams_data.home_team[0]: home, teams_data.away_team[0]: away}
-
-    def prev_match_logos(self):
-        teams_data = self.prev_match()
-        home = teams[teams_data.home_team[0]]['logo']
-        away = teams[teams_data.away_team[0]]['logo']
-        return {teams_data.home_team[0]: home, teams_data.away_team[0]: away}
-
-    def started_games(self) -> int:
-        df_input = self.all_matches()
-        df = pd.DataFrame(df_input[0], columns=df_input[1])
-        games_played = int(df[df.match_status != '0'].shape[0])
-        return games_played
+            prev_output = None
+        context = {
+            'next': {
+                'data': {key: obj[0] for key, obj in next_output.head(1).to_dict().items()},
+                'logo': {
+                         df.home_team[0]: teams[next_output.home_team[0]]['logo'],
+                         df.away_team[0]: teams[next_output.away_team[0]]['logo']
+                     }
+                },
+            'prev': {
+                'data': {key: obj[0] for key, obj in prev_output.head(1).to_dict().items()},
+                'logo': {
+                         df.home_team[0]: teams[prev_output.home_team[0]]['logo'],
+                         df.away_team[0]: teams[prev_output.away_team[0]]['logo']
+                     }
+            },
+            'started_games': int(df[df.match_status != '0'].shape[0])
+        }
+        return context
 
     def top_players(self, event_type: int = 1) -> list:
         event_name = 'Top Scorer' if event_type == 1 else 'Top Assist'

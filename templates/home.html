@@ -12,350 +12,356 @@
       </div>
         </center>
     <hr>
-{% if committed_a_bet %}
 
-                 <div>
-                <body>
-                     <style>
-                        img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
-                        p.liketext { display:inline }
-                    </style>
-                <center>
-                        <div class="card" style="width: 17rem;">
-              <div class="card-body">
-                <h5 class="card-title">
-                    {% for key, obj in next_match_logos.items %}
-                     <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
-                     {% if forloop.counter == 1 %} - {% endif %}
-                     {% endfor %}
-                </h5>
-                <h6 class="card-subtitle mb-2 text-muted">
-                     <p style="color:#1C2833;font-size:15px;">
-                         {% if next_match.match_status == '-1' %}
-                             Live
-                         {% elif next_match.match_status == '1'%}
-                             Finished
-                         {% else %}
-                            Fixture ({{ next_match.match_date }}; {{ next_match.match_hour }} GMT)
-                         {% endif %}
-                     </p>
-                </h6>
-                         <p class="card-text" style="color:#1C2833;font-size:15px;">
-                                      Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
-                                      Your Prediction: {{ next_match.user_pred }} <br>
-                                  </p>
-                            <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+
+{% if in_construction %}
+    <h3>STAY TUNED</h3>
+    <h5>We are coming back soon...</h5>
+    {% if committed_a_bet %}
+
+                     <div>
+                    <body>
+                         <style>
+                            img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
+                            p.liketext { display:inline }
+                        </style>
+                    <center>
+                            <div class="card" style="width: 17rem;">
+                  <div class="card-body">
+                    <h5 class="card-title">
+                        {% for key, obj in next_match_logos.items %}
+                         <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
+                         {% if forloop.counter == 1 %} - {% endif %}
+                         {% endfor %}
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                         <p style="color:#1C2833;font-size:15px;">
+                             {% if next_match.match_status == '-1' %}
+                                 Live
+                             {% elif next_match.match_status == '1'%}
+                                 Finished
+                             {% else %}
+                                Fixture ({{ next_match.match_date }}; {{ next_match.match_hour }} GMT)
+                             {% endif %}
+                         </p>
+                    </h6>
+                             <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                          Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
+                                          Your Prediction: {{ next_match.user_pred }} <br>
+                                      </p>
+                                <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                                         <a href="{% url 'my_predictions' %}">
+                                             <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
+                                         </a>
+                                        <a href="{% url 'predictions' %}">
+                                           <a href="{% url 'live_next_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
+                                        </a>
+                                </div>
+
+                    </div>
+                 </div>
+                    </center>
+                <hr>
+                                 <center>
+                  <div class="card" style="width: 17rem;">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                                {% for key, obj in prev_match_logos.items %}
+                                 <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
+                                 {% if forloop.counter == 1 %} - {% endif %}
+                                 {% endfor %}
+                            </h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                 <p style="color:#1C2833;font-size:15px;">
+                                     {% if prev_match.match_status == '-1' %}
+                                         Live
+                                     {% elif prev_match.match_status == '1'%}
+                                         Finished
+                                     {% else %}
+                                        Fixture ({{ prev_match.match_date }}; {{ prev_match.match_hour }} GMT)
+                                     {% endif %}
+                                 </p>
+                            </h6>
+                              <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                  Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>
+                                  Your Prediction: {{ prev_match.user_pred }} <br>
+                              </p>
+                             <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                                      <a href="{% url 'my_predictions' %}">
-                                         <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
+                                         <a href="{% url 'prev_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
                                      </a>
                                     <a href="{% url 'predictions' %}">
-                                       <a href="{% url 'live_next_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
+                                       <a href="{% url 'live_prev_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
                                     </a>
                             </div>
-
+                    </div>
+                 </div>
+                    </center>
+                    </body>
                 </div>
-             </div>
-                </center>
-            <hr>
-                             <center>
-              <div class="card" style="width: 17rem;">
-                      <div class="card-body">
-                        <h5 class="card-title">
-                            {% for key, obj in prev_match_logos.items %}
-                             <img class='likeordislike' src='{{ obj }}' width="20" height="20"/><p class='liketext'>{{ key }}</p>
-                             {% if forloop.counter == 1 %} - {% endif %}
-                             {% endfor %}
-                        </h5>
-                        <h6 class="card-subtitle mb-2 text-muted">
-                             <p style="color:#1C2833;font-size:15px;">
-                                 {% if prev_match.match_status == '-1' %}
-                                     Live
-                                 {% elif prev_match.match_status == '1'%}
-                                     Finished
-                                 {% else %}
-                                    Fixture ({{ prev_match.match_date }}; {{ prev_match.match_hour }} GMT)
-                                 {% endif %}
-                             </p>
-                        </h6>
-                          <p class="card-text" style="color:#1C2833;font-size:15px;">
-                              Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>
-                              Your Prediction: {{ prev_match.user_pred }} <br>
-                          </p>
-                         <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
-                                 <a href="{% url 'my_predictions' %}">
-                                     <a href="{% url 'prev_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
-                                 </a>
-                                <a href="{% url 'predictions' %}">
-                                   <a href="{% url 'live_prev_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
-                                </a>
-                        </div>
+                <hr>
+                  <h6>Quick Access</h6>
+                    <center>
+               <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                        {% if is_cup_user %}
+                        <a href="{% url 'the_cup' %}">
+                             <button type="button" class="btn btn-dark">Cup</button>
+                         </a>
+                        {% endif %}
+                         <a href="{% url 'my_predictions' %}">
+                             <button type="button" class="btn btn-dark">My Bets</button>
+                         </a>
+                        <a href="{% url 'predictions' %}">
+                            <button type="button" class="btn btn-dark">All Bets</button>
+                        </a>
+                         <a href="{% url 'top_players' %}">
+                             <button type="button" class="btn btn-dark">Players</button>
+                         </a>
                 </div>
-             </div>
-                </center>
-                </body>
-            </div>
-            <hr>
-              <h6>Quick Access</h6>
-                <center>
-           <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
-                    {% if is_cup_user %}
-                    <a href="{% url 'the_cup' %}">
-                         <button type="button" class="btn btn-dark">Cup</button>
-                     </a>
-                    {% endif %}
-                     <a href="{% url 'my_predictions' %}">
-                         <button type="button" class="btn btn-dark">My Bets</button>
-                     </a>
-                    <a href="{% url 'predictions' %}">
-                        <button type="button" class="btn btn-dark">All Bets</button>
-                    </a>
-                     <a href="{% url 'top_players' %}">
-                         <button type="button" class="btn btn-dark">Players</button>
-                     </a>
-            </div>
-                </center>
-            <hr>
-{#     <h6>Required Actions</h6>#}
-{#    {% if committed_a_bet %}#}
-{#              <li> <a href= {% url 'update_your_bet_3_tound' bet_id %}>Edit your 3'rd round predictions.</a></li>#}
-{#    * Available until 06-19-2021 23:59#}
-{#          <hr>#}
-{#    {% endif %}#}
-      {% endif %}
-  <div>
-  {% if committed_a_bet %}
+                    </center>
+                <hr>
+    {#     <h6>Required Actions</h6>#}
+    {#    {% if committed_a_bet %}#}
+    {#              <li> <a href= {% url 'update_your_bet_3_tound' bet_id %}>Edit your 3'rd round predictions.</a></li>#}
+    {#    * Available until 06-19-2021 23:59#}
+    {#          <hr>#}
+    {#    {% endif %}#}
+          {% endif %}
       <div>
-          <h3>League Table  <span style="font-size:14px;">({{ games_started }}/51)</span></h3>
-          {% for key, obj in league_member_points.items %}
-                <p>{{ key }}</p>
-              <hr>
-              <div>
-                  <table class="styled-table" style="width: 100%; height: 100%; text-align: center">
-                        <thead>
-                            <tr style="text-align: center">
-                                <th>#</th>
-                                <th>User</th>
-                                <th>Points</th>
-                                <th>Booms</th>
-                                <th>Winners</th>
-                                <th>Success</th>
-                                <th>B-Goals</th>
-                                <th>Extra</th>
-                            </tr>
-                        <thead/>
-                        <tbody>
-                          {% for item in obj %}
-                              {% if forloop.counter == 1 %}
-                                    <tr class="active-row">
-                                      <th>{{ item.11 }}</th>
-                                      <td>{{ item.0 }}</td>
-                                      <td>{{ item.2 }}</td>
-                                      <td>{{ item.3 }}</td>
-                                      <td>{{ item.4 }}</td>
-                                      <td>{{ item.5 }}</td>
-                                      <td>{{ item.6 }}</td>
-                                      <th>{{ item.10 }}</th>
-                                  </tr>
-                          {% else %}
-                                  <tr>
-                                      <th>{{ item.11 }}</th>
-                                      <td>{{ item.0 }}</td>
-                                      <td>{{ item.2 }}</td>
-                                      <td>{{ item.3 }}</td>
-                                      <td>{{ item.4 }}</td>
-                                      <td>{{ item.5 }}</td>
-                                      <td>{{ item.6 }}</td>
-                                      <th>{{ item.10 }}</th>
-                                  </tr>
-                              {% endif %}
-                          {% endfor %}
-                        </tbody>
-                  </table>
-                </div>
-        {% endfor %}
+      {% if committed_a_bet %}
+          <div>
+              <h3>League Table  <span style="font-size:14px;">({{ games_started }}/51)</span></h3>
+              {% for key, obj in league_member_points.items %}
+                    <p>{{ key }}</p>
+                  <hr>
+                  <div>
+                      <table class="styled-table" style="width: 100%; height: 100%; text-align: center">
+                            <thead>
+                                <tr style="text-align: center">
+                                    <th>#</th>
+                                    <th>User</th>
+                                    <th>Points</th>
+                                    <th>Booms</th>
+                                    <th>Winners</th>
+                                    <th>Success</th>
+                                    <th>B-Goals</th>
+                                    <th>Extra</th>
+                                </tr>
+                            <thead/>
+                            <tbody>
+                              {% for item in obj %}
+                                  {% if forloop.counter == 1 %}
+                                        <tr class="active-row">
+                                          <th>{{ item.11 }}</th>
+                                          <td>{{ item.0 }}</td>
+                                          <td>{{ item.2 }}</td>
+                                          <td>{{ item.3 }}</td>
+                                          <td>{{ item.4 }}</td>
+                                          <td>{{ item.5 }}</td>
+                                          <td>{{ item.6 }}</td>
+                                          <th>{{ item.10 }}</th>
+                                      </tr>
+                              {% else %}
+                                      <tr>
+                                          <th>{{ item.11 }}</th>
+                                          <td>{{ item.0 }}</td>
+                                          <td>{{ item.2 }}</td>
+                                          <td>{{ item.3 }}</td>
+                                          <td>{{ item.4 }}</td>
+                                          <td>{{ item.5 }}</td>
+                                          <td>{{ item.6 }}</td>
+                                          <th>{{ item.10 }}</th>
+                                      </tr>
+                                  {% endif %}
+                              {% endfor %}
+                            </tbody>
+                      </table>
+                    </div>
+            {% endfor %}
+          </div>
+          <hr>
+      {% endif %}
+          <h3>Onboarding Check List</h3>
+              {% if league_signup %}
+                  <p style="color:darkgreen;">
+                      1. Join a league.
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-square" viewBox="0 0 16 16">
+                          <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
+                          <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                      </svg>
+                  <p/>
+              {% else %}
+                 <p style="color:tomato;">
+                     1. Join a league.
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+                      <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                      <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                  </svg>
+              <p/>
+              {% endif %}
+              {% if committed_a_bet %}
+                <p style="color:darkgreen;">2. Add your group stage bets.
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-square" viewBox="0 0 16 16">
+                      <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
+                      <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                  </svg><p/>
+              {% else %}
+                 <p style="color:tomato;">2. Add your group stage bets.
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+                      <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                      <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                  </svg><p/>
+              {% endif %}
+                 {% if image_uploaded %}
+                  <p style="color:darkgreen;">
+                      3. Upload your image.
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-square" viewBox="0 0 16 16">
+                          <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
+                          <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                      </svg>
+                  <p/>
+              {% else %}
+                 <p style="color:tomato;">
+                     3. Upload your image.
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+                      <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                      <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                  </svg>
+              <p/>
+              {% endif %}
       </div>
       <hr>
-  {% endif %}
-      <h3>Onboarding Check List</h3>
-          {% if league_signup %}
-              <p style="color:darkgreen;">
-                  1. Join a league.
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-square" viewBox="0 0 16 16">
-                      <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
-                      <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
-                  </svg>
-              <p/>
-          {% else %}
-             <p style="color:tomato;">
-                 1. Join a league.
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
-                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-                  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-              </svg>
-          <p/>
-          {% endif %}
-          {% if committed_a_bet %}
-            <p style="color:darkgreen;">2. Add your group stage bets.
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-square" viewBox="0 0 16 16">
-                  <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
-                  <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
-              </svg><p/>
-          {% else %}
-             <p style="color:tomato;">2. Add your group stage bets.
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
-                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-                  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-              </svg><p/>
-          {% endif %}
-             {% if image_uploaded %}
-              <p style="color:darkgreen;">
-                  3. Upload your image.
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-square" viewBox="0 0 16 16">
-                      <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
-                      <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
-                  </svg>
-              <p/>
-          {% else %}
-             <p style="color:tomato;">
-                 3. Upload your image.
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
-                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-                  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-              </svg>
-          <p/>
-          {% endif %}
-  </div>
-  <hr>
-{% if committed_a_bet %}
-      <h3>Second Thoughts?</h3>
-{#          <li> <a href= {% url 'update_your_bet' bet_id %}>Edit your bet form.</a></li>#}
-          <li>Edit your league profile:
-        <ul>
-          {% for key, obj in league_memberships.items %}
-              <li><a href= {% url 'update_league_member' obj %}>{{ key }}</a></li>
-          {% endfor %}
-        </ul>
-      <hr>
-{% endif %}
-
-
-    <style>
-    .styled-table {
-        border-collapse: collapse;
-        margin: 20px 0;
-        font-size: 0.5em;
-        font-family: sans-serif;
-        min-width: 300px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .styled-table thead tr {
-        background-color: #DE3163;
-        color: #ffffff;
-        text-align: left;
-    }
-
-    .styled-table th,
-    .styled-table td {
-        padding: 2px 3px;
-    }
-
-    .styled-table tbody tr {
-        border-bottom: 1px solid #dddddd;
-    }
-
-    .styled-table tbody tr:nth-of-type(even) {
-        background-color: #f3f3f3;
-    }
-
-    .styled-table tbody tr:last-of-type {
-        border-bottom: 1px solid #090f18;
-    }
-
-    .styled-table tbody tr:first-of-type {
-        border-bottom: 1px solid #DE3163;
-    }
-
-    .styled-table tbody tr.active-row {
-        font-weight: bold;
-        color: #090f18;
-    }
-
-    .dp-styled-img {
-      height: 35px;
-      width: 35px;
-      border-radius: 50%;
-    }
-
-    .dp2-styled-img {
-      height: 30px;
-      width: 30px;
-      border-radius: 50%;
-    }
-
-  </style>
-
-{% if league_signup %}
-        <h3>League Members</h3>
-        <p> The following users have been already signed up to your league: <p/>
-          {% for key, obj in league_members.items %}
-              <p>{{ key }}</p>
-              <hr>
-              <div>
-              <center>
-                  <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Image</th>
-                                <th>Name</th>
-                            </tr>
-                        <thead/>
-                        <tbody>
-                          {% for item in obj %}
-                              {% if forloop.counter == 1 %}
-                                  <tr class="active-row">
-                                     <td>{{ forloop.counter	}}</td>
-                                      <td><img class="dp-styled-img" src="{{ item.1 }}"></td>
-                                     <td>{{ item.0 }}</td>
-                                  </tr>
-                              {% else %}
-                              <tr>
-                                 <td>{{ forloop.counter	 }}</td>
-                                  <td><img class="dp-styled-img" src="{{ item.1}}"></td>
-                                  <td>{{ item.0 }}</td>
-                              </tr>
-                              {% endif %}
-                          {% endfor %}
-                        </tbody>
-                  </table>
-              </center>
-                </div>
-        {% endfor %}
+    {% if committed_a_bet %}
+          <h3>Second Thoughts?</h3>
+    {#          <li> <a href= {% url 'update_your_bet' bet_id %}>Edit your bet form.</a></li>#}
+              <li>Edit your league profile:
+            <ul>
+              {% for key, obj in league_memberships.items %}
+                  <li><a href= {% url 'update_league_member' obj %}>{{ key }}</a></li>
+              {% endfor %}
+            </ul>
+          <hr>
     {% endif %}
-  </body>
-{% else %}
-    <div>
-        <h3>Welcome Home Dear Friend!</h3>
-        <h6>Euro 2021 - Friends Zone Platform.</h6>
-        <p>For quick start, the following steps need to be taken:</p>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">1. Register.</li>
-          <li class="list-group-item">2. Login with your user credentials.</li>
-          <li class="list-group-item">3. Get your private league name.</li>
-          <li class="list-group-item">4. Join a league (via the setup tab).</li>
-          <li class="list-group-item">5. Place your group-stage bets.</li>
-        </ul>
-        <br/>
-        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-            <a href="{% url 'register' %}"><button type="button" class="btn btn-danger">Register</button></a>
-            <a href="{% url 'login' %}"><button type="button" class="btn btn-warning">Login</button></a>
+
+
+        <style>
+        .styled-table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.5em;
+            font-family: sans-serif;
+            min-width: 300px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .styled-table thead tr {
+            background-color: #DE3163;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 2px 3px;
+        }
+
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 1px solid #090f18;
+        }
+
+        .styled-table tbody tr:first-of-type {
+            border-bottom: 1px solid #DE3163;
+        }
+
+        .styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: #090f18;
+        }
+
+        .dp-styled-img {
+          height: 35px;
+          width: 35px;
+          border-radius: 50%;
+        }
+
+        .dp2-styled-img {
+          height: 30px;
+          width: 30px;
+          border-radius: 50%;
+        }
+
+      </style>
+
+    {% if league_signup %}
+            <h3>League Members</h3>
+            <p> The following users have been already signed up to your league: <p/>
+              {% for key, obj in league_members.items %}
+                  <p>{{ key }}</p>
+                  <hr>
+                  <div>
+                  <center>
+                      <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                </tr>
+                            <thead/>
+                            <tbody>
+                              {% for item in obj %}
+                                  {% if forloop.counter == 1 %}
+                                      <tr class="active-row">
+                                         <td>{{ forloop.counter	}}</td>
+                                          <td><img class="dp-styled-img" src="{{ item.1 }}"></td>
+                                         <td>{{ item.0 }}</td>
+                                      </tr>
+                                  {% else %}
+                                  <tr>
+                                     <td>{{ forloop.counter	 }}</td>
+                                      <td><img class="dp-styled-img" src="{{ item.1}}"></td>
+                                      <td>{{ item.0 }}</td>
+                                  </tr>
+                                  {% endif %}
+                              {% endfor %}
+                            </tbody>
+                      </table>
+                  </center>
+                    </div>
+            {% endfor %}
+        {% endif %}
+      </body>
+    {% else %}
+        <div>
+            <h3>Welcome Home Dear Friend!</h3>
+            <h6>Euro 2021 - Friends Zone Platform.</h6>
+            <p>For quick start, the following steps need to be taken:</p>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">1. Register.</li>
+              <li class="list-group-item">2. Login with your user credentials.</li>
+              <li class="list-group-item">3. Get your private league name.</li>
+              <li class="list-group-item">4. Join a league (via the setup tab).</li>
+              <li class="list-group-item">5. Place your group-stage bets.</li>
+            </ul>
+            <br/>
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                <a href="{% url 'register' %}"><button type="button" class="btn btn-danger">Register</button></a>
+                <a href="{% url 'login' %}"><button type="button" class="btn btn-warning">Login</button></a>
+            </div>
+            <p></p>
         </div>
-        <p></p>
-    </div>
+{% endif %}
 {% endif %}
 
 {% endblock %}

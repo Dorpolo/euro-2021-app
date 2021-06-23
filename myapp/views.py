@@ -26,14 +26,14 @@ class HomeView(TemplateView):
     def get(self, request):
         if request.user.is_authenticated:
             UserPred = UserPredictionBase(request.user.id)
-            games_started = self.GetAPIData.started_games()
+            home_page_context = self.GetAPIData.game_router()
             onboarding = BaseViewUserControl(request.user.id).onboarding()
             league_data_output = UserPred.get_league_members()
             if league_data_output is not None:
                context = {
                         'league_members': league_data_output,
-                        'next_match_logos': self.GetAPIData.next_match_logos(),
-                        'prev_match_logos': self.GetAPIData.prev_match_logos(),
+                        'prev_match_logos': home_page_context['prev']['logo'],
+                        'next_match_logos': home_page_context['next']['logo'],
                         'league_signup': onboarding['league'],
                         'committed_a_bet': onboarding['bet'],
                         'image_uploaded': onboarding['image'],
@@ -42,8 +42,9 @@ class HomeView(TemplateView):
                         'committed_a_bet_4': onboarding['bet_top_4'],
                         'committed_a_bet_2': onboarding['bet_top_2'],
                         'bet_id': UserPred.user_game_bet_id(),
-                        'games_started': games_started,
-                        'is_cup_user': UserPred.is_cup_user()
+                        'games_started': home_page_context['started_games'],
+                        'is_cup_user': UserPred.is_cup_user(),
+                        'in_construction': True
                     }
                if onboarding['bet']:
                     presented_data = UserPred.home_screen_match_relevant_data()
@@ -86,6 +87,7 @@ class CupView(TemplateView):
             images_qualification_2 = list(pd.merge(qualification_2_df, qualification_1_images_df, on=[0], how='inner')['1_y'])
 
             if league_data_output is not None:
+               match_router = self.GetAPIData.game_router()
                context = {
                          'is_cup_user': UserPred.is_cup_user(),
                          'qualification_1_points': qualification_1_data,
@@ -97,8 +99,8 @@ class CupView(TemplateView):
                          'top_4_points': UserPred.league_member_points_cup('1/2 Final'),
                          'top_2_points': UserPred.league_member_points_cup('Final'),
                          'league_members': league_data_output,
-                         'next_match_logos': self.GetAPIData.next_match_logos(),
-                         'prev_match_logos': self.GetAPIData.prev_match_logos(),
+                         'prev_match_logos': match_router['prev']['logo'],
+                         'next_match_logos': match_router['next']['logo'],
                          'league_signup': onboarding['league'],
                          'committed_a_bet': onboarding['bet'],
                          'image_uploaded': onboarding['image'],
@@ -657,20 +659,20 @@ class LeagueTableView(TemplateView):
 class LiveGameView:
     def next(request):
         is_next = True
-        Match = GetMatchData()
-        match = Match.next_match() if is_next else Match.prev_match()
-        status = match.match_status[0]
+        match_router = GetMatchData().game_router()
+        match = match_router['next']['data'] if is_next else match_router['prev']['data']
+        status = match['match_status']
         onboarding = BaseViewUserControl(request.user.id).onboarding()
         if onboarding['bet']:
-            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match.match_label[0])
+            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match['match_label'])
         else:
             LiveOutput = [None, None]
         context = {
-            'title': match.match_label[0],
-            'real_score': f"{match.home_team_score[0]}-{match.away_team_score[0]}",
+            'title': match['match_label'],
+            'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
             'plots': LiveOutput[0],
-            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
+            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
             'entitled_users': LiveOutput[1],
             'committed_a_bet': onboarding['bet'],
         }
@@ -679,18 +681,18 @@ class LiveGameView:
 
     def prev(request):
         is_next = False
-        Match = GetMatchData()
-        match = Match.next_match() if is_next else Match.prev_match()
-        status = match.match_status[0]
+        match_router = GetMatchData().game_router()
+        match = match_router['next']['data'] if is_next else match_router['prev']['data']
+        status = match['match_label']
         onboarding = BaseViewUserControl(request.user.id).onboarding()
         if onboarding['bet']:
             LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match.match_label[0])
         context = {
             'title': match.match_label[0],
-            'real_score': f"{match.home_team_score[0]}-{match.away_team_score[0]}",
+            'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
             'plots': LiveOutput[0],
-            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
+            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
             'entitled_users': LiveOutput[1],
             'committed_a_bet': onboarding['bet'],
         }
@@ -701,16 +703,16 @@ class LiveGameView:
 class GameStatsView:
     def next(request):
         is_next = True
-        Match = GetMatchData()
-        match = Match.next_match() if is_next else Match.prev_match()
-        status = match.match_status[0]
+        match_router = GetMatchData().game_router()
+        match = match_router['next']['data'] if is_next else match_router['prev']['data']
+        status = match['match_label']
         Plot = GameStats(request.user.id, match.match_label[0])
         viz = Plot.match_prediction_outputs()
         context = {
             'plot_next_match': viz,
             'title': match.match_label[0],
-            'real_score':  f"{match.home_team_score[0]}-{match.away_team_score[0]}",
-            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
+            'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
+            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
             }
         template = 'stats_next_game.html' if is_next else 'stats_prev_game.html'
@@ -718,16 +720,16 @@ class GameStatsView:
 
     def prev(request):
         is_next = False
-        Match = GetMatchData()
-        match = Match.next_match() if is_next else Match.prev_match()
-        status = match.match_status[0]
+        match_router = GetMatchData().game_router()
+        match = match_router['next']['data'] if is_next else match_router['prev']['data']
+        status = match['match_label']
         Plot = GameStats(request.user.id, match.match_label[0])
         viz = Plot.match_prediction_outputs()
         context = {
             'plot_next_match': viz,
             'title': match.match_label[0],
-            'real_score':  f"{match.home_team_score[0]}-{match.away_team_score[0]}",
-            'logos': Match.next_match_logos() if is_next else Match.prev_match_logos(),
+            'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
+            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
             }
         template = 'stats_next_game.html' if is_next else 'stats_prev_game.html'
