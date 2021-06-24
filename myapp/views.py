@@ -44,7 +44,7 @@ class HomeView(TemplateView):
                     'bet_id_knockout': UserPred.user_game_bet_id('top_16'),
                     'games_started': home_page_context['started_games'],
                     'is_cup_user': UserPred.is_cup_user(),
-                    'show_results': False
+                    'show_results': False, # TODO - change to True once bet window ends
                 }
                 if onboarding['bet']:
                     presented_data = UserPred.home_screen_match_relevant_data(home_page_context)
@@ -77,7 +77,7 @@ class CupView(TemplateView):
             qualification_1_images_df = pd.DataFrame(league_data_output[relevant_key])
             images_qualification_1 = list(
                 pd.merge(qualification_1_df, qualification_1_images_df, on=[0], how='inner')['1_y'])
-            qualification_1_losers_df = pd.DataFrame(qualification_1[1:])
+            qualification_1_losers_df = pd.DataFrame(qualification_1[15:])
             qualification_2_nick_names = list(qualification_1_losers_df[0])
             qualification_2_data = {key: [item for item in val if item[0] in qualification_2_nick_names]
                                     for key, val in UserPred.league_member_points_cup('qualification_2').items()

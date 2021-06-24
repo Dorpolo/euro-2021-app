@@ -805,13 +805,14 @@ class GetMatchData:
         df = pd.DataFrame(df_input[0], columns=df_input[1])
         next_df = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
         next_output = next_df.head(1).reset_index()
-        next_game_status = 'started' if next_output['match_status'][0] == '-1' else 'fixture'
-        if next_game_status == 'started':
+        next_game_status = 'live' if next_output['match_status'][0] == '-1' else 'fixture'
+        if next_game_status == 'live':
             prev_df = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
             prev_output = prev_df.head(1).reset_index()
         else:
             prev_df = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
             prev_output = prev_df.tail(1).reset_index()
+            print({key: obj[0] for key, obj in prev_output.head(1).to_dict().items()},)
         context = {
             'next': {
                 'data': {key: obj[0] for key, obj in next_output.head(1).to_dict().items()},
