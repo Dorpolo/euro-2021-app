@@ -44,7 +44,7 @@ class HomeView(TemplateView):
                     'bet_id_knockout': UserPred.user_game_bet_id('top_16'),
                     'games_started': home_page_context['started_games'],
                     'is_cup_user': UserPred.is_cup_user(),
-                    'in_construction': True
+                    'show_results': False
                 }
                 if onboarding['bet']:
                     presented_data = UserPred.home_screen_match_relevant_data()

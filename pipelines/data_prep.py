@@ -456,7 +456,7 @@ class UserPredictionBase:
                 winners = {key: list(np.setdiff1d(list(val[val.is_direction == 1].nick_name), boomers[key])) for key, val in x.items()}
                 user_pred_df_next = x['next'].loc[x['next'].user_name_id == self.user_id]
                 user_pred_df_prev = x['prev'].loc[x['prev'].user_name_id == self.user_id]
-                if user_pred_df_prev.shape[0] > 0:
+                if user_pred_df_prev.shape[0] > 0 and user_pred_df_next.shape[0] > 0:
                     user_nick = user_pred_df_next.nick_name.values[0]
                     user_pred = {
                         'next': user_pred_df_next.predicted_score.values[0],
@@ -466,7 +466,7 @@ class UserPredictionBase:
                     output[item] = {'boom': boomers, 'winner': winners, 'user_pred': user_pred, 'user_score': user_score}
                 else:
                     output[item] = {'boom': None, 'winner': None, 'user_pred': None, 'user_score': None}
-            if user_pred_df_prev.shape[0] > 0:
+            if user_pred_df_prev.shape[0] > 0 and user_pred_df_next.shape[0] > 0:
                 reshaped_output = {key: {
                                 'next': {
                                     'boom': value['boom']['next'],

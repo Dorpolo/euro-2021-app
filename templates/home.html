@@ -15,13 +15,13 @@
 
     {% if committed_a_bet %}
 
-                     <div>
-                    <body>
-                         <style>
-                            img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
-                            p.liketext { display:inline }
-                        </style>
-                    <center>
+         <div>
+        <body>
+             <style>
+                img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
+                p.liketext { display:inline }
+            </style>
+        <center>
 
     {% if committed_a_bet_16 %}
         <a href= {% url 'update_bets_top_16' bet_id_knockout %}>
@@ -32,7 +32,8 @@
         <button type="button" class="btn btn-info">Add your Top 16 round predictions.</button>
      </a>
     {% endif %}
-        <hr>
+     <hr>
+        {% if committed_a_bet_16 %}
             <div class="card" style="width: 17rem;">
                   <div class="card-body">
                     <h5 class="card-title">
@@ -56,6 +57,7 @@
                                           Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
                                           Your Prediction: {{ next_match.user_pred }} <br>
                                       </p>
+                  {% if show_results %}
                                 <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                                          <a href="{% url 'my_predictions' %}">
                                              <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
@@ -64,6 +66,7 @@
                                            <a href="{% url 'live_next_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
                                         </a>
                                 </div>
+                  {% endif %}
 
                     </div>
                  </div>
@@ -103,7 +106,8 @@
                             </div>
                     </div>
                  </div>
-                    </center>
+            </center>
+      {% endif %}
                     </body>
                 </div>
                 <hr>
@@ -118,9 +122,11 @@
                          <a href="{% url 'my_predictions' %}">
                              <button type="button" class="btn btn-dark">My Bets</button>
                          </a>
+                  {% if show_results %}
                         <a href="{% url 'predictions' %}">
                             <button type="button" class="btn btn-dark">All Bets</button>
                         </a>
+                  {% endif %}
                          <a href="{% url 'top_players' %}">
                              <button type="button" class="btn btn-dark">Players</button>
                          </a>
@@ -133,7 +139,8 @@
     {#    * Available until 06-19-2021 23:59#}
     {#          <hr>#}
     {#    {% endif %}#}
-          {% endif %}
+
+    {% endif %}
       <div>
       {% if committed_a_bet %}
           <div>
