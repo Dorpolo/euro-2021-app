@@ -214,6 +214,7 @@ class BetFormUpdate3Round(forms.ModelForm):
             ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
         return data
 
+
 class BetFormTop16(forms.ModelForm):
     class Meta:
         model = GameTop16
@@ -258,11 +259,7 @@ class BetFormTop16(forms.ModelForm):
         }
 
     def more_data(self):
-        sorted_fixtures = logos
-        data = [
-            list(
-                set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
-            ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
+        data = KNOCK_OUT_LOGOS['1/8 Final']
         return data
 
 
@@ -294,11 +291,7 @@ class BetFormTop8(forms.ModelForm):
         }
 
     def more_data(self):
-        sorted_fixtures = logos
-        data = [
-            list(
-                set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
-            ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
+        data = KNOCK_OUT_LOGOS_BETA['1/4 Final']
         return data
 
 
@@ -322,11 +315,7 @@ class BetFormTop4(forms.ModelForm):
         }
 
     def more_data(self):
-        sorted_fixtures = logos
-        data = [
-            list(
-                set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
-            ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
+        data = KNOCK_OUT_LOGOS_BETA['1/2 Final']
         return data
 
 
@@ -346,11 +335,7 @@ class BetFormTop2(forms.ModelForm):
         }
 
     def more_data(self):
-        sorted_fixtures = logos
-        data = [
-            list(
-                set([item[8] for item in sorted_fixtures if item[2] == f'Group {group}'])
-            ) for group in ['A', 'B', 'C', 'D', 'E', 'F']]
+        data = KNOCK_OUT_LOGOS_BETA['Final']
         return data
 
 

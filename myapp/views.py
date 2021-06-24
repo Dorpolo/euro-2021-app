@@ -40,14 +40,14 @@ class HomeView(TemplateView):
                     'committed_a_bet_8': onboarding['bet_top_8'],
                     'committed_a_bet_4': onboarding['bet_top_4'],
                     'committed_a_bet_2': onboarding['bet_top_2'],
-                    'bet_id': UserPred.user_game_bet_id(),
+                    'bet_id': UserPred.user_game_bet_id('group'),
+                    'bet_id_knockout': UserPred.user_game_bet_id('top_16'),
                     'games_started': home_page_context['started_games'],
                     'is_cup_user': UserPred.is_cup_user(),
                     'in_construction': True
                 }
                 if onboarding['bet']:
                     presented_data = UserPred.home_screen_match_relevant_data()
-                    print(presented_data)
                     context['user_game_points'] = presented_data[2]
                     context['next_match'] = presented_data[1]
                     context['prev_match'] = presented_data[0]
@@ -67,7 +67,6 @@ class CupView(TemplateView):
     def get(self, request):
         if request.user.is_authenticated:
             UserPred = UserPredictionBase(request.user.id)
-            games_started = self.GetAPIData.started_games()
             league_data_output = UserPred.get_league_members()
             onboarding = BaseViewUserControl(request.user.id).onboarding()
             qualification_1_data = UserPred.league_member_points_cup('qualification_1')
@@ -110,10 +109,9 @@ class CupView(TemplateView):
                     'committed_a_bet_8': onboarding['bet_top_8'],
                     'committed_a_bet_4': onboarding['bet_top_4'],
                     'committed_a_bet_2': onboarding['bet_top_2'],
-                    'bet_id': UserPred.user_game_bet_id(),
+                    'bet_id': UserPred.user_game_bet_id('group'),
                     'league_member_points': UserPred.league_member_points(),
                     'league_memberships': UserPred.get_league_members_data(),
-                    'games_started': games_started,
                 }
                 presented_data = UserPred.home_screen_match_relevant_data()
                 if presented_data[0] is not None:
@@ -399,7 +397,7 @@ class AddBetsTop4View(TemplateView):
         form = BetFormTop4()
         context = {
             'form': form,
-            'logos': KNOCK_OUT_LOGOS['1/2 Final']
+            'logos': KNOCK_OUT_LOGOS_BETA['1/2 Final']
         }
         return render(request, self.template_name, context)
 
@@ -506,6 +504,7 @@ class UpdateBetViewTop16(UpdateView):
     model = GameTop16
     form_class = BetFormTop16
     template_name = 'update_bets_top_16.html'
+
 
 
 class UpdateBetViewTop8(UpdateView):
@@ -686,12 +685,12 @@ class LiveGameView:
         is_next = False
         match_router = GetMatchData().game_router()
         match = match_router['next']['data'] if is_next else match_router['prev']['data']
-        status = match['match_label']
+        status = match['match_status']
         onboarding = BaseViewUserControl(request.user.id).onboarding()
         if onboarding['bet']:
-            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match.match_label[0])
+            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match['match_label'])
         context = {
-            'title': match.match_label[0],
+            'title': match['match_label'],
             'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
             'plots': LiveOutput[0],
@@ -708,12 +707,12 @@ class GameStatsView:
         is_next = True
         match_router = GetMatchData().game_router()
         match = match_router['next']['data'] if is_next else match_router['prev']['data']
-        status = match['match_label']
-        Plot = GameStats(request.user.id, match.match_label[0])
+        status = match['match_status']
+        Plot = GameStats(request.user.id, match['match_label'])
         viz = Plot.match_prediction_outputs()
         context = {
             'plot_next_match': viz,
-            'title': match.match_label[0],
+            'title': match['match_label'],
             'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
             'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
@@ -725,12 +724,12 @@ class GameStatsView:
         is_next = False
         match_router = GetMatchData().game_router()
         match = match_router['next']['data'] if is_next else match_router['prev']['data']
-        status = match['match_label']
+        status = match['match_status']
         Plot = GameStats(request.user.id, match.match_label[0])
         viz = Plot.match_prediction_outputs()
         context = {
             'plot_next_match': viz,
-            'title': match.match_label[0],
+            'title': match['match_label'],
             'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
             'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',

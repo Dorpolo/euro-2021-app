@@ -8,7 +8,7 @@
     <hr>
         <center>
       <div>
-          <img src="/media/images/profile/Johan-Cruyffs.jpeg" style="min-width: 300px; max-width: 800px; overflow: auto; width: 100%;">
+          <img src="/media/images/profile/beckebnauer.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 90%;">
       </div>
         </center>
     <hr>
@@ -22,7 +22,18 @@
                             p.liketext { display:inline }
                         </style>
                     <center>
-                            <div class="card" style="width: 17rem;">
+
+    {% if committed_a_bet_16 %}
+        <a href= {% url 'update_bets_top_16' bet_id_knockout %}>
+            <button type="button" class="btn btn-dark">Edit your Top 16 round predictions.</button>
+        </a>
+    {%  else %}
+       <a href= {% url 'add_your_bet_top_16' %}>
+        <button type="button" class="btn btn-info">Add your Top 16 round predictions.</button>
+     </a>
+    {% endif %}
+        <hr>
+            <div class="card" style="width: 17rem;">
                   <div class="card-body">
                     <h5 class="card-title">
                         {% for key, obj in next_match_logos.items %}

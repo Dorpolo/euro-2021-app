@@ -200,8 +200,17 @@ class UserPredictionBase:
         else:
             return None
 
-    def user_game_bet_id(self) -> dict:
-        data = Game.objects.filter(user_name_id=self.user_id)
+    def user_game_bet_id(self, stage) -> dict:
+        if stage == 'group':
+            data = Game.objects.filter(user_name_id=self.user_id)
+        if stage == 'top_16':
+            data = GameTop16.objects.filter(user_name_id=self.user_id)
+        if stage == 'top_8':
+            data = GameTop8.objects.filter(user_name_id=self.user_id)
+        if stage == 'top_4':
+            data = GameTop4.objects.filter(user_name_id=self.user_id)
+        if stage == 'top_2':
+            data = GameTop2.objects.filter(user_name_id=self.user_id)
         if len(data) > 0:
             return data[0].id
         else:
@@ -664,24 +673,36 @@ class GetMatchData:
     def get_knockout_attributes(self, match_id):
         base_url = f"{self.PREFIX}/matches/{match_id}&apikey={self.TOKEN}"
         data = requests.get(url=base_url).json()
+        score_90_min_home = int(data['match']['homeParticipant']['score']) - int(data['match']['extraTime']['home_score'])
+        score_90_min_away = int(data['match']['awayParticipant']['score']) - int(data['match']['extraTime']['away_score'])
+        extra_time = True if data['match']['extraTime']['is_extra'] == '1' else False
+        penalties = False
+        if penalties:
+            game_winner = None
+        else:
+            game_winner = 'home' if int(data['match']['homeParticipant']['score']) > \
+                                    int(data['match']['awayParticipant']['score']) else 'away'
         context = {
-            'is_extra_time': True if data['match']['extraTime']['is_extra'] == '1' else False,
-            'home_score_90_min': data['match']['homeParticipant']['score'],
-            'away_score_90_min': data['match']['homeParticipant']['score'],
-            'home_score_extra_time': data['match']['extraTime']['home_score'],
-            'away_score_extra_time': data['match']['extraTime']['away_score']
+            'is_extra_time': extra_time,
+            'home_score_90_min': score_90_min_home,
+            'away_score_90_min': score_90_min_away,
+            'home_score_end_match': data['match']['homeParticipant']['score'],
+            'away_score_end_match': data['match']['awayParticipant']['score'],
+            'match_winner': game_winner
         }
         return context
 
     def all_matches(self):
         data, fields = self.all_matches_phase_1()
-        # for row in data:
-        #     if row[2] == '1':
-        #         extra_time_info = [*self.get_knockout_attributes(row[6]).values()]
-        #         row += extra_time_info
-        #     else:
-        #         row += [None]*5
-        # fields += ['is_extra_time', 'home_score_90_min', 'away_score_90_min', 'home_score_extra_time', 'away_score_extra_time']
+        for row in data:
+            if row[2] == '1':
+                extra_time_info = [*self.get_knockout_attributes(row[6]).values()]
+                row += extra_time_info
+            else:
+                row += [None]*5
+        fields += ['is_extra_time', 'home_score_90_min', 'away_score_90_min',
+                   'home_score_end_match', 'away_score_end_match', 'match_winner']
+        print(pd.DataFrame(data, columns=fields).head(3))
         return data, fields
 
     def all_matches_old(self):
@@ -774,31 +795,18 @@ class GetMatchData:
                 }
             return output
 
-    def current_live_game(self):
-        df_input = self.all_matches()
-        df = pd.DataFrame(df_input[0], columns=df_input[1])
-        output = df[df.match_status == '-1']
-        if output.shape[0] > 1:
-            return 'double'
-        elif output.shape[0] == 1:
-            return 'single'
-        else:
-            return 'zero'
-
     def game_router(self):
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
-        output = df[df.match_status == '-1']
-        status = 'double' if output.shape[0] > 1 else 'single' if output.shape[0] == 1 else 'zero'
         next_df = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
         next_output = next_df.head(1).reset_index()
         next_game_status = 'started' if next_output['match_status'][0] == '-1' else 'fixture'
-        if next_game_status == 'fixture':
-            prev_df = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
-            prev_output = prev_df.head(2).tail(1).reset_index()
-        else:
+        if next_game_status == 'started':
             prev_df = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
             prev_output = prev_df.head(1).reset_index()
+        else:
+            prev_df = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
+            prev_output = prev_df.tail(1).reset_index()
         context = {
             'next': {
                 'data': {key: obj[0] for key, obj in next_output.head(1).to_dict().items()},

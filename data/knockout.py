@@ -143,5 +143,60 @@ CUP_GAMES = {
     'Final': [item['match_label'] for item in cup_meta if item['match_type'] == 'Final']
 }
 
-if __name__ == '__main__':
-    print(KNOCK_OUT_MATCHES)
+CUP_DRAW = {
+    '1/8 Final': {
+        'm1': {
+            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'result': {'table': None, 'winner': None}
+        },
+        'm2': {
+            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'result': {'table': None, 'winner': None}
+        },
+        'm3': {
+            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'result': {'table': None, 'winner': None}
+        },
+        'm4': {
+            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'result': {'table': None, 'winner': None}
+        },
+        'm5': {
+            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'result': {'table': None, 'winner': None}
+        },
+        'm6': {
+            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'result': {'table': None, 'winner': None}
+        },
+        'm7': {
+            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'result': {'table': None, 'winner': None}
+        },
+        'm8': {
+            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'result': {'table': None, 'winner': None}
+        },
+        },
+    '1/4 Final': {
+        'm1': None,
+        'm2': None,
+        'm3': None,
+        'm4': None,
+    },
+    '1/2 Final': {
+        'm1': None,
+        'm2': None,
+    },
+    'Final': {
+        'm1': None,
+    },
+}
