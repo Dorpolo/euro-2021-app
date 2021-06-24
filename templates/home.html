@@ -8,7 +8,7 @@
     <hr>
         <center>
       <div>
-          <img src="/media/images/profile/beckebnauer.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 90%;">
+          <img src="/media/images/profile/marco_van_basten.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 100%;">
       </div>
         </center>
     <hr>
@@ -25,15 +25,16 @@
 
     {% if committed_a_bet_16 %}
         <a href= {% url 'update_bets_top_16' bet_id_knockout %}>
-            <button type="button" class="btn btn-dark">Edit your Top 16 round predictions.</button>
+            <button type="button" class="btn btn-dark">Edit your Top 16 round predictions</button>
         </a>
     {%  else %}
        <a href= {% url 'add_your_bet_top_16' %}>
-        <button type="button" class="btn btn-info">Add your Top 16 round predictions.</button>
+        <button type="button" class="btn btn-warning">Add your Top 16 round predictions</button>
      </a>
     {% endif %}
-     <hr>
+
         {% if committed_a_bet_16 %}
+             <hr>
             <div class="card" style="width: 17rem;">
                   <div class="card-body">
                     <h5 class="card-title">

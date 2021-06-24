@@ -488,8 +488,7 @@ class UserPredictionBase:
         else:
             return None
 
-    def home_screen_match_relevant_data(self):
-        data = GetMatchData().game_router()
+    def home_screen_match_relevant_data(self, data):
         next_match = data['next']['data']
         prev_match = data['prev']['data']
         user_data = self.user_game_points()
@@ -702,7 +701,6 @@ class GetMatchData:
                 row += [None]*5
         fields += ['is_extra_time', 'home_score_90_min', 'away_score_90_min',
                    'home_score_end_match', 'away_score_end_match', 'match_winner']
-        print(pd.DataFrame(data, columns=fields).head(3))
         return data, fields
 
     def all_matches_old(self):

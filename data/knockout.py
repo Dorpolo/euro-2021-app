@@ -142,6 +142,28 @@ CUP_GAMES = {
     '1/2 Final': [item['match_label'] for item in cup_meta if item['match_type'] == '1/2 Final'],
     'Final': [item['match_label'] for item in cup_meta if item['match_type'] == 'Final']
 }
+users_dict = {
+     'Team Grisha': 17,
+     'Polo': 15,
+     'OLempire': 18,
+     'Raveh': 2,
+     'Miklo': 21,
+     'Sharkyboy': 26,
+     'Soobool': 27,
+     'Klinger': 28,
+     'Dorki': 29,
+     'Doli': 30,
+     'HalefetHaGadol': 44,
+     'Chico Grinboim': 14,
+     'VL Lions': 52,
+     'Adom ole': 94,
+     'The *REAL* Ilay': 20,
+     'omerico21': 133,
+     'Lidoro': 122,
+     'Parasol': 117,
+     'No booms': 176
+}
+
 
 CUP_DRAW = {
     '1/8 Final': {

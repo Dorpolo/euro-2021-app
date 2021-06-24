@@ -47,7 +47,7 @@ class HomeView(TemplateView):
                     'show_results': False
                 }
                 if onboarding['bet']:
-                    presented_data = UserPred.home_screen_match_relevant_data()
+                    presented_data = UserPred.home_screen_match_relevant_data(home_page_context)
                     context['user_game_points'] = presented_data[2]
                     context['next_match'] = presented_data[1]
                     context['prev_match'] = presented_data[0]
