@@ -77,7 +77,7 @@ class CupView(TemplateView):
             qualification_1_images_df = pd.DataFrame(league_data_output[relevant_key])
             images_qualification_1 = list(
                 pd.merge(qualification_1_df, qualification_1_images_df, on=[0], how='inner')['1_y'])
-            qualification_1_losers_df = pd.DataFrame(qualification_1[15:])
+            qualification_1_losers_df = pd.DataFrame(qualification_1[1:])
             qualification_2_nick_names = list(qualification_1_losers_df[0])
             qualification_2_data = {key: [item for item in val if item[0] in qualification_2_nick_names]
                                     for key, val in UserPred.league_member_points_cup('qualification_2').items()
@@ -113,11 +113,6 @@ class CupView(TemplateView):
                     'league_member_points': UserPred.league_member_points(),
                     'league_memberships': UserPred.get_league_members_data(),
                 }
-                presented_data = UserPred.home_screen_match_relevant_data()
-                if presented_data[0] is not None:
-                    context['user_game_points'] = presented_data[2]
-                    context['next_match'] = presented_data[1]
-                    context['prev_match'] = presented_data[0]
                 return render(request, self.template_name, context)
             else:
                 return render(request, self.template_name, {'data': None})
