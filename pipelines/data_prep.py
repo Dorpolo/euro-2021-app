@@ -358,7 +358,6 @@ class UserPredictionBase:
                                     how='inner'
                             ).drop(columns=['rn', 'alter_game_id'])
         df_main_2 = pd.concat([df_main_2_groups, df_main_2_knockout])
-        print(df_main_2.sort_values(by=['user_name_id', 'game_id']))
         league_member_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name', 'created']
         df_league_member_pre = pd.DataFrame(
             list(LeagueMember.objects.filter(user_name_id__in=self.extract_relevant_user_ids()).
