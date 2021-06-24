@@ -57,8 +57,8 @@ class BuildKnockOutForm:
                  }
         return metadata
 
-    def get_knockout_matches(self) -> dict:
-        data = {key: val for key, val in self.get_api_data(beta_mode=True).items()
+    def get_knockout_matches(self, beta_mode: bool = False) -> dict:
+        data = {key: val for key, val in self.get_api_data(beta_mode=beta_mode).items()
                 if val['is_playoff'] == '1' and val['match_type'] != '1/16 Final'}
         output = {}
         for item in [f"{j}Final" for j in ['1/8 ', '1/4 ', '1/2 ', '']]:
@@ -74,7 +74,7 @@ class BuildKnockOutForm:
                         }
         return output
 
-    def get_knockout_team(self, beta_mode: bool = True) -> dict:
+    def get_knockout_team(self, beta_mode: bool = False) -> dict:
         if beta_mode:
             s_id, divider, team_dict = '82', 2, teams_mock
         else:
@@ -83,7 +83,6 @@ class BuildKnockOutForm:
         data = requests.get(url=URL).json()
         output = {}
         playoff_matches = [item for item in data['calendar']['matchdays'] if item['matchdayPlayoff'] == '1']
-        print(playoff_matches)
         for item in playoff_matches:
             stage = item['matchdayName']
             if stage != '1/16 Final':
@@ -121,13 +120,16 @@ class BuildKnockOutForm:
 
 
 GetAPI = BuildKnockOutForm()
-KNOCK_OUT_MATCHES = GetAPI.get_knockout_matches()
-KNOCK_OUT_LOGOS = GetAPI.get_knockout_team(beta_mode=BETA_MODE)
+KNOCK_OUT_MATCHES = GetAPI.get_knockout_matches(beta_mode=False)
+KNOCK_OUT_MATCHES_BETA = GetAPI.get_knockout_matches(beta_mode=True)
+KNOCK_OUT_LOGOS = GetAPI.get_knockout_team(beta_mode=False)
+KNOCK_OUT_LOGOS_BETA = GetAPI.get_knockout_team(beta_mode=True)
 TEAM_GAME_MAP = GetAPI.get_team_game_map()
+
 TOP_16 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/8 Final'].values()][0:8])
-TOP_8 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/4 Final'].values()][0:8])
-TOP_4 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/2 Final'].values()][0:8])
-TOP_2 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['Final'].values()][0:8])
+TOP_8 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['1/4 Final'].values()][0:4])
+TOP_4 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['1/2 Final'].values()][0:2])
+TOP_2 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['Final'].values()][0:1])
 
 cup_meta = GetAPI.get_api_data().values()
 qualification_labels = [item['match_label'] for item in cup_meta if item['match_type'] == '3rd Round']
@@ -140,3 +142,6 @@ CUP_GAMES = {
     '1/2 Final': [item['match_label'] for item in cup_meta if item['match_type'] == '1/2 Final'],
     'Final': [item['match_label'] for item in cup_meta if item['match_type'] == 'Final']
 }
+
+if __name__ == '__main__':
+    print(KNOCK_OUT_MATCHES)
