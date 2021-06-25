@@ -139,7 +139,10 @@ class UserPredictionBase:
                     'is_playoff': is_playoff,
                     'match_type': match_type,
                     'home_team': home_team,
-                    'away_team': away_team
+                    'away_team': away_team,
+                    'real_score_home_90_min': real_score_home,
+                    'real_score_away_90_min': real_score_away,
+                    'score_label_90_min': real_score_away,
                  }
         return metadata
 
@@ -357,7 +360,18 @@ class UserPredictionBase:
                                     right_on=['alter_game_id', 'match_type'],
                                     how='inner'
                             ).drop(columns=['rn', 'alter_game_id'])
-        df_main_2 = pd.concat([df_main_2_groups, df_main_2_knockout])
+
+        init_knockout_data = []
+        for item in df_main_2_knockout.values.tolist():
+            item += [*GetMatchData().get_knockout_attributes(item[6]).values()]
+            init_knockout_data.append(item)
+        new_columns = ['is_extra_time', 'home_score_90_min', 'away_score_90_min', 'home_score_end_match',
+                       'away_score_end_match', 'match_winner']
+        adjusted_columns = list(df_main_2_knockout.columns) + new_columns
+        for col in new_columns:
+            df_main_2_groups[col] = None
+        df_main_2_knockout_adj = pd.DataFrame(init_knockout_data, columns=adjusted_columns)
+        df_main_2 = pd.concat([df_main_2_groups, df_main_2_knockout_adj])
         league_member_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name', 'created']
         df_league_member_pre = pd.DataFrame(
             list(LeagueMember.objects.filter(user_name_id__in=self.extract_relevant_user_ids()).
@@ -395,9 +409,16 @@ class UserPredictionBase:
             'home_team',
             'away_team',
             'pred_winner',
-            'knockout_winner'
+            'is_extra_time',
+            'home_score_90_min',
+            'away_score_90_min',
+            'home_score_end_match',
+            'away_score_end_match',
+            'match_winner',
             ]
-        return output[output_fields]
+        return output[output_fields].rename(columns={
+                    'match_winner': 'knockout_winner'
+                })
 
     def present_predictions(self) -> tuple:
         data = self.data_enrichment()
@@ -406,7 +427,9 @@ class UserPredictionBase:
             output = {}
             required_fields = ['nick_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
                                'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
-                               'real_score_away', 'user_name_id', 'match_type', 'is_playoff', 'pred_winner', 'knockout_winner']
+                               'real_score_away', 'user_name_id', 'match_type', 'is_playoff', 'pred_winner',
+                               'knockout_winner', 'is_extra_time', 'home_score_90_min', 'away_score_90_min',
+                               'home_score_end_match', 'away_score_end_match']
             for item in leagues:
                 filtered_df = data[(data.league_name_id == item)][required_fields]
                 filtered_df['status_rank'] = np.where(filtered_df.game_status == 'Finished', 1, 0)
@@ -508,19 +531,35 @@ class UserPredictionBase:
             return None, None, None
 
     @staticmethod
-    def table_calculations(x):
-        x['pred_dir'] = np.where(x.pred_score_home > x.pred_score_away, 'home', np.where(x.pred_score_home < x.pred_score_away, 'away', 'draw'))
-        x['real_dir'] = np.where(x.real_score_home > x.real_score_away, 'home', np.where(x.real_score_home < x.real_score_away, 'away', 'draw'))
+    def league_table(x):
+        x['pred_dir'] = np.where(x.pred_score_home > x.pred_score_away,
+                                 'home',
+                                 np.where(x.pred_score_home < x.pred_score_away,
+                                          'away',
+                                          'draw'))
+        x['real_dir'] = np.where(x.real_score_home > x.real_score_away,
+                                 'home', np.where(x.real_score_home < x.real_score_away,
+                                                  'away',
+                                                  'draw'))
         x['is_direction'] = np.where(x.pred_dir == x.real_dir, 1, 0)
         x['is_boom'] = np.where((x.pred_score_home == x.real_score_home) & (x.pred_score_away == x.real_score_away), 1, 0)
-        x['is_knockout_boom'] = np.where((x.is_playoff == '1') & (x.pred_score_home == x.real_score_home) & (x.pred_score_away == x.real_score_away), 1, 0)
+        x['is_knockout_boom'] = np.where((x.is_playoff == '1') &
+                                         (x.pred_score_home == x.home_score_90_min) &
+                                         (x.pred_score_away == x.away_score_90_min), 1, 0)
         x['is_knockout_direction'] = np.where((x.is_playoff == '1') & (x.pred_winner == x.knockout_winner), 1, 0)
-        x['knockout_points'] = np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom == x.knockout_winner), 4,
+        x['knockout_points'] = np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom == x.knockout_winner),
+                                        4,
                                         np.where((x.is_knockout_direction != 1) & (x.is_knockout_boom == 1),
                                                  3,
-                                        np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom != 1), 1, 0)))
+                                                 np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom != 1),
+                                                          1,
+                                                          0)))
         x['points'] = np.where(x.is_playoff != '1',
-                               np.where(x.is_boom == 1, 3, np.where(x.is_direction == 1, 1, 0)),
+                               np.where(x.is_boom == 1,
+                                        3,
+                                        np.where(x.is_direction == 1,
+                                                 1,
+                                                 0)),
                                x['knockout_points'])
         x['started'] = np.where(x.game_status != 'Fixture', 1, 0)
         x['is_live'] = np.where(x.game_status == 'live', 1, 0)
@@ -578,8 +617,9 @@ class UserPredictionBase:
             return None
 
     def get_game_points_group_stage(self, df, player_points: dict):
-        required_cols = ['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'distance', 'user_name_id']
-        data = pd.DataFrame(df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).reset_index())
+        required_cols = ['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals',
+                         'live_points', 'distance', 'user_name_id']
+        data = pd.DataFrame(df.groupby(['user_name_id', 'nick_name']).apply(self.league_table).reset_index())
         df = pd.DataFrame(self.adjust_table_column_type(data[required_cols]), columns=required_cols)
         df['player_point_col'] = [int(player_points[item[1]]) for item in data.values.tolist()]
         df['points'] = df['player_point_col'] + df['points']
@@ -590,7 +630,7 @@ class UserPredictionBase:
 
     def get_game_points_cup(self, df):
         required_cols = ['nick_name', 'games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'distance',  'user_name_id']
-        data = pd.DataFrame(df.groupby(['user_name_id', 'nick_name']).apply(self.table_calculations).reset_index())
+        data = pd.DataFrame(df.groupby(['user_name_id', 'nick_name']).apply(self.league_table).reset_index())
         cleaner_data = data.sort_values(
                             by=[('points',), ('boom',), ('direction', ), ('predicted_goals', ), ('distance', )],
                             ascending=[False]*4 + [True])[required_cols]
@@ -682,9 +722,20 @@ class GetMatchData:
         score_90_min_home = int(data['match']['homeParticipant']['score']) - int(data['match']['extraTime']['home_score'])
         score_90_min_away = int(data['match']['awayParticipant']['score']) - int(data['match']['extraTime']['away_score'])
         extra_time = True if data['match']['extraTime']['is_extra'] == '1' else False
-        penalties = False
+        if 'stages' in data.keys():
+            if data['stages']:
+                if data['stages'][0]['stageID'] == '4':
+                    penalties = True
+                else:
+                    penalties = False
+            else:
+                penalties = False
+        else:
+            penalties = False
+
         if penalties:
-            game_winner = None
+            stage_score = data['stages'][0]
+            game_winner = 'home' if int(stage_score['home_score']) > int(stage_score['away_score']) else 'away'
         else:
             game_winner = 'home' if int(data['match']['homeParticipant']['score']) > \
                                     int(data['match']['awayParticipant']['score']) else 'away'
@@ -812,7 +863,6 @@ class GetMatchData:
         else:
             prev_df = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
             prev_output = prev_df.tail(1).reset_index()
-            print({key: obj[0] for key, obj in prev_output.head(1).to_dict().items()},)
         context = {
             'next': {
                 'data': {key: obj[0] for key, obj in next_output.head(1).to_dict().items()},
@@ -1086,7 +1136,9 @@ class GameStats(UserPredictionBase):
 
     @staticmethod
     def match_prediction_plot(data):
-        fig = px.bar(data, x='score', y='count', color="winner", template='simple_white', text='count',
+        fig = px.bar(
+            data,
+            x='score', y='count', color="winner", template='simple_white', text='count',
                      title="Score Distribution",  labels={"score": "Score", "count": "Prediction Count", "winner": ""})
         fig.update_traces(textposition='inside')
         fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT,)

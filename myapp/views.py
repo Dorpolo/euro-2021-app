@@ -737,11 +737,10 @@ def plot_top_players(request):
     DataClass = TopPlayerStats(request.user.id)
     top_players_real = {key: val[0:10] for key, val in
                         DataClass.top_players_real()[0].items()}
-    started_games = DataClass.started_games()
     predicted_plots = DataClass.top_players_pred_plot()
     context = {
         'top_players': top_players_real,
-        'games_started': started_games,
+        'games_started': DataClass.game_router()['started_games'],
         'plots': predicted_plots
     }
     return render(request, "stats_top_players.html", context)
