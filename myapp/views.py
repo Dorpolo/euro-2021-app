@@ -515,7 +515,6 @@ class UpdateBetViewTop16(UpdateView):
     template_name = 'update_bets_top_16.html'
 
 
-
 class UpdateBetViewTop8(UpdateView):
     model = GameTop8
     form_class = BetFormTop8
@@ -634,6 +633,7 @@ class MyPredictionsView(TemplateView):
             get_my_players = UserPred.get_top_players_my_predictions()
         else:
             get_my_predictions = None
+        print(get_my_predictions[0])
         context = {
             'my_predictions': get_my_predictions[0],
             'my_players': get_my_players
@@ -673,6 +673,7 @@ class LiveGameView:
         match_router = GetMatchData().game_router()
         match = match_router['next']['data'] if is_next else match_router['prev']['data']
         status = match['match_status']
+        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
         onboarding = BaseViewUserControl(request.user.id).onboarding()
         if onboarding['bet']:
             LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match['match_label'])
@@ -680,7 +681,7 @@ class LiveGameView:
             LiveOutput = [None, None]
         context = {
             'title': match['match_label'],
-            'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
+            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
             'plots': LiveOutput[0],
             'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
@@ -695,12 +696,13 @@ class LiveGameView:
         match_router = GetMatchData().game_router()
         match = match_router['next']['data'] if is_next else match_router['prev']['data']
         status = match['match_status']
+        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
         onboarding = BaseViewUserControl(request.user.id).onboarding()
         if onboarding['bet']:
             LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match['match_label'])
         context = {
             'title': match['match_label'],
-            'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
+            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
             'plots': LiveOutput[0],
             'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
@@ -718,11 +720,12 @@ class GameStatsView:
         match = match_router['next']['data'] if is_next else match_router['prev']['data']
         status = match['match_status']
         Plot = GameStats(request.user.id, match['match_label'])
+        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
         viz = Plot.match_prediction_outputs()
         context = {
             'plot_next_match': viz,
             'title': match['match_label'],
-            'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
+            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
             'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
         }
@@ -735,11 +738,12 @@ class GameStatsView:
         match = match_router['next']['data'] if is_next else match_router['prev']['data']
         status = match['match_status']
         Plot = GameStats(request.user.id, match.match_label[0])
+        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
         viz = Plot.match_prediction_outputs()
         context = {
             'plot_next_match': viz,
             'title': match['match_label'],
-            'real_score': f"{match['home_team_score']}-{match['away_team_score']}",
+            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
             'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
             'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
         }

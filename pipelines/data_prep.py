@@ -495,7 +495,9 @@ class UserPredictionBase:
                     user_nick = user_pred_df_next.nick_name.values[0]
                     user_pred = {
                         'next': user_pred_df_next.predicted_score.values[0],
-                        'prev': user_pred_df_prev.predicted_score.values[0]
+                        'next_winner': user_pred_df_next.pred_winner.values[0],
+                        'prev': user_pred_df_prev.predicted_score.values[0],
+                        'prev_winner': user_pred_df_prev.pred_winner.values[0]
                         }
                     user_score = {key: 'Boom' if user_nick in value else '' for key, value in boomers.items()}
                     output[item] = {'boom': boomers, 'winner': winners, 'user_pred': user_pred, 'user_score': user_score}
@@ -507,13 +509,15 @@ class UserPredictionBase:
                                     'boom': value['boom']['next'],
                                     'winner': value['winner']['next'],
                                     'user_pred': value['user_pred']['next'],
-                                    'user_score': value['user_score']['next']
+                                    'user_score': value['user_score']['next'],
+                                    'user_pred_winner': value['user_pred']['next_winner']
                                 },
                                 'prev': {
                                     'boom': value['boom']['prev'],
                                     'winner': value['winner']['prev'],
                                     'user_pred': value['user_pred']['prev'],
-                                    'user_score': value['user_score']['prev']
+                                    'user_score': value['user_score']['prev'],
+                                    'user_pred_winner': value['user_pred']['prev_winner']
                                }
                             } for key, value in output.items()}
                 return reshaped_output
@@ -530,7 +534,9 @@ class UserPredictionBase:
         if isinstance(user_data, dict):
             some_league = list(user_data.keys())[0]
             next_match['user_pred'] = user_data[some_league]['next']['user_pred']
+            next_match['user_pred_winner'] = user_data[some_league]['next']['user_pred_winner']
             prev_match['user_pred'] = user_data[some_league]['prev']['user_pred']
+            prev_match['user_pred_winner'] = user_data[some_league]['prev']['user_pred_winner']
             return prev_match, next_match, user_data
         else:
             return None, None, None
@@ -551,14 +557,20 @@ class UserPredictionBase:
         x['is_knockout_boom'] = np.where((x.is_playoff == '1') &
                                          (x.pred_score_home == x.home_score_90_min) &
                                          (x.pred_score_away == x.away_score_90_min), 1, 0)
+        x[['home_team', 'away_team']] = x.match_label.str.split('-', n=2, expand=True)
+        x['knockout_winner'] = np.where(x['knockout_winner'] == 'home',
+                                        x['home_team'],
+                                        np.where(x['knockout_winner'] == 'away',
+                                                 x['away_team'],
+                                                 x['knockout_winner']))
         x['is_knockout_direction'] = np.where((x.is_playoff == '1') & (x.pred_winner == x.knockout_winner), 1, 0)
         x['knockout_points'] = np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom == x.knockout_winner),
-                                        4,
-                                        np.where((x.is_knockout_direction != 1) & (x.is_knockout_boom == 1),
-                                                 3,
-                                                 np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom != 1),
-                                                          1,
-                                                          0)))
+                                         4,
+                                         np.where((x.is_knockout_direction != 1) & (x.is_knockout_boom == 1),
+                                                  3,
+                                                  np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom != 1),
+                                                            1,
+                                                            0)))
         x['points'] = np.where(x.is_playoff != '1',
                                np.where(x.is_boom == 1,
                                         3,
@@ -570,6 +582,8 @@ class UserPredictionBase:
         x['is_live'] = np.where(x.game_status == 'live', 1, 0)
         x['distance'] = (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + \
                         (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int)))
+        print(x.columns)
+        print(x[['nick_name', 'match_label', 'home_team', 'away_team', 'pred_winner', 'started', 'is_live', 'predicted_score', 'knockout_points', 'points', 'is_knockout_direction', 'points', 'distance', 'knockout_winner']])
         d = [
             int(x['started'].sum()),
             int((x['started'] * x['points']).sum()),
@@ -771,7 +785,9 @@ class GetMatchData:
                 row += [None]*5
         fields += ['is_extra_time', 'home_score_90_min', 'away_score_90_min',
                    'home_score_end_match', 'away_score_end_match', 'match_winner']
-        print(fields)
+        for row in data:
+            row[12] = int(row[18]) if 'Final' in row[1] else row[12]
+            row[15] = int(row[19]) if 'Final' in row[1] else row[15]
         return data, fields
 
     def all_matches_old(self):
@@ -871,8 +887,8 @@ class GetMatchData:
         next_output = next_df.head(1).reset_index()
         next_game_status = 'live' if next_output['match_status'][0] == '-1' else 'fixture'
         if next_game_status == 'live':
-            prev_df = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
-            prev_output = prev_df.head(1).reset_index()
+            prev_df = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
+            prev_output = prev_df.head(2).tail(1).reset_index()
         else:
             prev_df = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
             prev_output = prev_df.tail(1).reset_index()
@@ -902,8 +918,8 @@ class GetMatchData:
         next_output = next_df.head(1).reset_index()
         next_game_status = 'live' if next_output['match_status'][0] == '-1' else 'fixture'
         if next_game_status == 'live':
-            prev_df = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
-            prev_output = prev_df.head(1).reset_index()
+            prev_df = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
+            prev_output = prev_df.head(2).tail(1).reset_index()
         else:
             prev_df = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
             prev_output = prev_df.tail(1).reset_index()
@@ -1102,9 +1118,11 @@ class TopPlayerStats(GetMatchData):
             init_data = [[
                 item[0],
                 item[4],
-                self.score_distance([int(i) for i in item[7:11]]),
+                self.score_distance([int(i) for i in item[7:11]]) if 'Final' not in item[12] else
+                self.score_distance([int(i) for i in [item[7], item[8], item[19], item[20]]]),
                 user_id_map[item[0]]
             ] for item in val if item[3] == match_label]
+            print(val)
             relevant_data = [item for item in init_data if item[2] < 15]
             data_preps = self.data_sankey_live_game(relevant_data, league_name=key)
             output[key] = self.build_sankey_plot(data_preps)
@@ -1217,10 +1235,10 @@ class GameStats(UserPredictionBase):
 
 
 class CupKnockOut(UserPredictionBase):
-    def __init__(self, user_id, draw_template: dict = CUP_DRAW, beta: bool = False):
+    def __init__(self, user_id, beta: bool = False):
         super().__init__(user_id)
         self.beta = beta
-        self.draw_template = draw_template
+        self.draw_template = CUP_DRAW if not self.beta else CUP_DRAW_BETA
         self.league_id = 9 if not self.beta else 1
 
     def get_league_name(self):

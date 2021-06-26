@@ -56,9 +56,13 @@
                          </p>
                     </h6>
                              <p class="card-text" style="color:#1C2833;font-size:15px;">
-                                          Result: {{ next_match.home_team_score }} - {{ next_match.away_team_score }} <br>
-                                          Your Prediction: {{ next_match.user_pred }} <br>
-                                      </p>
+                                  Score (90 min): {{ next_match.home_team_score }}-{{ next_match.away_team_score }}
+                                  {% if prev_match.match_status != '1' %}
+                                  {% else %}
+                                      <br>Winning Team: {{ next_match.match_winner }}
+                                  {% endif %}<br>
+                                  Your Prediction: {{ next_match.user_pred }} {% if next_match.match_winner != 'draw' %}{% else %} ({{ next_match.user_pred_winner }}) {% endif %}<br>
+                              </p>
                   {% if show_results %}
                         <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                                  <a href="{% url 'my_predictions' %}">
@@ -94,9 +98,13 @@
                                      {% endif %}
                                  </p>
                             </h6>
-                              <p class="card-text" style="color:#1C2833;font-size:15px;">
-                                  Result: {{ prev_match.home_team_score }} - {{ prev_match.away_team_score }} <br>
-                                  Your Prediction: {{ prev_match.user_pred }} <br>
+                           <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                  Score (90 min): {{ prev_match.home_team_score }}-{{ prev_match.away_team_score }}
+                                  {% if prev_match.match_status != '1' %}
+                                  {% else %}
+                                      <br>Winning Team: {{ prev_match.match_winner }}
+                                  {% endif %}<br>
+                                  Your Prediction: {{ prev_match.user_pred }} {% if prev_match.match_winner != 'draw' %}{% else %} ({{ prev_match.user_pred_winner }}) {% endif %}<br>
                               </p>
                              <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                                      <a href="{% url 'my_predictions' %}">

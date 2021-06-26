@@ -53,36 +53,36 @@
               <h3>{{ key }}</h3>
               <hr>
               <div>
-                  <table class="styled-table" style="width: 100%; height: 100%; text-align: center">
+                      <table class="styled-table" style="width: 100%; height: 100%; text-align: center">
                         <thead>
                             <tr style="text-align: center">
-                                <th>User</th>
                                 <th>Date</th>
                                 <th>Hour</th>
                                 <th>Match</th>
                                 <th>Prediction</th>
-                                <th>Score</th>
-                                <th>Game Status</th>
+                                <th>Score (90 min)</th>
+                                <th>Winning Team</th>
+                                <th>Status</th>
                             </tr>
                         <thead/>
                         <tbody>
                           {% for item in obj %}
                               <tr>
                               {% if item.6 == 'Finished' %}
-                                      <td style="color: darkgray">{{ item.0}}</td>
                                       <td style="color: darkgray">{{ item.1 }}</td>
                                       <td style="color: darkgray">{{ item.2 }}</td>
                                       <td style="color: darkgray">{{ item.3 }}</td>
-                                      <td style="color: darkgray">{{ item.4 }}</td>
-                                      <td style="color: darkgray">{{ item.5 }}</td>
+                                      <td style="color: darkgray">{{ item.4 }} ({{ item.14 }})</td>
+                                      <td style="color: darkgray">{{ item.19 }}-{{ item.20 }}</td>
+                                      <td style="color: darkgray">{{ item.15 }}</td>
                                       <td style="color: darkgray">{{ item.6 }}</td>
                               {% else %}
-                                      <td>{{ item.0}}</td>
                                       <td>{{ item.1 }}</td>
                                       <td>{{ item.2 }}</td>
                                       <td>{{ item.3 }}</td>
-                                      <td>{{ item.4 }}</td>
-                                      <td>{{ item.5 }}</td>
+                                      <td>{{ item.4 }} ({{ item.14 }})</td>
+                                      <td>{{ item.19 }}-{{ item.20 }}</td>
+                                      <td>{{ item.15 }}</td>
                                       <td>{{ item.6 }}</td>
                                   </tr>
                               {% endif %}
