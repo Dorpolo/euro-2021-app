@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django_tables2',
     'django_filters',
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    'pipelines.password_manager'
 ]
 
 STATIC_URL = '/static/'

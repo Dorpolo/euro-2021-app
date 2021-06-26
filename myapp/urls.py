@@ -33,5 +33,6 @@ urlpatterns = [
     path('add-your-prediction-final/edit/<int:pk>', views.UpdateBetViewTop2.as_view(), name='update_bets_final'),
     path('cup/', views.CupView.as_view(), name='the_cup'),
     path('cup-view/', views.CupBracket.as_view(), name='cup_bracket'),
+    path('cup-knockout/', views.CupViewKnockOut.as_view(), name='the_cup_knockout'),
 ]
 

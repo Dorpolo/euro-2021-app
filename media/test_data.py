@@ -1,21 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def all_matches(self):
     data = self.extract_data()
     # live_api_history = self.match_history_data()

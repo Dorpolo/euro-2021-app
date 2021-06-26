@@ -13,7 +13,7 @@ import data.viz_variables as vis
 import plotly.express as px
 import plotly.offline as opy
 import plotly.graph_objects as go
-from data.knockout import TEAM_GAME_MAP as TGM, CUP_GAMES
+from data.knockout import TEAM_GAME_MAP as TGM, CUP_GAMES, CUP_DRAW, CUP_DRAW_BETA
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(SECRET_KEY=str,)
@@ -320,14 +320,13 @@ class UserPredictionBase:
                   for item in ['Top Scorer', 'Top Assist']}
         return output
 
-    def data_enrichment(self):
+    def merge_predictions_with_api(self, matches: list = []):
         extra_fields = ['game_id', 'match_label', 'real_score', 'real_score_home', 'real_score_away',
                         'game_status', 'date', 'hour', 'is_playoff', 'match_type', 'home_team', 'away_team', 'knockout_winner']
         metadata = self.get_api_data()
-        df_main = self.get_user_prediction()
-        df_api_enrichment = [
-                 [
-                    key,
+        df_user_predictions = self.get_user_prediction()
+        data_enrichment = [
+                   [key,
                     val['match_label'],
                     val['score_label'],
                     val['real_score_home'],
@@ -340,57 +339,62 @@ class UserPredictionBase:
                     val['home_team'],
                     val['away_team'],
                     None if val['is_playoff'] != '1' else val['home_team'] if val['real_score_home'] > val['real_score_away'] else val['away_team']
-            ] for key, val in metadata.items()]
-        df_more_data = pd.DataFrame(df_api_enrichment, columns=extra_fields)
-        df_more_data['rn'] = df_more_data.groupby('match_type').cumcount()
-        df_more_data['alter_game_id'] = "a" + df_more_data['rn'].map(str)
-        df_groupstage = df_main[df_main.stage == 'group']
-        df_knockout = df_main[df_main.stage != 'group']
-        df_main_2_groups = pd.merge(df_groupstage, df_more_data, on=['game_id'], how='inner')
-        df_knockout['stage'] = np.where(df_knockout['stage'] == 'top_16',
-                                        '1/8 Final',
-                                        np.where(df_knockout['stage'] == 'top_8',
-                                                 '1/4 Final',
-                                                  np.where(df_knockout['stage'] == 'top_4',
-                                                           '1/2 Final', 'Final')))
-        df_main_2_knockout = pd.merge(
-                                    df_knockout,
-                                    df_more_data,
-                                    left_on=['game_id', 'stage'],
-                                    right_on=['alter_game_id', 'match_type'],
-                                    how='inner'
-                            ).drop(columns=['rn', 'alter_game_id'])
+                ] for key, val in metadata.items()]
 
-        init_knockout_data = []
-        for item in df_main_2_knockout.values.tolist():
-            item += [*GetMatchData().get_knockout_attributes(item[6]).values()]
-            init_knockout_data.append(item)
-        new_columns = ['is_extra_time', 'home_score_90_min', 'away_score_90_min', 'home_score_end_match',
-                       'away_score_end_match', 'match_winner']
-        adjusted_columns = list(df_main_2_knockout.columns) + new_columns
-        for col in new_columns:
-            df_main_2_groups[col] = None
-        df_main_2_knockout_adj = pd.DataFrame(init_knockout_data, columns=adjusted_columns)
-        df_main_2 = pd.concat([df_main_2_groups, df_main_2_knockout_adj])
-        league_member_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name', 'created']
-        df_league_member_pre = pd.DataFrame(
+        df_enrichment = pd.DataFrame(data_enrichment, columns=extra_fields)
+        if matches:
+            df_enrichment = df_enrichment[df_enrichment['match_label'].isin(matches)]
+        df_enrichment['rn'] = df_enrichment.groupby('match_type').cumcount()
+        df_enrichment['alter_game_id'] = "a" + df_enrichment['rn'].map(str)
+        df_enrichment_groupstage = df_enrichment[df_enrichment.is_playoff != '1']
+        df_enrichment_knockout = df_enrichment[df_enrichment.is_playoff == '1']
+
+        knockout_features = ['is_extra_time', 'home_score_90_min', 'away_score_90_min', 'home_score_end_match',
+                             'away_score_end_match', 'match_winner']
+        adjusted_features = list(df_enrichment_groupstage.columns) + knockout_features
+
+        df_enrichment_knockout_init = []
+        for item in df_enrichment_knockout.values.tolist():
+            item += [*GetMatchData().get_knockout_attributes(item[0]).values()]
+            df_enrichment_knockout_init.append(item)
+
+        df_enrichment_knockout = pd.DataFrame(df_enrichment_knockout_init, columns=adjusted_features)
+
+        for col in knockout_features:
+            df_enrichment_groupstage[col] = None
+
+        df_user_predictions_groupstage = df_user_predictions[df_user_predictions.stage == 'group']
+        df_user_predictions_knockout = df_user_predictions[df_user_predictions.stage != 'group']
+        df_user_predictions_knockout['stage'] = np.where(df_user_predictions_knockout['stage'] == 'top_16',
+                                                         '1/8 Final',
+                                                         np.where(df_user_predictions_knockout['stage'] == 'top_8',
+                                                                  '1/4 Final',
+                                                                   np.where(df_user_predictions_knockout['stage'] == 'top_4',
+                                                                            '1/2 Final', 'Final')))
+
+        df_groupstage_final = pd.merge(df_user_predictions_groupstage, df_enrichment_groupstage, on=['game_id'], how='inner')
+        df_knockout_final = pd.merge(
+                    df_user_predictions_knockout,
+                    df_enrichment_knockout,
+                    left_on=['game_id', 'stage'],
+                    right_on=['alter_game_id', 'match_type'],
+                    how='inner').drop(columns=['rn', 'alter_game_id'])
+        df_final = pd.concat([df_groupstage_final, df_knockout_final])
+
+        user_level_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name', 'created']
+        df_user_level_pre = pd.DataFrame(
             list(LeagueMember.objects.filter(user_name_id__in=self.extract_relevant_user_ids()).
-                 values()))[league_member_fields].sort_values(
+                 values()))[user_level_fields].sort_values(
                                 by=['user_name_id', 'league_name_id', 'created'],
                                 ascending=[True, True, False])
-        df_league_member = df_league_member_pre.groupby(['user_name_id', 'league_name_id']).first().\
+        df_user_level = df_user_level_pre.groupby(['user_name_id', 'league_name_id']).first().\
             reset_index().drop(columns='created')
-        output = pd.merge(
-                    df_main_2,
-                    df_league_member,
-                    on=['user_name_id'],
-                    how='inner'
-                ).sort_values(by=['date', 'hour', 'user_name_id'])
+
+        output = pd.merge(df_final, df_user_level, on=['user_name_id'], how='inner').sort_values(by=['date', 'hour', 'user_name_id'])
         output['user_full_name'] = output['first_name'] + ' ' + output['last_name']
-        output['record_id'] = output['user_name_id'].astype(str) + '-' + output['match_label'] + '-' + output['league_name_id']
         output['date'] = output['date'].str[5:]
+
         output_fields = [
-            'record_id',
             'user_name_id',
             'nick_name',
             'league_name_id',
@@ -416,12 +420,11 @@ class UserPredictionBase:
             'away_score_end_match',
             'match_winner',
             ]
-        return output[output_fields].rename(columns={
-                    'match_winner': 'knockout_winner'
-                })
+        df_output = output[output_fields].rename(columns={'match_winner': 'knockout_winner'})
+        return df_output
 
     def present_predictions(self) -> tuple:
-        data = self.data_enrichment()
+        data = self.merge_predictions_with_api()
         leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
         if len(leagues) > 0:
             output = {}
@@ -437,16 +440,18 @@ class UserPredictionBase:
                 output[item] = final_df.values.tolist()
             return output, required_fields
         else:
-            return None, None
+            return None, None, None
 
     def present_my_predictions(self):
-        data = self.data_enrichment()
+        data = self.merge_predictions_with_api()
         leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
         if len(leagues) > 0:
             output = {}
             required_fields = ['nick_name', 'date', 'hour', 'match_label', 'predicted_score', 'real_score',
                                'game_status', 'pred_score_home', 'pred_score_away', 'real_score_home',
-                               'real_score_away', 'user_name_id', 'pred_winner']
+                               'real_score_away', 'user_name_id', 'match_type', 'is_playoff', 'pred_winner',
+                               'knockout_winner', 'is_extra_time', 'home_score_90_min', 'away_score_90_min',
+                               'home_score_end_match', 'away_score_end_match']
             for item in leagues:
                 filtered_df = data[(data.league_name_id == item) & (data.user_name_id == self.user_id)][required_fields]
                 filtered_df['status_rank'] = np.where(filtered_df.game_status == 'Finished', 1, 0)
@@ -469,10 +474,10 @@ class UserPredictionBase:
         x['is_boom'] = np.where((x.pred_score_home == x.real_score_home) & (x.pred_score_away == x.real_score_away), 1, 0)
         return x
 
-    def user_game_points(self):
-        data = self.data_enrichment()
+    def user_game_points(self, matches: list = []):
+        data = self.merge_predictions_with_api(matches)
         leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
-        api_game_router = GetMatchData().game_router()
+        api_game_router = GetMatchData().game_router2(data)
         next_game = api_game_router['next']['data']
         prev_game = api_game_router['prev']['data']
         if len(leagues) > 0:
@@ -521,7 +526,7 @@ class UserPredictionBase:
     def home_screen_match_relevant_data(self, data):
         next_match = data['next']['data']
         prev_match = data['prev']['data']
-        user_data = self.user_game_points()
+        user_data = self.user_game_points(matches=[next_match['match_label'], prev_match['match_label']])
         if isinstance(user_data, dict):
             some_league = list(user_data.keys())[0]
             next_match['user_pred'] = user_data[some_league]['next']['user_pred']
@@ -589,6 +594,16 @@ class UserPredictionBase:
             adj_df.append(nick + values1 + [f"{item[5]}%"] + values2)
         return adj_df
 
+    @staticmethod
+    def adjust_cup_table_column_type(data) -> list:
+        adj_df = []
+        for item in data.values.tolist():
+            nick = [item[0]]
+            values1 = [int(sub) for sub in item[1:5]]
+            values2 = [int(sub) for sub in item[6:]]
+            adj_df.append(nick + values1 + [f"{item[5]}%"] + values2)
+        return adj_df
+
     def league_member_points(self):
         metadata = self.present_predictions()
         output = {}
@@ -599,7 +614,7 @@ class UserPredictionBase:
                 output[key] = self.get_game_points_group_stage(df, points_from_players[key])
             return output
         else:
-            return None
+            return None, None
 
     def league_member_points_cup(self, stage: str = None):
         metadata = self.present_predictions()
@@ -635,7 +650,7 @@ class UserPredictionBase:
                             by=[('points',), ('boom',), ('direction', ), ('predicted_goals', ), ('distance', )],
                             ascending=[False]*4 + [True])[required_cols]
         cleaner_data['rn'] = np.arange(len(cleaner_data)) + 1
-        return self.adjust_table_column_type(cleaner_data)
+        return self.adjust_cup_table_column_type(cleaner_data)
 
     def get_user_league_rank(self) -> dict:
         get_user_points = self.league_member_points()
@@ -722,17 +737,11 @@ class GetMatchData:
         score_90_min_home = int(data['match']['homeParticipant']['score']) - int(data['match']['extraTime']['home_score'])
         score_90_min_away = int(data['match']['awayParticipant']['score']) - int(data['match']['extraTime']['away_score'])
         extra_time = True if data['match']['extraTime']['is_extra'] == '1' else False
+        penalties = False
         if 'stages' in data.keys():
             if data['stages']:
                 if data['stages'][0]['stageID'] == '4':
                     penalties = True
-                else:
-                    penalties = False
-            else:
-                penalties = False
-        else:
-            penalties = False
-
         if penalties:
             stage_score = data['stages'][0]
             game_winner = 'home' if int(stage_score['home_score']) > int(stage_score['away_score']) else 'away'
@@ -852,6 +861,37 @@ class GetMatchData:
             return output
 
     def game_router(self):
+        df_input = self.all_matches()
+        df = pd.DataFrame(df_input[0], columns=df_input[1])
+        next_df = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
+        next_output = next_df.head(1).reset_index()
+        next_game_status = 'live' if next_output['match_status'][0] == '-1' else 'fixture'
+        if next_game_status == 'live':
+            prev_df = df[df.match_status == '0'].sort_values(by=['match_date', 'match_hour'])
+            prev_output = prev_df.head(1).reset_index()
+        else:
+            prev_df = df[df.match_status == '1'].sort_values(by=['match_date', 'match_hour'])
+            prev_output = prev_df.tail(1).reset_index()
+        context = {
+            'next': {
+                'data': {key: obj[0] for key, obj in next_output.head(1).to_dict().items()},
+                'logo': {
+                         next_output.home_team[0]: teams[next_output.home_team[0]]['logo'],
+                         next_output.away_team[0]: teams[next_output.away_team[0]]['logo']
+                     }
+                },
+            'prev': {
+                'data': {key: obj[0] for key, obj in prev_output.head(1).to_dict().items()},
+                'logo': {
+                         prev_output.home_team[0]: teams[prev_output.home_team[0]]['logo'],
+                         prev_output.away_team[0]: teams[prev_output.away_team[0]]['logo']
+                     }
+            },
+            'started_games': int(df[df.match_status != '0'].shape[0])
+        }
+        return context
+
+    def game_router2(self, df2):
         df_input = self.all_matches()
         df = pd.DataFrame(df_input[0], columns=df_input[1])
         next_df = df[df.match_status != '1'].sort_values(by=['match_date', 'match_hour'])
@@ -1129,7 +1169,8 @@ class GameStats(UserPredictionBase):
                 df.columns = df_input[1]
                 df = df[df.match_label == self.match_label]
                 df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
-                output[key] = obj
+                output[key] = df
+
             return output
         else:
             return None
@@ -1172,14 +1213,74 @@ class GameStats(UserPredictionBase):
 
 
 class CupKnockOut(UserPredictionBase):
-    def __init__(self, user_id, match_label):
+    def __init__(self, user_id, draw_template: dict = CUP_DRAW_BETA, beta: bool = True):
         super().__init__(user_id)
-        self.match_label = match_label
+        self.beta = beta
+        self.draw_template = draw_template
+        self.league_id = 9 if not self.beta else 1
 
-    def cup_top_16_data(self, pairs):
-        data = self.league_member_points_cup(stage='1/8 Final')
-        return None
+    def get_league_name(self):
+        league_name = list(League.objects.filter(id=self.league_id).values('league_name'))[0]['league_name']
+        return league_name
+
+    def get_user_data(self):
+        league_name = self.get_league_name()
+        league_members = list(LeagueMember.objects.filter(league_name_id=league_name).values('user_name_id', 'nick_name'))
+        user_list = [i['user_name_id'] for i in league_members]
+        get_image = pd.DataFrame(list(UserImage.objects.filter(user_name_id__in=user_list).all().
+                                      order_by('user_name_id', '-created').values('user_name_id', 'header_image'))).\
+            groupby(['user_name_id']).first().reset_index().values.tolist()
+        league_images = {item[0]: item[1] for item in get_image}
+        league_members_map = {item['user_name_id']: item['nick_name'] for item in league_members}
+        for key, val in league_members_map.items():
+            img = league_images[key] if key in list(league_images.keys()) else DEFAULT_PHOTO
+            league_members_map[key] = {
+                'nick': league_members_map[key],
+                'img': f"{AWS_S3_URL}{img}"
+            }
+        return league_members_map
+
+    def prepare_template_data(self):
+        league_name = self.get_league_name()
+        metadata = self.present_predictions()
+        col_names = metadata[1]
+        df = pd.DataFrame(metadata[0][league_name], columns=col_names)
+        print(df[['user_name_id', 'nick_name', 'match_label',
+                  'home_score_90_min', 'away_score_90_min']].head(10))
+        user_data = self.get_user_data()
+        output = {}
+        for stage in ['1/8 Final']:
+            output[stage] = {}
+            for key, val in self.draw_template[stage]['data'].items():
+                users = [user_data[item['user_id']]['nick'] for item in val.values()]
+                user_ids = [item['user_id'] for item in val.values()]
+                sub_df = df[(df.nick_name.isin(users)) & (df.match_type == stage)]
+                if sub_df.shape[0] > 0:
+                    mini_league = self.get_game_points_cup(sub_df)
+                    print(mini_league)
+                    output[stage][key] = {
+                                'logos': {user: user_data[uid]['img'] for user, uid in zip(users, user_ids)},
+                                'table': mini_league,
+                                'winner': mini_league[0][0],
+                                'matches': self.present_match_games_data(sub_df)
+                            }
+                else:
+                    output[stage][key] = None
+        print(output)
+        return output
+
+    def present_match_games_data(self, df):
+        df[['home_team', 'away_team']] = df.match_label.str.split('-', n=2, expand=True)
+        df['home_score_90_min'] = df['home_score_90_min'].astype(int)
+        df['away_score_90_min'] = df['away_score_90_min'].astype(int)
+        df['real_score_90_min'] = df['home_score_90_min'].map(str) + '-' + df['away_score_90_min'].map(str)
+        df['knockout_winner_team'] = np.where(df.knockout_winner == 'home', df.home_team, df.away_team)
+        cols = ['nick_name', 'match_label', 'predicted_score', 'real_score_90_min',
+                'pred_winner', 'knockout_winner_team']
+        output = df[cols].values.tolist()
+        return output
 
 
-
-
+# from pipelines.data_prep import *
+# Init = CupKnockOut(1)
+# Init.prepare_template_data()

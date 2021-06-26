@@ -165,60 +165,82 @@ users_dict = {
 }
 
 
+CUP_DRAW_BETA = {
+    '1/8 Final': {
+        'status': 'next',
+        'data': {
+            'm1': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            }
+        }
+    }
+}
+
 CUP_DRAW = {
     '1/8 Final': {
+       'status': 'next',
+       'data': {
         'm1': {
-            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'result': {'table': None, 'winner': None}
+            'home': {'user_id': 28},
+            'away': {'user_id': 122},
         },
         'm2': {
-            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'result': {'table': None, 'winner': None}
+            'home': {'user_id': 29},
+            'away': {'user_id': 20},
         },
         'm3': {
-            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'home': {'user_id': 176, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': 15, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
         'm4': {
-            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'home': {'user_id': 2, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': 94, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
         'm5': {
-            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'home': {'user_id': 44, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': 133, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
         'm6': {
-            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'home': {'user_id': 14, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': 27, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
         'm7': {
-            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'home': {'user_id': 18, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': 117, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
         'm8': {
-            'home': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': None, 'nick': None, 'logo': None, 'points': None},
+            'home': {'user_id': 21, 'nick': None, 'logo': None, 'points': None},
+            'away': {'user_id': 52, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
-        },
+        }
+},
     '1/4 Final': {
-        'm1': None,
-        'm2': None,
-        'm3': None,
-        'm4': None,
-    },
+        'status': 'fixture',
+        'data': {
+            'm1': None,
+            'm2': None,
+            'm3': None,
+            'm4': None,
+            }
+        },
     '1/2 Final': {
-        'm1': None,
-        'm2': None,
+        'status': 'fixture',
+        'data': {
+            'm1': None,
+            'm2': None,
+            }
     },
     'Final': {
-        'm1': None,
-    },
-}
+    'status': 'fixture',
+    'data': {
+            'm1': None,
+            }
+     },
+    }

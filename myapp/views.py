@@ -25,14 +25,13 @@ class HomeView(TemplateView):
     def get(self, request):
         if request.user.is_authenticated:
             UserPred = UserPredictionBase(request.user.id)
-            home_page_context = self.GetAPIData.game_router()
             onboarding = BaseViewUserControl(request.user.id).onboarding()
             league_data_output = UserPred.get_league_members()
+            home_page_context = self.GetAPIData.game_router()
             if league_data_output is not None:
                 context = {
+                    'show_results': False,  # TODO - change to True once bet window ends
                     'league_members': league_data_output,
-                    'prev_match_logos': home_page_context['prev']['logo'],
-                    'next_match_logos': home_page_context['next']['logo'],
                     'league_signup': onboarding['league'],
                     'committed_a_bet': onboarding['bet'],
                     'image_uploaded': onboarding['image'],
@@ -40,11 +39,9 @@ class HomeView(TemplateView):
                     'committed_a_bet_8': onboarding['bet_top_8'],
                     'committed_a_bet_4': onboarding['bet_top_4'],
                     'committed_a_bet_2': onboarding['bet_top_2'],
-                    'bet_id': UserPred.user_game_bet_id('group'),
-                    'bet_id_knockout': UserPred.user_game_bet_id('top_16'),
-                    'games_started': home_page_context['started_games'],
                     'is_cup_user': UserPred.is_cup_user(),
-                    'show_results': False, # TODO - change to True once bet window ends
+                    'prev_match_logos': home_page_context['prev']['logo'],
+                    'next_match_logos': home_page_context['next']['logo'],
                 }
                 if onboarding['bet']:
                     presented_data = UserPred.home_screen_match_relevant_data(home_page_context)
@@ -53,6 +50,9 @@ class HomeView(TemplateView):
                     context['prev_match'] = presented_data[0]
                     context['league_member_points'] = UserPred.league_member_points()
                     context['league_memberships'] = UserPred.get_league_members_data()
+                    context['games_started'] = home_page_context['started_games']
+                    context['bet_id'] = UserPred.user_game_bet_id('group')
+                    context['bet_id_knockout'] = UserPred.user_game_bet_id('top_16')
                 return render(request, self.template_name, context)
             else:
                 return render(request, self.template_name, {'data': None})
@@ -77,7 +77,7 @@ class CupView(TemplateView):
             qualification_1_images_df = pd.DataFrame(league_data_output[relevant_key])
             images_qualification_1 = list(
                 pd.merge(qualification_1_df, qualification_1_images_df, on=[0], how='inner')['1_y'])
-            qualification_1_losers_df = pd.DataFrame(qualification_1[15:])
+            qualification_1_losers_df = pd.DataFrame(qualification_1[1:])
             qualification_2_nick_names = list(qualification_1_losers_df[0])
             qualification_2_data = {key: [item for item in val if item[0] in qualification_2_nick_names]
                                     for key, val in UserPred.league_member_points_cup('qualification_2').items()
@@ -118,6 +118,19 @@ class CupView(TemplateView):
                 return render(request, self.template_name, {'data': None})
         else:
             return render(request, self.template_name, {'data': None})
+
+
+class CupViewKnockOut(TemplateView):
+    template_name = "the_cup_knockout.html"
+
+    def get(self, request):
+        Cup = CupKnockOut(request.user.id)
+        data = Cup.prepare_template_data()
+        context = {
+            'is_cup_user': True,
+            'data': data
+        }
+        return render(request, self.template_name, context)
 
 
 class TermsView(TemplateView):
@@ -312,6 +325,7 @@ class AddBetsTop16View(TemplateView):
                 league_user_email = [LeagueMember.objects.filter(user_name_id=request.user.id)[0].email]
                 if league_user_email[0] != env('EMAIL_HOST_USER'):
                     league_user_email.append(env('EMAIL_HOST_USER'))
+                print(f"Trying to send email to {league_user_email}")
                 email_data = MailTemplate().knockout_bet_submission(request, form, stage='1/16 Final')
                 print(email_data)
                 send_mail(
