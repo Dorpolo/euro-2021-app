@@ -771,6 +771,7 @@ class GetMatchData:
                 row += [None]*5
         fields += ['is_extra_time', 'home_score_90_min', 'away_score_90_min',
                    'home_score_end_match', 'away_score_end_match', 'match_winner']
+        print(fields)
         return data, fields
 
     def all_matches_old(self):

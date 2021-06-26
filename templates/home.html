@@ -60,14 +60,14 @@
                                           Your Prediction: {{ next_match.user_pred }} <br>
                                       </p>
                   {% if show_results %}
-                                <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
-                                         <a href="{% url 'my_predictions' %}">
-                                             <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
-                                         </a>
-                                        <a href="{% url 'predictions' %}">
-                                           <a href="{% url 'live_next_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
-                                        </a>
-                                </div>
+                        <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                                 <a href="{% url 'my_predictions' %}">
+                                     <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
+                                 </a>
+                                <a href="{% url 'predictions' %}">
+                                   <a href="{% url 'live_next_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
+                                </a>
+                        </div>
                   {% endif %}
 
                     </div>
@@ -110,7 +110,7 @@
                  </div>
             </center>
       {% endif %}
-                    </body>
+        </body>
                 </div>
                 <hr>
                   <h6>Quick Access</h6>

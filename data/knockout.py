@@ -181,44 +181,38 @@ CUP_DRAW = {
     '1/8 Final': {
        'status': 'next',
        'data': {
-        'Match I': {
-            'home': {'user_id': 28},
-            'away': {'user_id': 122},
-        },
-        'Match II': {
-            'home': {'user_id': 29},
-            'away': {'user_id': 20},
-        },
-        'Match III': {
-            'home': {'user_id': 176, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': 15, 'nick': None, 'logo': None, 'points': None},
-            'result': {'table': None, 'winner': None}
-        },
-        'Match IV': {
-            'home': {'user_id': 2, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': 94, 'nick': None, 'logo': None, 'points': None},
-            'result': {'table': None, 'winner': None}
-        },
-        'Match V': {
-            'home': {'user_id': 44, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': 133, 'nick': None, 'logo': None, 'points': None},
-            'result': {'table': None, 'winner': None}
-        },
-        'Match VI': {
-            'home': {'user_id': 14, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': 27, 'nick': None, 'logo': None, 'points': None},
-            'result': {'table': None, 'winner': None}
-        },
-        'Match VII': {
-            'home': {'user_id': 18, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': 117, 'nick': None, 'logo': None, 'points': None},
-            'result': {'table': None, 'winner': None}
-        },
-        'Match VIII': {
-            'home': {'user_id': 21, 'nick': None, 'logo': None, 'points': None},
-            'away': {'user_id': 52, 'nick': None, 'logo': None, 'points': None},
-            'result': {'table': None, 'winner': None}
-        },
+            'Match I': {
+                'home': {'user_id': 28},
+                'away': {'user_id': 122},
+            },
+            'Match II': {
+                'home': {'user_id': 29},
+                'away': {'user_id': 20},
+            },
+            'Match III': {
+                'home': {'user_id': 176, 'nick': None, 'logo': None, 'points': None},
+                'away': {'user_id': 15, 'nick': None, 'logo': None, 'points': None},
+            },
+            'Match IV': {
+                'home': {'user_id': 2, 'nick': None, 'logo': None, 'points': None},
+                'away': {'user_id': 94, 'nick': None, 'logo': None, 'points': None},
+            },
+            'Match V': {
+                'home': {'user_id': 44, 'nick': None, 'logo': None, 'points': None},
+                'away': {'user_id': 133, 'nick': None, 'logo': None, 'points': None},
+            },
+            'Match VI': {
+                'home': {'user_id': 14, 'nick': None, 'logo': None, 'points': None},
+                'away': {'user_id': 27, 'nick': None, 'logo': None, 'points': None},
+            },
+            'Match VII': {
+                'home': {'user_id': 18, 'nick': None, 'logo': None, 'points': None},
+                'away': {'user_id': 117, 'nick': None, 'logo': None, 'points': None},
+            },
+            'Match VIII': {
+                'home': {'user_id': 21, 'nick': None, 'logo': None, 'points': None},
+                'away': {'user_id': 52, 'nick': None, 'logo': None, 'points': None},
+            },
         }
 },
     '1/4 Final': {
