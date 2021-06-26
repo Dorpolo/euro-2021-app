@@ -169,7 +169,7 @@ CUP_DRAW_BETA = {
     '1/8 Final': {
         'status': 'next',
         'data': {
-            'm1': {
+            'Match I': {
                 'home': {'user_id': 1},
                 'away': {'user_id': 2},
             }
@@ -181,40 +181,40 @@ CUP_DRAW = {
     '1/8 Final': {
        'status': 'next',
        'data': {
-        'm1': {
+        'Match I': {
             'home': {'user_id': 28},
             'away': {'user_id': 122},
         },
-        'm2': {
+        'Match II': {
             'home': {'user_id': 29},
             'away': {'user_id': 20},
         },
-        'm3': {
+        'Match III': {
             'home': {'user_id': 176, 'nick': None, 'logo': None, 'points': None},
             'away': {'user_id': 15, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
-        'm4': {
+        'Match IV': {
             'home': {'user_id': 2, 'nick': None, 'logo': None, 'points': None},
             'away': {'user_id': 94, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
-        'm5': {
+        'Match V': {
             'home': {'user_id': 44, 'nick': None, 'logo': None, 'points': None},
             'away': {'user_id': 133, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
-        'm6': {
+        'Match VI': {
             'home': {'user_id': 14, 'nick': None, 'logo': None, 'points': None},
             'away': {'user_id': 27, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
-        'm7': {
+        'Match VII': {
             'home': {'user_id': 18, 'nick': None, 'logo': None, 'points': None},
             'away': {'user_id': 117, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
         },
-        'm8': {
+        'Match VIII': {
             'home': {'user_id': 21, 'nick': None, 'logo': None, 'points': None},
             'away': {'user_id': 52, 'nick': None, 'logo': None, 'points': None},
             'result': {'table': None, 'winner': None}
@@ -224,23 +224,23 @@ CUP_DRAW = {
     '1/4 Final': {
         'status': 'fixture',
         'data': {
-            'm1': None,
-            'm2': None,
-            'm3': None,
-            'm4': None,
+            'Match I': None,
+            'Match II': None,
+            'Match III': None,
+            'Match IV': None,
             }
         },
     '1/2 Final': {
         'status': 'fixture',
         'data': {
-            'm1': None,
-            'm2': None,
+            'Semi-Final I': None,
+            'Semi-Final II': None,
             }
     },
     'Final': {
     'status': 'fixture',
     'data': {
-            'm1': None,
+            'Final': None,
             }
      },
     }

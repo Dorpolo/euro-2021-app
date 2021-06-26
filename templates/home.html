@@ -23,18 +23,19 @@
             </style>
         <center>
 
-    {% if committed_a_bet_16 %}
-        <a href= {% url 'update_bets_top_16' bet_id_knockout %}>
-            <button type="button" class="btn btn-dark">Edit your Top 16 round predictions</button>
-        </a>
-    {%  else %}
-       <a href= {% url 'add_your_bet_top_16' %}>
-        <button type="button" class="btn btn-warning">Add your Top 16 round predictions</button>
-     </a>
-    {% endif %}
+{#    {% if committed_a_bet_16 %}#}
+{#        <a href= {% url 'update_bets_top_16' bet_id_knockout %}>#}
+{#            <button type="button" class="btn btn-dark">Edit your Top 16 round predictions</button>#}
+{#        </a>#}
+{#        <hr>#}
+{#    {%  else %}#}
+{#       <a href= {% url 'add_your_bet_top_16' %}>#}
+{#        <button type="button" class="btn btn-warning">Add your Top 16 round predictions</button>#}
+{#     </a>#}
+{#        <hr>#}
+{#    {% endif %}#}
 
         {% if committed_a_bet_16 %}
-             <hr>
             <div class="card" style="width: 17rem;">
                   <div class="card-body">
                     <h5 class="card-title">
@@ -116,7 +117,7 @@
                     <center>
                <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                         {% if is_cup_user %}
-                        <a href="{% url 'the_cup' %}">
+                        <a href="{% url 'the_cup_knockout' %}">
                              <button type="button" class="btn btn-dark">Cup</button>
                          </a>
                         {% endif %}
@@ -134,13 +135,6 @@
                 </div>
                     </center>
                 <hr>
-    {#     <h6>Required Actions</h6>#}
-    {#    {% if committed_a_bet %}#}
-    {#              <li> <a href= {% url 'update_your_bet_3_tound' bet_id %}>Edit your 3'rd round predictions.</a></li>#}
-    {#    * Available until 06-19-2021 23:59#}
-    {#          <hr>#}
-    {#    {% endif %}#}
-
     {% endif %}
       <div>
       {% if committed_a_bet %}

@@ -22,7 +22,8 @@
         <hr>
         <center>
         {% for sub_key, sub_val in val.items %}
-            Winner - {{ sub_val.winner }}
+            <script src="https://kit.fontawesome.com/4953bb3938.js" crossorigin="anonymous"></script>
+            <i class="fas fa-crown"></i> {{ sub_val.winner }} <i class="fas fa-crown"></i>
             <hr>
             <div style="display:inline;">
                 {% for nickname in sub_val.logos.keys %}
@@ -75,12 +76,48 @@
                               {% endfor %}
                             </tbody>
                       </table>
+                <hr>
+            <p>
+              <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Show Predictions
+              </a>
+            </p>
+            <div class="collapse" id="collapseExample">
+              <div class="card card-body">
+                <table class="styled-table2" style="width: 100%; height: 100%; text-align: center">
+                            <thead>
+                                <tr style="text-align: center">
+                                    <th>Home</th>
+                                    <th>Match</th>
+                                    <th>Result</th>
+                                    <th>Away</th>
+                                    <th>Status</th>
+                                </tr>
+                            <thead/>
+                            <tbody>
+                              {% for item in sub_val.matches %}
+                                  <tr>
+                                      <td>{{ item.0 }}</td>
+                                      <td>{{ item.1 }}</td>
+                                      <td>{{ item.2 }}</td>
+                                      <td>{{ item.3 }}</td>
+                                      <td>{{ item.4 }}</td>
+                                      <td>{{ item.5 }}</td>
+                                  </tr>
+
+                              {% endfor %}
+                            </tbody>
+                      </table>
+              </div>
             </div>
-            {% endfor %}
-            </center>
+
+            </div>
         {% endfor %}
+        </center>
     {% endfor %}
     </div>
+    <br>
+    <br>
 {% endif %}
 
 <style>
@@ -96,10 +133,6 @@
     }
 </style>
 
-
-  <hr>
-
-
     <style>
     .styled-table {
         border-collapse: collapse;
@@ -111,7 +144,7 @@
     }
 
     .styled-table thead tr {
-        background-color: #009879;
+        background-color: #00A0E2;
         color: #ffffff;
         text-align: left;
     }
@@ -133,7 +166,7 @@
         border-bottom: 1px solid #090f18;
     }
 
-    .styled-table tbody tr:nth-last-of-type(5) {
+    .styled-table tbody tr:nth-last-of-type(10) {
         border-bottom: 2px solid #009879;
     }
 
@@ -142,18 +175,18 @@
         color: #090f18;
     }
 
-        .styled-table2 {
+    .styled-table2 {
         border-collapse: collapse;
         margin: 20px 0;
-        font-size: 0.6em;
+        font-size: 0.4em;
         font-family: sans-serif;
         min-width: 300px;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
     }
 
     .styled-table2 thead tr {
-        background-color: #1C2833;
-        color: #ffffff;
+        background-color: #F3D041;
+        color: #090f18;
         text-align: left;
     }
 
@@ -174,26 +207,11 @@
         border-bottom: 1px solid #090f18;
     }
 
-    .styled-table2 tbody tr:first-of-type {
-        border-bottom: 2px solid #009879;
-    }
-
     .styled-table2 tbody tr.active-row {
         font-weight: bold;
         color: #090f18;
     }
 
-    .dp-styled-img {
-      height: 35px;
-      width: 35px;
-      border-radius: 50%;
-    }
-
-    .dp2-styled-img {
-      height: 30px;
-      width: 30px;
-      border-radius: 50%;
-    }
 
   </style>
 

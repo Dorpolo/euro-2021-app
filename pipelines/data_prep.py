@@ -744,10 +744,13 @@ class GetMatchData:
                     penalties = True
         if penalties:
             stage_score = data['stages'][0]
-            game_winner = 'home' if int(stage_score['home_score']) > int(stage_score['away_score']) else 'away'
+            game_winner = 'home' if int(stage_score['home_score']) > int(stage_score['away_score']) \
+                else 'away' if int(stage_score['home_score']) < int(stage_score['away_score']) else 'draw'
         else:
             game_winner = 'home' if int(data['match']['homeParticipant']['score']) > \
-                                    int(data['match']['awayParticipant']['score']) else 'away'
+                                    int(data['match']['awayParticipant']['score']) else \
+                'away' if int(data['match']['homeParticipant']['score']) < int(data['match']['awayParticipant']['score']) \
+                    else 'draw'
         context = {
             'is_extra_time': extra_time,
             'home_score_90_min': score_90_min_home,
@@ -1245,8 +1248,6 @@ class CupKnockOut(UserPredictionBase):
         metadata = self.present_predictions()
         col_names = metadata[1]
         df = pd.DataFrame(metadata[0][league_name], columns=col_names)
-        print(df[['user_name_id', 'nick_name', 'match_label',
-                  'home_score_90_min', 'away_score_90_min']].head(10))
         user_data = self.get_user_data()
         output = {}
         for stage in ['1/8 Final']:
@@ -1257,7 +1258,6 @@ class CupKnockOut(UserPredictionBase):
                 sub_df = df[(df.nick_name.isin(users)) & (df.match_type == stage)]
                 if sub_df.shape[0] > 0:
                     mini_league = self.get_game_points_cup(sub_df)
-                    print(mini_league)
                     output[stage][key] = {
                                 'logos': {user: user_data[uid]['img'] for user, uid in zip(users, user_ids)},
                                 'table': mini_league,
@@ -1266,19 +1266,27 @@ class CupKnockOut(UserPredictionBase):
                             }
                 else:
                     output[stage][key] = None
-        print(output)
         return output
+
+    @staticmethod
+    def manipulate_prediction_presentation(data):
+        player_a = [data[i] for i in range(len(data)) if i % 2 != 0]
+        player_b = [data[i] for i in range(len(data)) if i % 2 == 0]
+        merged = [[a[0], a[2], a[4], a[1], a[3], a[5], b[0], b[2], b[4], a[6]] for a, b in zip(player_a, player_b)]
+        return [[f"{i[1]} ({i[2]})", f"{i[3]}", f"{i[4]} ({i[5]})", f"{i[7]} ({i[8]})", i[9]] for i in merged]
 
     def present_match_games_data(self, df):
         df[['home_team', 'away_team']] = df.match_label.str.split('-', n=2, expand=True)
         df['home_score_90_min'] = df['home_score_90_min'].astype(int)
         df['away_score_90_min'] = df['away_score_90_min'].astype(int)
         df['real_score_90_min'] = df['home_score_90_min'].map(str) + '-' + df['away_score_90_min'].map(str)
-        df['knockout_winner_team'] = np.where(df.knockout_winner == 'home', df.home_team, df.away_team)
+        df['knockout_winner_team'] = np.where(df.knockout_winner == 'home',
+                                              df.home_team,
+                                              np.where(df.knockout_winner == 'away', df.away_team, 'draw'))
         cols = ['nick_name', 'match_label', 'predicted_score', 'real_score_90_min',
-                'pred_winner', 'knockout_winner_team']
+                'pred_winner', 'knockout_winner_team', 'game_status']
         output = df[cols].values.tolist()
-        return output
+        return self.manipulate_prediction_presentation(output)
 
 
 # from pipelines.data_prep import *

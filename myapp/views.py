@@ -30,7 +30,7 @@ class HomeView(TemplateView):
             home_page_context = self.GetAPIData.game_router()
             if league_data_output is not None:
                 context = {
-                    'show_results': False,  # TODO - change to True once bet window ends
+                    'show_results': True,  # TODO - change to True once bet window ends
                     'league_members': league_data_output,
                     'league_signup': onboarding['league'],
                     'committed_a_bet': onboarding['bet'],
