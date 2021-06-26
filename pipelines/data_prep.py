@@ -582,18 +582,21 @@ class UserPredictionBase:
         x['is_live'] = np.where(x.game_status == 'live', 1, 0)
         x['distance'] = (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + \
                         (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int)))
-        print(x.columns)
-        print(x[['nick_name', 'match_label', 'home_team', 'away_team', 'pred_winner', 'started', 'is_live', 'predicted_score', 'knockout_points', 'points', 'is_knockout_direction', 'points', 'distance', 'knockout_winner']])
+        # test section
+        print('-'*200)
+        print(list(x.columns))
+        print(x.values.tolist())
+        print('-' * 200)
         d = [
-            int(x['started'].sum()),
-            int((x['started'] * x['points']).sum()),
-            int((x['started'] * x['is_boom']).sum()),
-            int((x['started'] * x['is_direction']).sum()),
-            round((x['started'] * x['points']).sum()*100/(x['started'] * 3).sum(), 1),
-            int((x['started'] * x['is_boom'] * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()),
-            int((x['is_live'] * x['points']).sum()),
+            int(x['started'].sum()), # started games
+            int((x['started'] * x['points']).sum()), # total points
+            int((x['started'] * x['is_boom']).sum()), # total booms
+            int((x['started'] * x['is_direction']).sum()), # total directions
+            round((x['started'] * x['points']).sum()*100/(x['started'] * 3).sum(), 1), # success rate
+            int((x['started'] * x['is_boom'] * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()), # B-goals
+            int((x['is_live'] * x['points']).sum()), # live points
             int(1),
-            int((x['started'] * x['distance']).sum())
+            int((x['started'] * x['distance']).sum())  # total distance
         ]
         index_names = ['games', 'points', 'boom', 'direction', 'success_rate', 'predicted_goals', 'live_points', 'players', 'distance']
         return pd.Series(d, index=[index_names])
@@ -1122,7 +1125,6 @@ class TopPlayerStats(GetMatchData):
                 self.score_distance([int(i) for i in [item[7], item[8], item[19], item[20]]]),
                 user_id_map[item[0]]
             ] for item in val if item[3] == match_label]
-            print(val)
             relevant_data = [item for item in init_data if item[2] < 15]
             data_preps = self.data_sankey_live_game(relevant_data, league_name=key)
             output[key] = self.build_sankey_plot(data_preps)

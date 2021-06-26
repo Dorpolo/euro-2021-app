@@ -633,7 +633,6 @@ class MyPredictionsView(TemplateView):
             get_my_players = UserPred.get_top_players_my_predictions()
         else:
             get_my_predictions = None
-        print(get_my_predictions[0])
         context = {
             'my_predictions': get_my_predictions[0],
             'my_players': get_my_players
