@@ -591,15 +591,17 @@ class UserPredictionBase:
 
         x['started'] = np.where(x.game_status != 'Fixture', 1, 0)
         x['is_live'] = np.where(x.game_status == 'live', 1, 0)
-        x['distance'] = (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int)))
+        x['distance'] = np.where(x.is_playoff != '1',
+                                 (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int))),
+                                 (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int))))
 
         d = [
             int(x['started'].sum()), # started games
-            int((x['started'] * x['points']).sum()), # total points
-            int(((x['started'] * x['is_boom']) + (x['started'] * x['is_knockout_boom'])).sum()), # total booms
-            int(((x['started'] * x['is_direction']) + (x['started'] * x['is_knockout_direction'])).sum()), # total directions
-            round((x['started'] * x['points']).sum()*100/(x['started'] * 3).sum(), 1), # success rate
-            int((x['started'] * (x['is_boom'] + x['is_knockout_boom']) * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()), # B-goals
+            int((x['started'] * x['points']).sum()),# total points
+            int(((x['started'] * x['is_boom']) + (x['started'] * x['is_knockout_boom'])).sum()),# total booms
+            int(((x['started'] * x['is_direction']) + (x['started'] * x['is_knockout_direction'])).sum()),# total directions
+            round((x['started'] * x['points']).sum()*100/((x['started']*3)).sum(), 1), # success rate
+            int((x['started'] * (x['is_boom'] + x['is_knockout_boom']) * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()),# B-goals
             int((x['is_live'] * x['points']).sum()), # live points
             int(1),
             int((x['started'] * x['distance']).sum())  # total distance
@@ -1179,10 +1181,10 @@ class GameStats(UserPredictionBase):
                 df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
                 df['pred_dir'] = np.where(df.pred_score_home > df.pred_score_away,
                                           df.home_team, np.where(df.pred_score_home < df.pred_score_away, df.away_team, 'Draw'))
-                df_winner = pd.DataFrame(df.groupby(['pred_dir'])['game_status'].count()).\
+                df_winner = pd.DataFrame(df.groupby(['pred_winner'])['game_status'].count()).\
                     reset_index().rename(columns={
                         'game_status': 'count',
-                        'pred_dir': 'winner'
+                        'pred_winner': 'winner'
                     })
                 df_winner_output = df_winner
                 output[key] = df_winner_output
