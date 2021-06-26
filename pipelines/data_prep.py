@@ -349,8 +349,7 @@ class UserPredictionBase:
         df_enrichment_groupstage = df_enrichment[df_enrichment.is_playoff != '1']
         df_enrichment_knockout = df_enrichment[df_enrichment.is_playoff == '1']
 
-        knockout_features = ['is_extra_time', 'home_score_90_min', 'away_score_90_min', 'home_score_end_match',
-                             'away_score_end_match', 'match_winner']
+        knockout_features = ['is_extra_time', 'home_score_90_min', 'away_score_90_min', 'home_score_end_match', 'away_score_end_match', 'match_winner']
         adjusted_features = list(df_enrichment_groupstage.columns) + knockout_features
 
         df_enrichment_knockout_init = []
@@ -379,6 +378,7 @@ class UserPredictionBase:
                     left_on=['game_id', 'stage'],
                     right_on=['alter_game_id', 'match_type'],
                     how='inner').drop(columns=['rn', 'alter_game_id'])
+
         df_final = pd.concat([df_groupstage_final, df_knockout_final])
 
         user_level_fields = ['user_name_id', 'first_name', 'last_name', 'league_name_id', 'nick_name', 'created']
@@ -475,9 +475,9 @@ class UserPredictionBase:
         return x
 
     def user_game_points(self, matches: list = []):
-        data = self.merge_predictions_with_api(matches)
+        data = self.merge_predictions_with_api()
         leagues = list(data[data.user_name_id == self.user_id]['league_name_id'].unique())
-        api_game_router = GetMatchData().game_router2(data)
+        api_game_router = GetMatchData().game_router()
         next_game = api_game_router['next']['data']
         prev_game = api_game_router['prev']['data']
         if len(leagues) > 0:
@@ -552,25 +552,35 @@ class UserPredictionBase:
                                  'home', np.where(x.real_score_home < x.real_score_away,
                                                   'away',
                                                   'draw'))
-        x['is_direction'] = np.where(x.pred_dir == x.real_dir, 1, 0)
-        x['is_boom'] = np.where((x.pred_score_home == x.real_score_home) & (x.pred_score_away == x.real_score_away), 1, 0)
+        x['is_direction'] = np.where((x.is_playoff != '1') &
+                                     (x.pred_dir == x.real_dir), 1, 0)
+
+        x['is_boom'] = np.where((x.is_playoff != '1') &
+                                (x.pred_score_home == x.real_score_home) &
+                                (x.pred_score_away == x.real_score_away), 1, 0)
+
         x['is_knockout_boom'] = np.where((x.is_playoff == '1') &
                                          (x.pred_score_home == x.home_score_90_min) &
                                          (x.pred_score_away == x.away_score_90_min), 1, 0)
+
         x[['home_team', 'away_team']] = x.match_label.str.split('-', n=2, expand=True)
+
         x['knockout_winner'] = np.where(x['knockout_winner'] == 'home',
                                         x['home_team'],
                                         np.where(x['knockout_winner'] == 'away',
                                                  x['away_team'],
                                                  x['knockout_winner']))
+
         x['is_knockout_direction'] = np.where((x.is_playoff == '1') & (x.pred_winner == x.knockout_winner), 1, 0)
-        x['knockout_points'] = np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom == x.knockout_winner),
+
+        x['knockout_points'] = np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom == 1),
                                          4,
                                          np.where((x.is_knockout_direction != 1) & (x.is_knockout_boom == 1),
                                                   3,
                                                   np.where((x.is_knockout_direction == 1) & (x.is_knockout_boom != 1),
                                                             1,
                                                             0)))
+
         x['points'] = np.where(x.is_playoff != '1',
                                np.where(x.is_boom == 1,
                                         3,
@@ -578,22 +588,18 @@ class UserPredictionBase:
                                                  1,
                                                  0)),
                                x['knockout_points'])
+
         x['started'] = np.where(x.game_status != 'Fixture', 1, 0)
         x['is_live'] = np.where(x.game_status == 'live', 1, 0)
-        x['distance'] = (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + \
-                        (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int)))
-        # test section
-        print('-'*200)
-        print(list(x.columns))
-        print(x.values.tolist())
-        print('-' * 200)
+        x['distance'] = (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int)))
+
         d = [
             int(x['started'].sum()), # started games
             int((x['started'] * x['points']).sum()), # total points
-            int((x['started'] * x['is_boom']).sum()), # total booms
-            int((x['started'] * x['is_direction']).sum()), # total directions
+            int(((x['started'] * x['is_boom']) + (x['started'] * x['is_knockout_boom'])).sum()), # total booms
+            int(((x['started'] * x['is_direction']) + (x['started'] * x['is_knockout_direction'])).sum()), # total directions
             round((x['started'] * x['points']).sum()*100/(x['started'] * 3).sum(), 1), # success rate
-            int((x['started'] * x['is_boom'] * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()), # B-goals
+            int((x['started'] * (x['is_boom'] + x['is_knockout_boom']) * (x['pred_score_home'].astype(int) + x['pred_score_away'].astype(int))).sum()), # B-goals
             int((x['is_live'] * x['points']).sum()), # live points
             int(1),
             int((x['started'] * x['distance']).sum())  # total distance
