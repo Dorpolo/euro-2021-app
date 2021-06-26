@@ -1216,7 +1216,7 @@ class GameStats(UserPredictionBase):
 
 
 class CupKnockOut(UserPredictionBase):
-    def __init__(self, user_id, draw_template: dict = CUP_DRAW_BETA, beta: bool = True):
+    def __init__(self, user_id, draw_template: dict = CUP_DRAW, beta: bool = True):
         super().__init__(user_id)
         self.beta = beta
         self.draw_template = draw_template
