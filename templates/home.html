@@ -70,7 +70,7 @@
                                   {% else %}
                                   {% endif %}<br>
                              {% endif %}
-                                  Your Prediction: {{ next_match.user_pred }} {% if next_match.match_winner != 'draw' %}{% else %} ({{ next_match.user_pred_winner }}) {% endif %}<br>
+                                  Your Prediction: {{ next_match.user_pred }}  {% if next_match.user_pred.0 == next_match.user_pred.2 %}  ({{ next_match.user_pred_winner }}) {% else %} {% endif %}<br>
                           </p>
                   {% if show_results %}
                         <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
@@ -122,7 +122,7 @@
                                   {% else %}
                                   {% endif %}<br>
                              {% endif %}
-                                  Your Prediction: {{ prev_match.user_pred }} {% if prev_match.match_winner != 'draw' %}{% else %} ({{ prev_match.user_pred_winner }}) {% endif %}<br>
+                                  Your Prediction: {{ prev_match.user_pred }} {% if prev_match.user_pred.0 == prev_match.user_pred.2 %}  ({{ prev_match.user_pred_winner }}) {% else %} {% endif %}<br>
                           </p>
                              <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                                      <a href="{% url 'my_predictions' %}">

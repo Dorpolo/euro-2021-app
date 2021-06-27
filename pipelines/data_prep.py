@@ -159,7 +159,7 @@ class UserPredictionBase:
         if len(leagues) > 0:
             league_list = [item['league_name_id'] for item in leagues]
             output = True if sum([('Conference League' in item) or
-                                 ('Beta Coffee' in item) for item in league_list]) > 0 else False
+                                  ('Beta Coffee' in item) for item in league_list]) > 0 else False
             return output
         else:
             return None

@@ -751,7 +751,7 @@ class GameStatsView:
         match_router = GetMatchData().game_router()
         match = match_router['next']['data'] if is_next else match_router['prev']['data']
         status = match['match_status']
-        Plot = GameStats(request.user.id, match.match_label[0])
+        Plot = GameStats(request.user.id, match['match_label'])
         real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
         viz = Plot.match_prediction_outputs()
         context = {
