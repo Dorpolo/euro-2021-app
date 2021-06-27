@@ -530,7 +530,6 @@ class UserPredictionBase:
     def home_screen_match_relevant_data(self, data):
         next_match = data['next']['data']
         prev_match = data['prev']['data']
-        print(prev_match)
         user_data = self.user_game_points(matches=[next_match['match_label'], prev_match['match_label']])
         if isinstance(user_data, dict):
             some_league = list(user_data.keys())[0]
@@ -592,7 +591,6 @@ class UserPredictionBase:
 
         x['started'] = np.where(x.game_status != 'Fixture', 1, 0)
         x['is_live'] = np.where(x.game_status == 'live', 1, 0)
-        print(x.dtypes)
         x['distance'] = np.where(x.is_playoff != '1',
                                  (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int))),
                                  (abs(x.home_score_90_min - x.pred_score_home.astype(int))) + (abs(x.away_score_90_min - x.pred_score_away.astype(int))))
@@ -1099,14 +1097,30 @@ class TopPlayerStats(GetMatchData):
     def get_live_winning_users(data, ids: dict, images: dict, match_label: str):
         output = {}
         for key, val in data.items():
-            base_data = [[item[0]] + [*item[7:11]] for item in val if item[3] == match_label]
-            df = pd.DataFrame(base_data, columns=['nick', 'p_h', 'p_a', 'r_h', 'r_a'])
-            df['user_type'] = np.where(((df.p_h == df.r_h) & (df.p_a == df.r_a)), 'boomer',
-                                       np.where(
-                                            ((df.p_h > df.p_a) & (df.r_h > df.r_a)) |
-                                            ((df.p_h == df.p_a) & (df.r_h == df.r_a)) |
-                                            ((df.p_h < df.p_a) & (df.r_h < df.r_a))
-                                            , 'winner', 'Loser'))
+            base_data = []
+            is_playoff = False
+            for item in val:
+                if item[3] == match_label:
+                    if 'Final' not in item[12]:
+                        base_data_row = [item[0]] + [*item[7:11]] + [None, None]
+                    else:
+                        is_playoff = True
+                        home, away = match_label.split('-')
+                        real_winner = home if item[15] == 'home' else away if item[15] == 'away' else item[16]
+                        base_data_row = [item[0], item[7], item[8], item[17], item[18], item[14] ,real_winner]
+                    base_data.append(base_data_row)
+            df = pd.DataFrame(base_data, columns=['nick', 'p_h', 'p_a', 'r_h', 'r_a', 'pred_winner', 'real_winner'])
+            if is_playoff:
+                df['user_type'] = np.where(((df.p_h == df.r_h) & (df.p_a == df.r_a)),
+                                           'boomer',
+                                           np.where(df.pred_winner == df.real_winner, 'winner', 'Loser'))
+            else:
+                df['user_type'] = np.where(((df.p_h == df.r_h) & (df.p_a == df.r_a)), 'boomer',
+                                           np.where(
+                                                ((df.p_h > df.p_a) & (df.r_h > df.r_a)) |
+                                                ((df.p_h == df.p_a) & (df.r_h == df.r_a)) |
+                                                ((df.p_h < df.p_a) & (df.r_h < df.r_a))
+                                                , 'winner', 'Loser'))
             adj_img_dict = {}
             relevant_users = [ids[i] for i in list(df[df.user_type != 'Loser']['nick'].unique())]
             for uid in relevant_users:
