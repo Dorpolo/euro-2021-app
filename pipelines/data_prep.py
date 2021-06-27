@@ -592,9 +592,10 @@ class UserPredictionBase:
 
         x['started'] = np.where(x.game_status != 'Fixture', 1, 0)
         x['is_live'] = np.where(x.game_status == 'live', 1, 0)
+        print(x.dtypes)
         x['distance'] = np.where(x.is_playoff != '1',
                                  (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int))),
-                                 (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int))))
+                                 (abs(x.home_score_90_min - x.pred_score_home.astype(int))) + (abs(x.away_score_90_min - x.pred_score_away.astype(int))))
 
         d = [
             int(x['started'].sum()), # started games
@@ -1246,7 +1247,7 @@ class GameStats(UserPredictionBase):
 
 
 class CupKnockOut(UserPredictionBase):
-    def __init__(self, user_id, beta: bool = False):
+    def __init__(self, user_id, beta: bool = True):
         super().__init__(user_id)
         self.beta = beta
         self.draw_template = CUP_DRAW if not self.beta else CUP_DRAW_BETA
@@ -1303,7 +1304,16 @@ class CupKnockOut(UserPredictionBase):
         player_a = [data[i] for i in range(len(data)) if i % 2 != 0]
         player_b = [data[i] for i in range(len(data)) if i % 2 == 0]
         merged = [[a[0], a[2], a[4], a[1], a[3], a[5], b[0], b[2], b[4], a[6]] for a, b in zip(player_a, player_b)]
-        return [[f"{i[1]} ({i[2]})", f"{i[3]}", f"{i[4]} ({i[5]})", f"{i[7]} ({i[8]})", i[9]] for i in merged]
+        context = [{
+              'p1': i[0],
+              'p1_pred': f"{i[1]} ({i[2]})",
+              'actual_match': f"{i[3]}",
+              'actual_score': f"{i[4]} ({i[5]})" if i[9] != 'Fixture' else f"{i[4]}",
+              'p2': i[6],
+              'p2_pred': f"{i[7]} ({i[8]})",
+              'status': i[9]
+         } for i in merged]
+        return context
 
     def present_match_games_data(self, df):
         df[['home_team', 'away_team']] = df.match_label.str.split('-', n=2, expand=True)
