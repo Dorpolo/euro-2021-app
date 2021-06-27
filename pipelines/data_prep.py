@@ -530,6 +530,7 @@ class UserPredictionBase:
     def home_screen_match_relevant_data(self, data):
         next_match = data['next']['data']
         prev_match = data['prev']['data']
+        print(prev_match)
         user_data = self.user_game_points(matches=[next_match['match_label'], prev_match['match_label']])
         if isinstance(user_data, dict):
             some_league = list(user_data.keys())[0]

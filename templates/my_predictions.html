@@ -68,19 +68,19 @@
                                       <td style="color: darkgray">{{ item.1 }}</td>
                                       <td style="color: darkgray">{{ item.2 }}</td>
                                       <td style="color: darkgray">{{ item.3 }}</td>
-                                      <td style="color: darkgray">{{ item.4 }} ({{ item.14 }})</td>
+                                      <td style="color: darkgray">{{ item.4 }} {% if 'Final' in item.12 %}({{ item.14 }}) {% endif %}</td>
                                   <td style="color: darkgray">{{ item.17 }}-{{ item.18 }}</td>
                                       <td style="color: darkgray">{{ item.19 }}-{{ item.20 }}</td>
-                                      <td style="color: darkgray">{{ item.15 }}</td>
+                                      <td style="color: darkgray">{% if 'Final' in item.12 %} {{ item.15 }} {% endif %}</td>
                                       <td style="color: darkgray">{{ item.6 }}</td>
                               {% else %}
                                       <td>{{ item.1 }}</td>
                                       <td>{{ item.2 }}</td>
                                       <td>{{ item.3 }}</td>
-                                      <td>{{ item.4 }} ({{ item.14 }})</td>
+                                      <td>{{ item.4 }} {% if 'Final' in item.12 %}({{ item.14 }}) {% endif %}</td>
                                   <td>{{ item.17 }}-{{ item.18 }}</td>
                                       <td>{{ item.19 }}-{{ item.20 }}</td>
-                                      <td>{{ item.15 }}</td>
+                                      <td>{% if 'Final' in item.12 %} {{ item.15 }} {% endif %}</td>
                                       <td>{{ item.6 }}</td>
                                   </tr>
                               {% endif %}

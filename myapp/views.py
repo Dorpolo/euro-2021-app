@@ -605,6 +605,14 @@ class AllPredictionsView(TemplateView):
             UserPrediction = UserPredictionBase(request.user.id)
             get_league_data = UserPrediction.present_predictions()
             league_data_output = get_league_data[0]
+            for league_data in league_data_output.values():
+                for row in league_data:
+                    home, away = row[3].split('-')
+                    winner_label = '' if row[6] == 'Fixture' else home if row[15] == 'home' else away if row[15] == 'away' else 'Draw'
+                    row[15] = winner_label
+                    if 'Final' not in row[12]:
+                        row[17], row[19] = row[9], row[9]
+                        row[18], row[20] = row[10], row[10]
             league_table_output = UserPrediction.league_member_points()
         else:
             league_data_output = None
@@ -630,6 +638,13 @@ class MyPredictionsView(TemplateView):
         if request.user.is_authenticated:
             UserPred = UserPredictionBase(request.user.id)
             get_my_predictions = UserPred.present_my_predictions()
+            for row in get_my_predictions[0]:
+                home, away = row[3].split('-')
+                winner_label = '' if row[6] == 'Fixture' else home if row[15] == 'home' else away if row[15] == 'away' else 'Draw'
+                row[15] = winner_label
+                if 'Final' not in row[12]:
+                    row[17], row[19] = row[9], row[9]
+                    row[18], row[20] = row[10], row[10]
             get_my_players = UserPred.get_top_players_my_predictions()
         else:
             get_my_predictions = None
