@@ -8,7 +8,7 @@
     <hr>
         <center>
       <div>
-          <img src="/media/images/profile/marco_van_basten.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 100%;">
+          <img src="/media/images/profile/beckebnauer.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 100%;">
       </div>
         </center>
     <hr>
@@ -216,6 +216,16 @@
           </div>
           <hr>
       {% endif %}
+          {% if committed_a_bet %}
+          <h3>Second Thoughts?</h3>
+              <li>Edit your league profile:
+            <ul>
+              {% for key, obj in league_memberships.items %}
+                  <li><a href= {% url 'update_league_member' obj %}>{{ key }}</a></li>
+              {% endfor %}
+            </ul>
+          <hr>
+    {% endif %}
           <h3>Onboarding Check List</h3>
               {% if league_signup %}
                   <p style="color:darkgreen;">
@@ -269,18 +279,6 @@
               {% endif %}
       </div>
       <hr>
-    {% if committed_a_bet %}
-          <h3>Second Thoughts?</h3>
-              <li>Edit your league profile:
-            <ul>
-              {% for key, obj in league_memberships.items %}
-                  <li><a href= {% url 'update_league_member' obj %}>{{ key }}</a></li>
-              {% endfor %}
-            </ul>
-          <hr>
-    {% endif %}
-
-
         <style>
         .styled-table {
             border-collapse: collapse;
@@ -292,7 +290,7 @@
         }
 
         .styled-table thead tr {
-            background-color: #DE3163;
+            background-color: #090f18;
             color: #ffffff;
             text-align: left;
         }
@@ -315,7 +313,7 @@
         }
 
         .styled-table tbody tr:first-of-type {
-            border-bottom: 1px solid #DE3163;
+            border-bottom: 1px solid #343130;
         }
 
         .styled-table tbody tr.active-row {
@@ -339,7 +337,6 @@
 
     {% if league_signup %}
             <h3>League Members</h3>
-            <p> The following users have been already signed up to your league: <p/>
               {% for key, obj in league_members.items %}
                   <p>{{ key }}</p>
                   <hr>
