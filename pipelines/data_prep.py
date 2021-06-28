@@ -563,8 +563,8 @@ class UserPredictionBase:
         # x['pred_score_away'] = x['pred_score_away'].astype(float)
 
         x['is_knockout_boom'] = np.where((x.is_playoff == '1') &
-                                         (x.pred_score_home == x.home_score_90_min) &
-                                         (x.pred_score_away == x.away_score_90_min), 1, 0)
+                                         (x.pred_score_home.astype(int) == x.home_score_90_min) &
+                                         (x.pred_score_away.astype(int) == x.away_score_90_min), 1, 0)
 
         x[['home_team', 'away_team']] = x.match_label.str.split('-', n=2, expand=True)
 
