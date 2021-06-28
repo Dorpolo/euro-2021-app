@@ -4,6 +4,7 @@ import environ
 import os
 from pathlib import Path
 from data.teams import teams, teams_mock
+from datetime import datetime
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(SECRET_KEY=str,)
@@ -125,6 +126,20 @@ KNOCK_OUT_MATCHES_BETA = GetAPI.get_knockout_matches(beta_mode=True)
 KNOCK_OUT_LOGOS = GetAPI.get_knockout_team(beta_mode=False)
 KNOCK_OUT_LOGOS_BETA = GetAPI.get_knockout_team(beta_mode=True)
 TEAM_GAME_MAP = GetAPI.get_team_game_map()
+
+def date_validation(dt: str) -> bool:
+    past = datetime.strptime(dt, "%d/%m/%Y")
+    present = datetime.now()
+    return past.date() <= present.date()
+
+
+KNOCKOUT_META = {
+    '1/8 Final': KNOCK_OUT_MATCHES['1/8 Final'],
+    '1/4 Final': KNOCK_OUT_MATCHES['1/4 Final'] if date_validation('30/06/2021') else KNOCK_OUT_MATCHES_BETA['1/4 Final'],
+    '1/2 Final': KNOCK_OUT_MATCHES['1/2 Final'] if date_validation('04/07/2021') else KNOCK_OUT_MATCHES_BETA['1/2 Final'],
+    'Final': KNOCK_OUT_MATCHES['Final'] if date_validation('08/07/2021') else KNOCK_OUT_MATCHES_BETA['Final'],
+    }
+
 
 TOP_16 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/8 Final'].values()][0:8])
 TOP_8 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['1/4 Final'].values()][0:4])

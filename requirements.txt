@@ -41,3 +41,4 @@ django_filter
 plotly
 django-storages
 django_plotly_dash
+datetime

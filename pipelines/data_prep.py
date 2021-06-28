@@ -559,6 +559,9 @@ class UserPredictionBase:
                                 (x.pred_score_home == x.real_score_home) &
                                 (x.pred_score_away == x.real_score_away), 1, 0)
 
+        x['pred_score_home'] = x['pred_score_home'].astype(float)
+        x['pred_score_away'] = x['pred_score_away'].astype(float)
+
         x['is_knockout_boom'] = np.where((x.is_playoff == '1') &
                                          (x.pred_score_home == x.home_score_90_min) &
                                          (x.pred_score_away == x.away_score_90_min), 1, 0)
