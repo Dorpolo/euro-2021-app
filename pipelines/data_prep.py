@@ -559,8 +559,8 @@ class UserPredictionBase:
                                 (x.pred_score_home == x.real_score_home) &
                                 (x.pred_score_away == x.real_score_away), 1, 0)
 
-        x['pred_score_home'] = x['pred_score_home'].astype(float)
-        x['pred_score_away'] = x['pred_score_away'].astype(float)
+        # x['pred_score_home'] = x['pred_score_home'].astype(float)
+        # x['pred_score_away'] = x['pred_score_away'].astype(float)
 
         x['is_knockout_boom'] = np.where((x.is_playoff == '1') &
                                          (x.pred_score_home == x.home_score_90_min) &
@@ -597,6 +597,7 @@ class UserPredictionBase:
         x['distance'] = np.where(x.is_playoff != '1',
                                  (abs(x.real_score_home.astype(int) - x.pred_score_home.astype(int))) + (abs(x.real_score_away.astype(int) - x.pred_score_away.astype(int))),
                                  (abs(x.home_score_90_min - x.pred_score_home.astype(int))) + (abs(x.away_score_90_min - x.pred_score_away.astype(int))))
+
 
         d = [
             int(x['started'].sum()), # started games
