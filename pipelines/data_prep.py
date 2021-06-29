@@ -559,9 +559,6 @@ class UserPredictionBase:
                                 (x.pred_score_home == x.real_score_home) &
                                 (x.pred_score_away == x.real_score_away), 1, 0)
 
-        # x['pred_score_home'] = x['pred_score_home'].astype(float)
-        # x['pred_score_away'] = x['pred_score_away'].astype(float)
-
         x['is_knockout_boom'] = np.where((x.is_playoff == '1') &
                                          (x.pred_score_home.astype(int) == x.home_score_90_min) &
                                          (x.pred_score_away.astype(int) == x.away_score_90_min), 1, 0)
@@ -769,10 +766,11 @@ class GetMatchData:
         penalties = False
         if 'stages' in data.keys():
             if data['stages']:
-                if data['stages'][0]['stageID'] == '4':
-                    penalties = True
+                if len(data['stages']) > 1:
+                    if data['stages'][1]['home_score'] is not None:
+                        penalties = True
         if penalties:
-            stage_score = data['stages'][0]
+            stage_score = data['stages'][1]
             game_winner = 'home' if int(stage_score['home_score']) > int(stage_score['away_score']) \
                 else 'away' if int(stage_score['home_score']) < int(stage_score['away_score']) else 'draw'
         else:
