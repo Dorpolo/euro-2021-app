@@ -766,11 +766,13 @@ class GetMatchData:
         penalties = False
         if 'stages' in data.keys():
             if data['stages']:
-                if len(data['stages']) > 1:
-                    if data['stages'][1]['home_score'] is not None:
+                stage_types = [i[1] for i in [list(item.values()) for item in data['stages']]]
+                if 'Penalty Shootout' in stage_types:
+                    loc = stage_types.index('Penalty Shootout')
+                    if data['stages'][loc]['home_score'] is not None:
                         penalties = True
         if penalties:
-            stage_score = data['stages'][1]
+            stage_score = data['stages'][loc]
             game_winner = 'home' if int(stage_score['home_score']) > int(stage_score['away_score']) \
                 else 'away' if int(stage_score['home_score']) < int(stage_score['away_score']) else 'draw'
         else:
