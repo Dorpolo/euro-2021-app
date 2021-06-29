@@ -30,7 +30,7 @@ class HomeView(TemplateView):
             home_page_context = self.GetAPIData.game_router()
             if league_data_output is not None:
                 context = {
-                    'show_results': True,  # TODO - change to True once bet window ends
+                    'show_results': False,  # TODO - change to True once bet window ends
                     'league_members': league_data_output,
                     'league_signup': onboarding['league'],
                     'committed_a_bet': onboarding['bet'],
@@ -53,12 +53,26 @@ class HomeView(TemplateView):
                     context['games_started'] = home_page_context['started_games']
                     context['bet_id'] = UserPred.user_game_bet_id('group')
                     context['bet_id_knockout'] = UserPred.user_game_bet_id('top_16')
+                    context['bet_id_knockout_8'] = UserPred.user_game_bet_id('top_8')
                 return render(request, self.template_name, context)
             else:
                 return render(request, self.template_name, {'data': None})
         else:
             return render(request, self.template_name, {'data': None})
 
+
+class PerfectHomeView(TemplateView):
+    template_name = "perfect_home.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            UserLevel = UserCreds(request.user.id).get_user_profile()
+            context = {
+                'user': UserLevel
+            }
+            return render(request, self.template_name, {'data': context})
+        else:
+            return render(request, self.template_name, {'data': None})
 
 class CupView(TemplateView):
     template_name = "the_cup.html"
@@ -351,7 +365,7 @@ class AddBetsTop8View(TemplateView):
         form = BetFormTop8()
         context = {
             'form': form,
-            'logos': KNOCK_OUT_LOGOS_BETA['1/4 Final']
+            'logos': KNOCK_OUT_LOGOS['1/4 Final']
         }
         return render(request, self.template_name, context)
 

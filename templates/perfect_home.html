@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+  <body style="background-color: whitesmoke;">
+        <h2> {{ user.username }}'s Fan Zone</h2>
+    <hr>
+        <center>
+      <div>
+          <img src="/media/images/profile/beckebnauer.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 100%;">
+      </div>
+        </center>
+    <hr>
+
+    {% if committed_a_bet %}
+
+         <div>
+        <body>
+             <style>
+                img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
+                p.liketext { display:inline }
+            </style>
+        <center>
+
+    {% endif %}
+        {% endif %}
+
+{% endblock %}

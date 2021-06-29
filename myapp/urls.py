@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.HomeView().get, name='home'),
+    path('home/', views.PerfectHomeView().get, name='better_home'),
     path('add-your-prediction-group-stage/', views.AddBetsView.as_view(), name='add_your_bet'),
     path('add-your-prediction-group-stage/edit/<int:pk>', views.UpdateBetView.as_view(), name='update_your_bet'),
     path('add-your-prediction-group-stage-3-round/edit/<int:pk>', views.UpdateBetViewThirdRound.as_view(), name='update_your_bet_3_tound'),

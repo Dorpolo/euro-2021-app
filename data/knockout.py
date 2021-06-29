@@ -142,7 +142,7 @@ KNOCKOUT_META = {
 
 
 TOP_16 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/8 Final'].values()][0:8])
-TOP_8 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['1/4 Final'].values()][0:4])
+TOP_8 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/4 Final'].values()][0:4])
 TOP_4 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['1/2 Final'].values()][0:2])
 TOP_2 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['Final'].values()][0:1])
 
@@ -233,10 +233,22 @@ CUP_DRAW = {
     '1/4 Final': {
         'status': 'fixture',
         'data': {
-            'Match I': None,
-            'Match II': None,
-            'Match III': None,
-            'Match IV': None,
+            'Match I': {
+                'home': {'user_id': 28},
+                'away': {'user_id': 20},
+            },
+            'Match II': {
+                'home': {'user_id': 176},
+                'away': {'user_id': 94},
+            },
+            'Match III': {
+                'home': {'user_id': 133},
+                'away': {'user_id': 14},
+            },
+            'Match IV': {
+                'home': {'user_id': 18},
+                'away': {'user_id': 52},
+            },
             }
         },
     '1/2 Final': {
