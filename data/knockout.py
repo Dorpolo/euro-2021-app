@@ -231,7 +231,7 @@ CUP_DRAW = {
         }
     },
     '1/4 Final': {
-        'status': 'fixture',
+        'status': 'next',
         'data': {
             'Match I': {
                 'home': {'user_id': 28},

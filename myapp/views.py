@@ -396,7 +396,7 @@ class AddBetsTop8View(TemplateView):
                 league_user_email = [LeagueMember.objects.filter(user_name_id=request.user.id)[0].email]
                 if league_user_email[0] != env('EMAIL_HOST_USER'):
                     league_user_email.append(env('EMAIL_HOST_USER'))
-                email_data = MailTemplate().knockout_bet_submission(request, form, '1/8 Final')
+                email_data = MailTemplate().knockout_bet_submission(request, form, '1/4 Final')
                 send_mail(
                     email_data['subject'],
                     email_data['message'],
