@@ -66,13 +66,14 @@ class PerfectHomeView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            UserLevel = UserCreds(request.user.id).get_user_profile()
+            data = DataPrepHomePage(request.user.id).show_data()
             context = {
-                'user': UserLevel
+                'user': None
             }
             return render(request, self.template_name, {'data': context})
         else:
             return render(request, self.template_name, {'data': None})
+
 
 class CupView(TemplateView):
     template_name = "the_cup.html"
