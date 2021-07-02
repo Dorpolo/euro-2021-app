@@ -747,39 +747,31 @@ class LiveGameView:
 
 class GameStatsView:
     def next(request):
-        is_next = True
-        match_router = GetMatchData().game_router()
-        match = match_router['next']['data'] if is_next else match_router['prev']['data']
-        status = match['match_status']
-        Plot = GameStats(request.user.id, match['match_label'])
-        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
-        viz = Plot.match_prediction_outputs()
+        PlotInit = PlotBuilder(request.user.id, match_type='next')
+        viz = PlotInit.main()
+        metadata = PlotInit.game_meta
         context = {
             'plot_next_match': viz,
-            'title': match['match_label'],
-            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
-            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
-            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
+            'title': metadata['match_label'],
+            'real_score': f"{int(metadata['home_score_90_min'])}-{int(metadata['away_score_90_min'])} ({metadata['match_winner']})",
+            'logos': {'home': teams[metadata['home_team']]['logo'], 'away': teams[metadata['away_team']]['logo']},
+            'status': 'Fixture' if metadata['match_status'] == '0' else 'Live' if metadata['match_status'] == '-1' else 'Finished',
         }
-        template = 'stats_next_game.html' if is_next else 'stats_prev_game.html'
+        template = 'stats_next_game.html' if PlotInit.match_type == 'next' else 'stats_prev_game.html'
         return render(request, template, context)
 
     def prev(request):
-        is_next = False
-        match_router = GetMatchData().game_router()
-        match = match_router['next']['data'] if is_next else match_router['prev']['data']
-        status = match['match_status']
-        Plot = GameStats(request.user.id, match['match_label'])
-        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
-        viz = Plot.match_prediction_outputs()
+        PlotInit = PlotBuilder(request.user.id, match_type='prev')
+        viz = PlotInit.main()
+        metadata = PlotInit.game_meta
         context = {
             'plot_next_match': viz,
-            'title': match['match_label'],
-            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
-            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
-            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
+            'title': metadata['match_label'],
+            'real_score': f"{int(metadata['home_score_90_min'])}-{int(metadata['away_score_90_min'])} ({metadata['match_winner']})",
+            'logos': {'home': teams[metadata['home_team']]['logo'], 'away': teams[metadata['away_team']]['logo']},
+            'status': 'Fixture' if metadata['match_status'] == '0' else 'Live' if metadata['match_status'] == '-1' else 'Finished',
         }
-        template = 'stats_next_game.html' if is_next else 'stats_prev_game.html'
+        template = 'stats_next_game.html' if PlotInit.match_type == 'next' else 'stats_prev_game.html'
         return render(request, template, context)
 
 

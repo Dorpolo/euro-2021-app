@@ -537,6 +537,98 @@ class UserPoints:
         return points
 
 
+class PlotBuilder(UserCreds):
+    def __init__(self, user_id, match_type='prev'):
+        super().__init__(user_id)
+        self.profile = self.get_user_profile()
+        self.UserPred = UserPrediction(self.profile)
+        self.df_games = RealScores().all_matches()
+        self.player_stats = RealScores().top_players()
+        self.player_selection = self.UserPred.top_players_selection()
+        self.UserPoints = UserPoints(self.UserPred.prepare_user_prediction(), self.df_games, self.player_stats, self.player_selection)
+        self.match_type = match_type
+        self.game_meta = None
+
+    def match_prediction_df(self):
+        input_data = self.UserPoints.merged_data_games()
+        output = {}
+        if input_data is not None:
+            df_meta = list(input_data.values())[0]
+            self.game_meta = df_meta.loc[df_meta.match_view_type == self.match_type].to_dict(orient='records')[0]
+            for key, val in input_data.items():
+                df = pd.DataFrame(val)
+                df = df.loc[df.match_view_type == self.match_type]
+                df['predicted_score_alternative'] = np.where(df['pred_winner'] == df.away_team,
+                                                             df['pred_score_away'] + '-' + df['pred_score_home'],
+                                                             df['predicted_score'])
+                df_scores = pd.DataFrame(
+                    df.groupby(['predicted_score_alternative', 'pred_winner'])['match_status'].count()).reset_index(). \
+                    rename(columns={
+                            'match_status': 'count',
+                            'predicted_score_alternative': 'score',
+                            'pred_winner': 'winner'
+                    }).merge(vis.SCORE_MAP_DF, on='score', how='inner')
+                df_fig = df_scores.sort_values(by=['score_rank', 'winner'])
+                output[key] = df_fig
+            return output
+        else:
+            return None
+
+    def match_winner_df(self):
+        input_data = self.UserPoints.merged_data_games()
+        output = {}
+        if input_data is not None:
+            for key, val in input_data.items():
+                df = pd.DataFrame(val)
+                df = df[df.match_view_type == self.match_type]
+                df_winner = pd.DataFrame(df.groupby(['pred_winner'])['match_status'].count()). \
+                    reset_index().rename(columns={
+                                    'match_status': 'count',
+                                    'pred_winner': 'winner'
+                                  })
+                output[key] = df_winner
+            return output
+        else:
+            return None
+
+    @staticmethod
+    def match_prediction_plot(data):
+        fig = px.bar(
+            data,
+            x='score', y='count', color="winner", template='simple_white', text='count',
+            title="Score Distribution", labels={"score": "Score", "count": "Prediction Count", "winner": ""})
+        fig.update_traces(textposition='inside')
+        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT, )
+        div = opy.plot(fig, auto_open=False, output_type='div')
+        return div
+
+    @staticmethod
+    def match_winner_plot(data):
+        fig = px.pie(data, values='count', names='winner', title='Predicted Winner')
+        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT, )
+        div = opy.plot(fig, auto_open=False, output_type='div')
+        return div
+
+    @staticmethod
+    def merge_dicts(a: dict, b: dict):
+        new_output = {}
+        for i, j in zip(a.items(), b.items()):
+            if i[0] == j[0]:
+                new_output[i[0]] = [i[1], j[1]]
+        return new_output
+
+    def main(self):
+        dict_score = self.match_prediction_df()
+        dict_winner = self.match_winner_df()
+        if dict_score is not None:
+            output_score = {key: self.match_prediction_plot(data) for key, data in dict_score.items()}
+            output_winner = {key: self.match_winner_plot(data) for key, data in dict_winner.items()}
+            return self.merge_dicts(output_score, output_winner)
+        else:
+            return None
+
+
+
 class UserPredictionBase:
     def __init__(self, user_id):
         self.TOKEN = env('API_TOKEN')
@@ -1169,6 +1261,112 @@ class UserPredictionBase:
         return output
 
 
+class GameStats(UserPredictionBase):
+    def __init__(self, user_id, match_label):
+        super().__init__(user_id)
+        self.match_label = match_label
+
+    def match_prediction_df(self):
+        df_input = self.present_predictions()
+        output = {}
+        if df_input[0] is not None:
+            for key, obj in df_input[0].items():
+                df = pd.DataFrame(obj)
+                df.columns = df_input[1]
+                df = df[df.match_label == self.match_label]
+                df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
+                df['pred_dir'] = np.where(df.pred_score_home > df.pred_score_away,
+                                          df.home_team,
+                                          np.where(df.pred_score_home < df.pred_score_away, df.away_team, 'Draw'))
+                df['predicted_score_alternative'] = np.where(df['pred_dir'] == df.away_team,
+                                                             df['pred_score_away'] + '-' + df['pred_score_home'],
+                                                             df['predicted_score'])
+                df_scores = pd.DataFrame(
+                    df.groupby(['predicted_score_alternative', 'pred_dir'])['game_status'].count()).reset_index(). \
+                    rename(columns={
+                    'game_status': 'count',
+                    'predicted_score_alternative': 'score',
+                    'pred_dir': 'winner'
+                }).merge(vis.SCORE_MAP_DF, on='score', how='inner')
+                df_fig = df_scores.sort_values(by=['score_rank', 'winner'])
+                output[key] = df_fig
+            return output
+        else:
+            return None
+
+    def match_winner_df(self):
+        df_input = self.present_predictions()
+        output = {}
+        if df_input[0] is not None:
+            for key, obj in df_input[0].items():
+                df = pd.DataFrame(obj)
+                df.columns = df_input[1]
+                df = df[df.match_label == self.match_label]
+                df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
+                df['pred_dir'] = np.where(df.pred_score_home > df.pred_score_away,
+                                          df.home_team,
+                                          np.where(df.pred_score_home < df.pred_score_away, df.away_team, 'Draw'))
+                df_winner = pd.DataFrame(df.groupby(['pred_winner'])['game_status'].count()). \
+                    reset_index().rename(columns={
+                    'game_status': 'count',
+                    'pred_winner': 'winner'
+                })
+                df_winner_output = df_winner
+                output[key] = df_winner_output
+            return output
+        else:
+            return None
+
+    def match_live_game(self):
+        df_input = self.present_predictions()
+        output = {}
+        if df_input[0] is not None:
+            for key, obj in df_input[0].items():
+                df = pd.DataFrame(obj)
+                df.columns = df_input[1]
+                df = df[df.match_label == self.match_label]
+                df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
+                output[key] = df
+            return output
+        else:
+            return None
+
+    @staticmethod
+    def match_prediction_plot(data):
+        fig = px.bar(
+            data,
+            x='score', y='count', color="winner", template='simple_white', text='count',
+            title="Score Distribution", labels={"score": "Score", "count": "Prediction Count", "winner": ""})
+        fig.update_traces(textposition='inside')
+        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT, )
+        div = opy.plot(fig, auto_open=False, output_type='div')
+        return div
+
+    @staticmethod
+    def match_winner_plot(data):
+        fig = px.pie(data, values='count', names='winner', title='Predicted Winner')
+        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT, )
+        div = opy.plot(fig, auto_open=False, output_type='div')
+        return div
+
+    @staticmethod
+    def merge_dicts(a: dict, b: dict):
+        new_output = {}
+        for i, j in zip(a.items(), b.items()):
+            if i[0] == j[0]:
+                new_output[i[0]] = [i[1], j[1]]
+        return new_output
+
+    def match_prediction_outputs(self):
+        dict_score = self.match_prediction_df()
+        dict_winner = self.match_winner_df()
+        if dict_score is not None:
+            output_score = {key: self.match_prediction_plot(data) for key, data in dict_score.items()}
+            output_winner = {key: self.match_winner_plot(data) for key, data in dict_winner.items()}
+            return self.merge_dicts(output_score, output_winner)
+        else:
+            return None
+
 class MailTemplate:
     def group_stage_bet_submission(self, request, form) -> dict:
         home, away, results, top_players = [], [], [], {}
@@ -1704,112 +1902,7 @@ class TopPlayerStats(GetMatchData):
         return output, self.get_live_winning_users(data, user_id_map, user_image, match_label)
 
 
-class GameStats(UserPredictionBase):
-    def __init__(self, user_id, match_label):
-        super().__init__(user_id)
-        self.match_label = match_label
 
-    def match_prediction_df(self):
-        df_input = self.present_predictions()
-        output = {}
-        if df_input[0] is not None:
-            for key, obj in df_input[0].items():
-                df = pd.DataFrame(obj)
-                df.columns = df_input[1]
-                df = df[df.match_label == self.match_label]
-                df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
-                df['pred_dir'] = np.where(df.pred_score_home > df.pred_score_away,
-                                          df.home_team,
-                                          np.where(df.pred_score_home < df.pred_score_away, df.away_team, 'Draw'))
-                df['predicted_score_alternative'] = np.where(df['pred_dir'] == df.away_team,
-                                                             df['pred_score_away'] + '-' + df['pred_score_home'],
-                                                             df['predicted_score'])
-                df_scores = pd.DataFrame(
-                    df.groupby(['predicted_score_alternative', 'pred_dir'])['game_status'].count()).reset_index(). \
-                    rename(columns={
-                    'game_status': 'count',
-                    'predicted_score_alternative': 'score',
-                    'pred_dir': 'winner'
-                }).merge(vis.SCORE_MAP_DF, on='score', how='inner')
-                df_fig = df_scores.sort_values(by=['score_rank', 'winner'])
-                output[key] = df_fig
-            return output
-        else:
-            return None
-
-    def match_winner_df(self):
-        df_input = self.present_predictions()
-        output = {}
-        if df_input[0] is not None:
-            for key, obj in df_input[0].items():
-                df = pd.DataFrame(obj)
-                df.columns = df_input[1]
-                df = df[df.match_label == self.match_label]
-                df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
-                df['pred_dir'] = np.where(df.pred_score_home > df.pred_score_away,
-                                          df.home_team,
-                                          np.where(df.pred_score_home < df.pred_score_away, df.away_team, 'Draw'))
-                df_winner = pd.DataFrame(df.groupby(['pred_winner'])['game_status'].count()). \
-                    reset_index().rename(columns={
-                    'game_status': 'count',
-                    'pred_winner': 'winner'
-                })
-                df_winner_output = df_winner
-                output[key] = df_winner_output
-            return output
-        else:
-            return None
-
-    def match_live_game(self):
-        df_input = self.present_predictions()
-        output = {}
-        if df_input[0] is not None:
-            for key, obj in df_input[0].items():
-                df = pd.DataFrame(obj)
-                df.columns = df_input[1]
-                df = df[df.match_label == self.match_label]
-                df[['home_team', 'away_team']] = df.match_label.str.split('-', expand=True, n=1)[[0, 1]]
-                output[key] = df
-
-            return output
-        else:
-            return None
-
-    @staticmethod
-    def match_prediction_plot(data):
-        fig = px.bar(
-            data,
-            x='score', y='count', color="winner", template='simple_white', text='count',
-            title="Score Distribution", labels={"score": "Score", "count": "Prediction Count", "winner": ""})
-        fig.update_traces(textposition='inside')
-        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT, )
-        div = opy.plot(fig, auto_open=False, output_type='div')
-        return div
-
-    @staticmethod
-    def match_winner_plot(data):
-        fig = px.pie(data, values='count', names='winner', title='Predicted Winner')
-        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT, )
-        div = opy.plot(fig, auto_open=False, output_type='div')
-        return div
-
-    @staticmethod
-    def merge_dicts(a: dict, b: dict):
-        new_output = {}
-        for i, j in zip(a.items(), b.items()):
-            if i[0] == j[0]:
-                new_output[i[0]] = [i[1], j[1]]
-        return new_output
-
-    def match_prediction_outputs(self):
-        dict_score = self.match_prediction_df()
-        dict_winner = self.match_winner_df()
-        if dict_score is not None:
-            output_score = {key: self.match_prediction_plot(data) for key, data in dict_score.items()}
-            output_winner = {key: self.match_winner_plot(data) for key, data in dict_winner.items()}
-            return self.merge_dicts(output_score, output_winner)
-        else:
-            return None
 
 
 class CupKnockOut(UserPredictionBase):
