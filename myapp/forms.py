@@ -291,7 +291,7 @@ class BetFormTop8(forms.ModelForm):
         }
 
     def more_data(self):
-        data = KNOCK_OUT_LOGOS_BETA['1/4 Final']
+        data = KNOCK_OUT_LOGOS['1/4 Final']
         return data
 
 

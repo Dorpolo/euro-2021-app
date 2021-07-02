@@ -8,22 +8,279 @@
     <hr>
         <center>
       <div>
-          <img src="/media/images/profile/beckebnauer.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 100%;">
+          <img src="/media/images/profile/gb.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 100%;">
       </div>
         </center>
-    <hr>
-
-    {% if committed_a_bet %}
-
-         <div>
-        <body>
-             <style>
-                img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
-                p.liketext { display:inline }
-            </style>
-        <center>
-
+            <hr>
+     <center>
+        {% if profile.permissions.bets.groups.placed %}
+                 <div>
+                     <style>
+                        img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
+                        p.liketext { display:inline }
+                    </style>
+                {% if profile.permissions.bets.quarter_final.placed %}
+                        <a href= {% url 'update_bets_quarter' profile.permissions.bets.quarter_final.id %}>
+                            <button type="button" class="btn btn-dark">Edit your Quarter Final predictions</button>
+                        </a>
+                        <hr>
+                                <div class="card" style="width: 17rem;">
+                                     <div class="card-body">
+                                        <h5 class="card-title">
+                                             <img class='likeordislike' src='{{ cards.next.home_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.next.home_team }}</p>
+                                             <img class='likeordislike' src='{{ cards.next.away_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.next.away_team }}</p>
+                                        </h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                             <p style="color:#1C2833;font-size:15px;">
+                                                 {% if cards.next.match_status == '-1' %}
+                                                     Live
+                                                 {% elif cards.next.match_status == '1'%}
+                                                     Finished
+                                                 {% else %}
+                                                    Fixture ({{ cards.next.match_date }}; {{ cards.next.match_hour }} GMT)
+                                                 {% endif %}
+                                             </p>
+                                        </h6>
+                                             <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                                 {% if cards.next.match_status == '0' %}
+                                                 {% else %}
+                                                     Score (90 min): {{ cards.next.home_score_90_min }}-{{ cards.next.away_score_90_min }}
+                                                      {% if  cards.next.home_score_90_min == cards.next.away_score_90_min %}
+                                                          <br>Winning Team:  {{ cards.next.match_winner }}
+                                                      {% else %}
+                                                      {% endif %}<br>
+                                                 {% endif %}
+                                                      Your Prediction: {{ cards.next.predicted_score }}  {% if cards.next.predicted_score.0 == cards.next.predicted_score.2 %}  ({{ cards.next.pred_winner }}) {% else %} {% endif %}<br>
+                                              </p>
+                                    </div>
+                                </div>
+                        <hr>
+                                <div class="card" style="width: 17rem;">
+                                     <div class="card-body">
+                                        <h5 class="card-title">
+                                             <img class='likeordislike' src='{{ cards.prev.home_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.prev.home_team }}</p>
+                                             <img class='likeordislike' src='{{ cards.prev.away_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.prev.away_team }}</p>
+                                        </h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                             <p style="color:#1C2833;font-size:15px;">
+                                                 {% if cards.prev.match_status == '-1' %}
+                                                     Live
+                                                 {% elif cards.prev.match_status == '1'%}
+                                                     Finished
+                                                 {% else %}
+                                                    Fixture ({{ cards.prev.match_date }}; {{ cards.prev.match_hour }} GMT)
+                                                 {% endif %}
+                                             </p>
+                                        </h6>
+                                             <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                                 {% if cards.prev.match_status == '0' %}
+                                                 {% else %}
+                                                     Score (90 min): {{ cards.prev.home_score_90_min }}-{{ cards.prev.away_score_90_min }}
+                                                      {% if  cards.prev.home_score_90_min == cards.prev.away_score_90_min %}
+                                                          <br>Winning Team:  {{ cards.prev.match_winner }}
+                                                      {% else %}
+                                                      {% endif %}<br>
+                                                 {% endif %}
+                                                      Your Prediction: {{ cards.prev.predicted_score }}  {% if cards.prev.predicted_score.0 == cards.prev.predicted_score.2 %}  ({{ cards.next.pred_winner }}) {% else %} {% endif %}<br>
+                                              </p>
+                                    </div>
+                                </div>
+                {% else %}
+                       <a href= {% url 'add_your_bet_quarter' %}>
+                            <button type="button" class="btn btn-warning">Add your Quarter Final predictions</button>
+                        </a>
+                {% endif %}
     {% endif %}
-        {% endif %}
+    </center>
+      <hr>
+    <h5>Quick Access</h5>
+                    <center>
+           <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                    {% if is_cup_user %}
+                    <a href="{% url 'the_cup_knockout' %}">
+                         <button type="button" class="btn btn-dark">Cup</button>
+                     </a>
+                    {% endif %}
+                     <a href="{% url 'my_predictions' %}">
+                         <button type="button" class="btn btn-dark">My Bets</button>
+                     </a>
+              {% if show_results %}
+                    <a href="{% url 'predictions' %}">
+                        <button type="button" class="btn btn-dark">All Bets</button>
+                    </a>
+              {% endif %}
+                     <a href="{% url 'top_players' %}">
+                         <button type="button" class="btn btn-dark">Players</button>
+                     </a>
+            </div>
+                    </center>
+            <hr>
+    {% if profile.permissions.bets.groups.placed %}
+        <div>
+            <h3>League Table  <span style="font-size:14px;">({{ cards.games_played }}/51)</span></h3>
+        {% for key, obj in tables.items %}
+                    <p>{{ key }}</p>
+                  <hr>
+                  <div>
+                      <table class="styled-table" style="width: 100%; height: 100%; text-align: center">
+                            <thead>
+                                <tr style="text-align: center">
+                                    <th>#</th>
+                                    <th>User</th>
+                                    <th>Points</th>
+                                    <th>Booms</th>
+                                    <th>Winners</th>
+                                    <th>Success</th>
+                                    <th>B-Goals</th>
+                                    <th>Extra</th>
+                                </tr>
+                            <thead/>
+                            <tbody>
+                              {% for item in obj %}
+                                  {% if forloop.counter == 1 %}
+                                        <tr class="active-row">
+                                          <th>{{ item.rn }}</th>
+                                          <td>{{ item.nickname }}</td>
+                                          <td>{{ item.points }}</td>
+                                          <td>{{ item.boom }}</td>
+                                          <td>{{ item.direction }}</td>
+                                          <td>{{ item.success_rate }}</td>
+                                          <td>{{ item.predicted_goals }}</td>
+                                          <th>{{ item.extra }}</th>
+                                      </tr>
+                              {% else %}
+                                      <tr>
+                                          <th>{{ item.rn }}</th>
+                                          <td>{{ item.nickname }}</td>
+                                          <td>{{ item.points }}</td>
+                                          <td>{{ item.boom }}</td>
+                                          <td>{{ item.direction }}</td>
+                                          <td>{{ item.success_rate }}</td>
+                                          <td>{{ item.predicted_goals }}</td>
+                                          <th>{{ item.extra }}</th>
+                                      </tr>
+                                  {% endif %}
+                              {% endfor %}
+                            </tbody>
+                      </table>
+                    </div>
+            {% endfor %}
+        </div>
+        <hr>
+    {% endif %}
+      <h6>Edit Your League Profile</h6>
+        <ul>
+          {% for key, val in profile.my_league_member_ids.items %}
+                  <li><a href= {% url 'update_league_member' val %}>{{ key }}</a></li>
+          {% endfor %}
+        </ul>
+      <hr>
+     <h6>Onboarding Check List</h6>
+              {% if profile.permissions.league %}
+                  <p style="color:darkgreen;">
+                      1. Join a league.
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-square" viewBox="0 0 16 16">
+                          <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
+                          <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                      </svg>
+                  <p/>
+              {% else %}
+                 <p style="color:tomato;">
+                     1. Join a league.
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+                      <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                      <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                  </svg>
+              <p/>
+              {% endif %}
+              {% if profile.permissions.bets.groups.placed %}
+                <p style="color:darkgreen;">2. Add your group stage bets.
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-square" viewBox="0 0 16 16">
+                      <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
+                      <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                  </svg><p/>
+              {% else %}
+                 <p style="color:tomato;">2. Add your group stage bets.
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+                      <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                      <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                  </svg><p/>
+              {% endif %}
+                 {% if profile.permissions.image %}
+                  <p style="color:darkgreen;">
+                      3. Upload your image.
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-square" viewBox="0 0 16 16">
+                          <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
+                          <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                      </svg>
+                  <p/>
+              {% else %}
+                 <p style="color:tomato;">
+                     3. Upload your image.
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+                      <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                      <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                  </svg>
+              <p/>
+              {% endif %}
+{% endif %}
 
+<style>
+        .styled-table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.5em;
+            font-family: sans-serif;
+            min-width: 300px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .styled-table thead tr {
+            background-color: #090f18;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 2px 3px;
+        }
+
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 1px solid #090f18;
+        }
+
+        .styled-table tbody tr:first-of-type {
+            border-bottom: 1px solid #343130;
+        }
+
+        .styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: #090f18;
+        }
+
+        .dp-styled-img {
+          height: 35px;
+          width: 35px;
+          border-radius: 50%;
+        }
+
+        .dp2-styled-img {
+          height: 30px;
+          width: 30px;
+          border-radius: 50%;
+        }
+
+      </style>
 {% endblock %}

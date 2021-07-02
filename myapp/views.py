@@ -66,11 +66,15 @@ class PerfectHomeView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            data = DataPrepHomePage(request.user.id).show_data()
+            Data = DataPrepHomePage(request.user.id)
+            print(Data.profile)
             context = {
-                'user': None
+                'profile': Data.profile,
+                'tables': Data.show_league_tables(),
+                'cards': Data.show_game_cards(),
+                'show_results': True
             }
-            return render(request, self.template_name, {'data': context})
+            return render(request, self.template_name, context)
         else:
             return render(request, self.template_name, {'data': None})
 
