@@ -89,7 +89,7 @@
                                                       {% else %}
                                                       {% endif %}<br>
                                                  {% endif %}
-                                                      Your Prediction: {{ cards.prev.predicted_score }}  {% if cards.prev.predicted_score.0 == cards.prev.predicted_score.2 %}  ({{ cards.next.pred_winner }}) {% else %} {% endif %}<br>
+                                                      Your Prediction: {{ cards.prev.predicted_score }}  {% if cards.prev.predicted_score.0 == cards.prev.predicted_score.2 %}  ({{ cards.prev.pred_winner }}) {% else %} {% endif %}<br>
                                               </p>
                                            <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                                                  <a href="{% url 'my_predictions' %}">
