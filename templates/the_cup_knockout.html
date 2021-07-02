@@ -18,6 +18,7 @@
 
     <div>
     {% for key, val in data.items %}
+        {% if not forloop.first %} <hr> {% endif %}
         <h1 style="color: #4682B4">{{ key }}</h1>
         <hr>
         <center>
