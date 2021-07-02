@@ -92,11 +92,12 @@
                 {% endif %}
     {% endif %}
     </center>
-      <hr>
-    <h5>Quick Access</h5>
+    {% if profile.permissions.bets.groups.placed %}
+        <hr>
+            <h5>Quick Access</h5>
                     <center>
            <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
-                    {% if is_cup_user %}
+                    {% if profile.permissions.views.cup %}
                     <a href="{% url 'the_cup_knockout' %}">
                          <button type="button" class="btn btn-dark">Cup</button>
                      </a>
@@ -115,7 +116,6 @@
             </div>
                     </center>
             <hr>
-    {% if profile.permissions.bets.groups.placed %}
         <div>
             <h3>League Table  <span style="font-size:14px;">({{ cards.games_played }}/51)</span></h3>
         {% for key, obj in tables.items %}
@@ -167,14 +167,15 @@
             {% endfor %}
         </div>
         <hr>
-    {% endif %}
-      <h6>Edit Your League Profile</h6>
+     <h6>Edit Your League Profile</h6>
         <ul>
           {% for key, val in profile.my_league_member_ids.items %}
                   <li><a href= {% url 'update_league_member' val %}>{{ key }}</a></li>
           {% endfor %}
         </ul>
       <hr>
+    {% endif %}
+
      <h6>Onboarding Check List</h6>
               {% if profile.permissions.league %}
                   <p style="color:darkgreen;">

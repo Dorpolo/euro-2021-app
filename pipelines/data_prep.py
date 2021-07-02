@@ -282,27 +282,30 @@ class DataPrepHomePage(UserCreds):
         return output
 
     def show_game_cards(self):
-        df = list(self.UserPoints.merged_data_games().values())[0]
-        data = df.loc[(df.user_name_id == self.user_id) &
-                      (df.match_view_type.isin(['next', 'prev']))][
-                            ['home_team', 'away_team', 'match_status', 'match_date', 'match_hour', 'home_score_90_min',
-                             'away_score_90_min', 'match_winner', 'predicted_score', 'pred_winner', 'match_view_type']
-                            ].to_dict(orient="records")
-        for item in data:
-            item['home_logo'] = teams[item['home_team']]['logo']
-            item['away_logo'] = teams[item['away_team']]['logo']
-        if 'next' in list(df['match_view_type']) and 'prev' in list(df['match_view_type']):
-            context = {
-                'next': [item for item in data if item['match_view_type'] == 'next'][0],
-                'prev': [item for item in data if item['match_view_type'] == 'prev'][0],
-                'games_played': int(df.loc[df.match_started == 1].shape[0]/len(set(list(df.user_name_id))))
-            }
+        if self.profile['permissions']['league']:
+            df = list(self.UserPoints.merged_data_games().values())[0]
+            data = df.loc[(df.user_name_id == self.user_id) &
+                          (df.match_view_type.isin(['next', 'prev']))][
+                                ['home_team', 'away_team', 'match_status', 'match_date', 'match_hour', 'home_score_90_min',
+                                 'away_score_90_min', 'match_winner', 'predicted_score', 'pred_winner', 'match_view_type']
+                                ].to_dict(orient="records")
+            for item in data:
+                item['home_logo'] = teams[item['home_team']]['logo']
+                item['away_logo'] = teams[item['away_team']]['logo']
+            if 'next' in list(df['match_view_type']) and 'prev' in list(df['match_view_type']):
+                context = {
+                    'next': [item for item in data if item['match_view_type'] == 'next'][0],
+                    'prev': [item for item in data if item['match_view_type'] == 'prev'][0],
+                    'games_played': int(df.loc[df.match_started == 1].shape[0]/len(set(list(df.user_name_id))))
+                }
+            else:
+                context = {
+                    'next': None,
+                    'prev': None,
+                    'games_played': int(df.loc[df.match_started == 1].shape[0] / len(set(list(df.user_name_id))))
+                }
         else:
-            context = {
-                'next': None,
-                'prev': None,
-                'games_played': int(df.loc[df.match_started == 1].shape[0] / len(set(list(df.user_name_id))))
-            }
+            context = {'next': None, 'prev': None, 'games_played': None}
         return context
 
 
