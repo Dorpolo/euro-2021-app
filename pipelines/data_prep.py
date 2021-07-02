@@ -28,11 +28,12 @@ class UserCreds(object):
     def get_user_profile(self):
         league_init = list(LeagueMember.objects.filter(user_name_id=self.user_id).values())
         leagues = [i['league_name_id'] for i in league_init] if league_init else None
-        league_members_init = list(LeagueMember.objects.filter(league_name_id__in=leagues).values())
+        if leagues:
+            league_members_init = list(LeagueMember.objects.filter(league_name_id__in=leagues).values())
         league_members = {}
         context = {
             'league_context': None,
-            'league_users': None,
+            'league_users': {},
             'my_league_member_ids': None,
             'permissions': {
                 'league': False,
@@ -103,6 +104,7 @@ class UserCreds(object):
         if G_2:
             context['permissions']['bets']['final']['placed'] = True
             context['permissions']['bets']['final']['id'] = G_2[0]['id']
+        print(context)
         return context
 
 
@@ -289,11 +291,18 @@ class DataPrepHomePage(UserCreds):
         for item in data:
             item['home_logo'] = teams[item['home_team']]['logo']
             item['away_logo'] = teams[item['away_team']]['logo']
-        context = {
-            'next': [item for item in data if item['match_view_type'] == 'next'][0],
-            'prev': [item for item in data if item['match_view_type'] == 'prev'][0],
-            'games_played': int(df.loc[df.match_started == 1].shape[0]/len(set(list(df.user_name_id))))
-        }
+        if 'next' in list(df['match_view_type']) and 'prev' in list(df['match_view_type']):
+            context = {
+                'next': [item for item in data if item['match_view_type'] == 'next'][0],
+                'prev': [item for item in data if item['match_view_type'] == 'prev'][0],
+                'games_played': int(df.loc[df.match_started == 1].shape[0]/len(set(list(df.user_name_id))))
+            }
+        else:
+            context = {
+                'next': None,
+                'prev': None,
+                'games_played': int(df.loc[df.match_started == 1].shape[0] / len(set(list(df.user_name_id))))
+            }
         return context
 
 

@@ -226,6 +226,25 @@
                   </svg>
               <p/>
               {% endif %}
+   {% else %}
+        <div>
+            <h3>Welcome Home Dear Friend!</h3>
+            <h6>Euro 2021 - Friends Zone Platform.</h6>
+            <p>For quick start, the following steps need to be taken:</p>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">1. Register.</li>
+              <li class="list-group-item">2. Login with your user credentials.</li>
+              <li class="list-group-item">3. Get your private league name.</li>
+              <li class="list-group-item">4. Join a league (via the setup tab).</li>
+              <li class="list-group-item">5. Place your group-stage bets.</li>
+            </ul>
+            <br/>
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                <a href="{% url 'register' %}"><button type="button" class="btn btn-danger">Register</button></a>
+                <a href="{% url 'login' %}"><button type="button" class="btn btn-warning">Login</button></a>
+            </div>
+            <p></p>
+        </div>
 {% endif %}
 
 <style>
