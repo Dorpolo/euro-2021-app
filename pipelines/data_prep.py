@@ -56,6 +56,7 @@ class UserCreds(object):
                 context['views']['cup'] = True
             if league_members_init:
                 for league in leagues:
+                    context['permissions']['league'] = True
                     league_members[league] = [{
                         'uid': item['user_name_id'],
                         'member_id': item['id'],
@@ -69,7 +70,6 @@ class UserCreds(object):
                 for member in league_members.values():
                     for sub in member:
                         sub['image'] = default_image if sub['uid'] not in images.keys() else images[sub['uid']]
-
             my_league_member_ids = {}
             for key, val in league_members.items():
                 for i in val:
