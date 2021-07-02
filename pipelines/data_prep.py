@@ -1848,7 +1848,7 @@ class CupKnockOut(UserPredictionBase):
         df = pd.DataFrame(metadata[0][league_name], columns=col_names)
         user_data = self.get_user_data()
         output = {}
-        for stage in ['1/8 Final']:
+        for stage in ['1/8 Final', '1/4 Final']:
             output[stage] = {}
             for key, val in self.draw_template[stage]['data'].items():
                 users = [user_data[item['user_id']]['nick'] for item in val.values()]

@@ -52,6 +52,14 @@
                                                  {% endif %}
                                                       Your Prediction: {{ cards.next.predicted_score }}  {% if cards.next.predicted_score.0 == cards.next.predicted_score.2 %}  ({{ cards.next.pred_winner }}) {% else %} {% endif %}<br>
                                               </p>
+                                        <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                                                 <a href="{% url 'my_predictions' %}">
+                                                     <a href="{% url 'next_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
+                                                 </a>
+                                                <a href="{% url 'predictions' %}">
+                                                   <a href="{% url 'live_next_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
+                                                </a>
+                                        </div>
                                     </div>
                                 </div>
                         <hr>
@@ -83,6 +91,14 @@
                                                  {% endif %}
                                                       Your Prediction: {{ cards.prev.predicted_score }}  {% if cards.prev.predicted_score.0 == cards.prev.predicted_score.2 %}  ({{ cards.next.pred_winner }}) {% else %} {% endif %}<br>
                                               </p>
+                                           <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                                                 <a href="{% url 'my_predictions' %}">
+                                                     <a href="{% url 'prev_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
+                                                 </a>
+                                                <a href="{% url 'predictions' %}">
+                                                   <a href="{% url 'live_prev_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
+                                                </a>
+                                        </div>
                                     </div>
                                 </div>
                 {% else %}
@@ -97,7 +113,7 @@
             <h5>Quick Access</h5>
                     <center>
            <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
-                    {% if profile.permissions.views.cup %}
+                    {% if profile.views.cup %}
                     <a href="{% url 'the_cup_knockout' %}">
                          <button type="button" class="btn btn-dark">Cup</button>
                      </a>
