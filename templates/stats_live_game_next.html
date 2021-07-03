@@ -53,7 +53,7 @@
                      <center>
                          <div>
                             {% for entitled_key, entitled_val in entitled_users.items %}
-                                {% if key == entitled_key %}
+                                {% if entitled_key == key %}
                                     {% for item_key, item_val in entitled_val.items %}
                                         {% if item_val|length > 0 %}
                                             <h6>{{ item_key }}</h6>
@@ -71,7 +71,7 @@
                          </div>
                      </center>
                  </body>
-             <hr>
+            <hr>
         {% endfor %}
          <hr class="bold">
     </body>

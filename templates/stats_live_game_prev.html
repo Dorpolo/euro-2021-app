@@ -51,27 +51,27 @@
                     {{ plot|safe }}
                   {% endautoescape %}
                  <center>
-                     <div>
-                        {% for entitled_key, entitled_val in entitled_users.items %}
-                            {% if key == entitled_key %}
-                                {% for item_key, item_val in entitled_val.items %}
-                                    {% if item_val|length > 0 %}
-                                        <h6>{{ item_key }}</h6>
-                                            {% for subitem_val in item_val %}
-                                                <img class="dp-styled-img" src="{{subitem_val.2}}">
-                                            {% endfor %}
-                                            <br>
-                                    {% endif %}
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                        <hr>
-                        Can't see yourself? <a href={% url 'add_image' %}>upload your photo</a>
-                     </div>
-                 </center>
+                         <div>
+                            {% for entitled_key, entitled_val in entitled_users.items %}
+                                {% if entitled_key == key %}
+                                    {% for item_key, item_val in entitled_val.items %}
+                                        {% if item_val|length > 0 %}
+                                            <h6>{{ item_key }}</h6>
+                                                {% for subitem_val in item_val %}
+                                                    <img class="dp-styled-img" src="{{subitem_val.2}}">
+                                                {% endfor %}
+                                                <br>
+                                        {% endif %}
+                                        <br>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                            <hr>
+                            Can't see yourself? <a href={% url 'add_image' %}>upload your photo</a>
+                         </div>
+                     </center>
              </body>
-         <hr>
+         {% if not forloop.last %} <hr> {% endif %}
     {% endfor %}
      <hr class="bold">
 </body>

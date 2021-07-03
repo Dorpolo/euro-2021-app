@@ -691,15 +691,16 @@ class PlotBuilder(UserCreds):
                      'home_score_90_min': 'r_h',
                      'away_score_90_min': 'r_a',
                      'match_winner': 'real_winner'})
-        df['user_type'] = np.where(((df.p_h == df.r_h) & (df.p_a == df.r_a)),
+        df['user_type'] = np.where(((df.p_h.astype(int) == df.r_h.astype(int)) &
+                                    (df.p_a.astype(int) == df.r_a.astype(int))),
                                    'boomer',
                                    np.where(df.pred_winner == df.real_winner, 'winner', 'Loser'))
         relevant_users = [i for i in list(df[df.user_type != 'Loser']['user_name_id'].unique())]
         images = {j['uid']: j['image'] for j in self.profile['league_context'][league_name] if
                   j['uid'] in relevant_users}
         output = {
-            'Boomers': [[r['nickname'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'boomer'].to_dict(orient='records')],
-            'Winners': [[r['nickname'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'winner'].to_dict(orient='records')],
+            'Boomers': [[r['nick'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'boomer'].to_dict(orient='records')],
+            'Winners': [[r['nick'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'winner'].to_dict(orient='records')],
         }
         return output
 
