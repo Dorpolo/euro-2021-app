@@ -545,7 +545,12 @@ class PlotBuilder(UserCreds):
         self.df_games = RealScores().all_matches()
         self.player_stats = RealScores().top_players()
         self.player_selection = self.UserPred.top_players_selection()
-        self.UserPoints = UserPoints(self.UserPred.prepare_user_prediction(), self.df_games, self.player_stats, self.player_selection)
+        self.UserPoints = UserPoints(
+                    self.UserPred.prepare_user_prediction(),
+                    self.df_games,
+                    self.player_stats,
+                    self.player_selection
+                    )
         self.match_type = match_type
         self.game_meta = None
         self.user_titles = {}
@@ -698,6 +703,7 @@ class PlotBuilder(UserCreds):
         relevant_users = [i for i in list(df[df.user_type != 'Loser']['user_name_id'].unique())]
         images = {j['uid']: j['image'] for j in self.profile['league_context'][league_name] if
                   j['uid'] in relevant_users}
+        print(self.profile['league_context'][league_name])
         output = {
             'Boomers': [[r['nick'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'boomer'].to_dict(orient='records')],
             'Winners': [[r['nick'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'winner'].to_dict(orient='records')],
