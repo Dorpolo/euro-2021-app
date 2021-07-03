@@ -699,7 +699,7 @@ class LeagueTableView(TemplateView):
         return render(request, self.template_name, context)
 
 
-class LiveGameView:
+class LiveGameViewOld:
     def next(request):
         is_next = True
         match_router = GetMatchData().game_router()
@@ -745,6 +745,42 @@ class LiveGameView:
         return render(request, template_name, context)
 
 
+class LiveGameView:
+    def next(request):
+        PlotInit = PlotBuilder(request.user.id, match_type='next')
+        viz = PlotInit.live_game_plot()
+        metadata = PlotInit.game_meta
+        context = {
+            'plots': viz,
+            'title': metadata['match_label'],
+            'real_score': f"{int(metadata['home_score_90_min'])}-{int(metadata['away_score_90_min'])} ({metadata['match_winner']})",
+            'logos': {metadata['home_team']: teams[metadata['home_team']]['logo'], metadata['away_team']: teams[metadata['away_team']]['logo']},
+            'status': 'Fixture' if metadata['match_status'] == '0' else 'Live' if metadata['match_status'] == '-1' else 'Finished',
+            'entitled_users': PlotInit.user_titles,
+            'committed_a_bet': PlotInit.profile['permissions']['bets']['groups']['placed'],
+        }
+        template_name = f"stats_live_game_{'next' if PlotInit.match_type == 'next' else 'prev'}.html"
+        return render(request, template_name, context)
+
+    def prev(request):
+        PlotInit = PlotBuilder(request.user.id, match_type='prev')
+        viz = PlotInit.live_game_plot()
+        metadata = PlotInit.game_meta
+        context = {
+            'plots': viz,
+            'title': metadata['match_label'],
+            'real_score': f"{int(metadata['home_score_90_min'])}-{int(metadata['away_score_90_min'])} ({metadata['match_winner']})",
+            'logos': {metadata['home_team']: teams[metadata['home_team']]['logo'],
+                      metadata['away_team']: teams[metadata['away_team']]['logo']},
+            'status': 'Fixture' if metadata['match_status'] == '0' else 'Live' if metadata[
+                                                                                      'match_status'] == '-1' else 'Finished',
+            'entitled_users': PlotInit.user_titles,
+            'committed_a_bet': PlotInit.profile['permissions']['bets']['groups']['bets'],
+        }
+        template_name = f"stats_live_game_{'next' if PlotInit.match_type == 'next' else 'prev'}.html"
+        return render(request, template_name, context)
+
+
 class GameStatsView:
     def next(request):
         PlotInit = PlotBuilder(request.user.id, match_type='next')
@@ -754,7 +790,7 @@ class GameStatsView:
             'plot_next_match': viz,
             'title': metadata['match_label'],
             'real_score': f"{int(metadata['home_score_90_min'])}-{int(metadata['away_score_90_min'])} ({metadata['match_winner']})",
-            'logos': {'home': teams[metadata['home_team']]['logo'], 'away': teams[metadata['away_team']]['logo']},
+            'logos': {metadata['home_team']: teams[metadata['home_team']]['logo'], metadata['away_team']: teams[metadata['away_team']]['logo']},
             'status': 'Fixture' if metadata['match_status'] == '0' else 'Live' if metadata['match_status'] == '-1' else 'Finished',
         }
         template = 'stats_next_game.html' if PlotInit.match_type == 'next' else 'stats_prev_game.html'

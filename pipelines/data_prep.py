@@ -66,7 +66,7 @@ class UserCreds(object):
                     } for item in league_members_init if item['league_name_id'] == league]
                 all_user_ids = [i['uid'] for i in [j[0] for j in list(league_members.values())]]
                 image_init = list(UserImage.objects.filter(user_name_id__in=all_user_ids).order_by('created').values())
-                images = {i['user_name_id']: i['header_image'] for i in image_init}
+                images = {i['user_name_id']: f"{AWS_S3_URL}{i['header_image']}" for i in image_init}
                 default_image = f"{AWS_S3_URL}{DEFAULT_PHOTO}"
                 for member in league_members.values():
                     for sub in member:
@@ -548,6 +548,7 @@ class PlotBuilder(UserCreds):
         self.UserPoints = UserPoints(self.UserPred.prepare_user_prediction(), self.df_games, self.player_stats, self.player_selection)
         self.match_type = match_type
         self.game_meta = None
+        self.user_titles = {}
 
     def match_prediction_df(self):
         input_data = self.UserPoints.merged_data_games()
@@ -627,6 +628,109 @@ class PlotBuilder(UserCreds):
         else:
             return None
 
+    @staticmethod
+    def build_sankey_plot(data: dict) -> dict:
+        link = dict(source=data['source'], target=data['target'], value=data['value'])
+        node = dict(label=data['label'], pad=40, thickness=5)
+        plot_data = go.Sankey(link=link, node=node)
+        fig = go.Figure(plot_data)
+        fig.update_layout(font_family=vis.FAMILY_FONT, title_font_family=vis.FAMILY_FONT, )
+        div = opy.plot(fig, auto_open=False, output_type='div')
+        return div
+
+    @staticmethod
+    def unique(list1):
+        unique_list = []
+        for x in list1:
+            if x not in unique_list:
+                unique_list.append(x)
+        return unique_list
+
+    @staticmethod
+    def ranked_items(x):
+        seq = sorted(x)
+        index = [seq.index(v) for v in x]
+        return index
+
+    @staticmethod
+    def score_distance(score_list: list) -> int:
+        if score_list[2] > score_list[0] or score_list[3] > score_list[1]:
+            return 15
+        else:
+            home_distance = score_list[0] - score_list[2]
+            away_distance = score_list[1] - score_list[3]
+            return home_distance + away_distance
+
+    def data_sankey_live_game(self, data) -> dict:
+        predicted_result = [j['predicted_score'] for j in data]
+        user_ids = [j['user_name_id'] for j in data]
+        user_rank = [j['league_rank'] for j in data]
+        unique_user_ids = self.unique(user_ids)
+        ranked_unique_user_ids = self.ranked_items(unique_user_ids)
+        source_map = {key: val for key, val in zip(unique_user_ids, ranked_unique_user_ids)}
+        source = [source_map[i] for i in user_ids]
+        users = [obj['nickname'] for obj in data]
+        unique_users_pre = self.unique(users)
+        unique_users = [f"{i} ({r})" for i, r in zip(unique_users_pre, user_rank)]
+        unique_results = self.unique(predicted_result)
+        label = unique_users + unique_results
+        n_start, n_results = len(ranked_unique_user_ids), len(unique_results)
+        n_end = n_results + n_start + 1
+        result_id = {obj: key for key, obj in zip(range(n_start, n_end), unique_results)}
+        target = [result_id[obj['predicted_score']] for obj in data]
+        value = [1 / (0.1 if item['distance'] == 0 else item['distance']) for item in data]
+        return {'source': source, 'target': target, 'value': value, 'label': label}
+
+    def live_winners(self, data: dict, league_name: str) -> dict:
+        df = pd.DataFrame(data)[['user_name_id', 'nickname', 'pred_score_home', 'pred_score_away', 'home_score_90_min',
+                                 'away_score_90_min', 'pred_winner', 'match_winner']].\
+            rename(columns={
+                     'nickname': 'nick',
+                     'pred_score_home': 'p_h',
+                     'pred_score_away': 'p_a',
+                     'home_score_90_min': 'r_h',
+                     'away_score_90_min': 'r_a',
+                     'match_winner': 'real_winner'})
+        df['user_type'] = np.where(((df.p_h == df.r_h) & (df.p_a == df.r_a)),
+                                   'boomer',
+                                   np.where(df.pred_winner == df.real_winner, 'winner', 'Loser'))
+        relevant_users = [i for i in list(df[df.user_type != 'Loser']['user_name_id'].unique())]
+        images = {j['uid']: j['image'] for j in self.profile['league_context'][league_name] if
+                  j['uid'] in relevant_users}
+        output = {
+            'Boomers': [[r['nickname'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'boomer'].to_dict(orient='records')],
+            'Winners': [[r['nickname'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'winner'].to_dict(orient='records')],
+        }
+        return output
+
+    def live_game_plot(self) -> dict:
+        output = {}
+        input_data = self.UserPoints.merged_data_games()
+        if input_data is not None:
+            df_meta = list(input_data.values())[0]
+            self.game_meta = df_meta.loc[df_meta.match_view_type == self.match_type].to_dict(orient='records')[0]
+            for key, df in input_data.items():
+                league_table = self.UserPoints.build_league_table(df)
+                this_game_df = df.loc[df.match_view_type == self.match_type]
+                self.user_titles[key] = self.live_winners(this_game_df.to_dict(orient='records'), league_name=key)
+                league_rank = {i['user_name_id']: i['rn'] for i in league_table}
+                game_data = this_game_df.to_dict(orient='records')
+                init_data = [{
+                        'user_name_id': j['user_name_id'],
+                        'nickname': j['nickname'],
+                        'predicted_score': j['predicted_score'],
+                        'distance': self.score_distance([
+                                int(j['pred_score_home']),
+                                int(j['pred_score_away']),
+                                int(j['home_score_90_min']),
+                                int(j['away_score_90_min'])
+                            ]),
+                        'league_rank': league_rank[j['user_name_id']]
+                    } for j in game_data]
+                relevant_data = [item for item in init_data if item['distance'] < 15]
+                data_preps = self.data_sankey_live_game(relevant_data)
+                output[key] = self.build_sankey_plot(data_preps)
+        return output
 
 
 class UserPredictionBase:
@@ -1366,6 +1470,7 @@ class GameStats(UserPredictionBase):
             return self.merge_dicts(output_score, output_winner)
         else:
             return None
+
 
 class MailTemplate:
     def group_stage_bet_submission(self, request, form) -> dict:
