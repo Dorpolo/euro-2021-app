@@ -294,8 +294,9 @@ class DataPrepHomePage(UserCreds):
             for item in data:
                 item['home_logo'] = teams[item['home_team']]['logo']
                 item['away_logo'] = teams[item['away_team']]['logo']
-                context['prev'] =  [item for item in data if item['match_view_type'] == 'prev'][0] if \
+                context['prev'] = [item for item in data if item['match_view_type'] == 'prev'][0] if \
                     'prev' in list(df['match_view_type']) else None
+                print(list(df['match_view_type']))
                 context['next'] = [item for item in data if item['match_view_type'] == 'next'][0] if \
                     'next' in list(df['match_view_type']) else None
             context['games_played'] = int(df.loc[(df.match_started == 1) & (df.user_name_id == self.user_id)].shape[0])
