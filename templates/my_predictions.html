@@ -53,6 +53,7 @@
                             <tr style="text-align: center">
                                 <th>Date</th>
                                 <th>Hour</th>
+                                <th>Stage</th>
                                 <th>Match</th>
                                 <th>Prediction</th>
                                 <th>Score (90 min)</th>
@@ -65,23 +66,25 @@
                           {% for item in my_predictions %}
                               <tr>
                               {% if item.6 == 'Finished' %}
-                                      <td style="color: darkgray">{{ item.1 }}</td>
-                                      <td style="color: darkgray">{{ item.2 }}</td>
-                                      <td style="color: darkgray">{{ item.3 }}</td>
-                                      <td style="color: darkgray">{{ item.4 }} {% if 'Final' in item.12 %}({{ item.14 }}) {% endif %}</td>
-                                  <td style="color: darkgray">{{ item.17 }}-{{ item.18 }}</td>
-                                      <td style="color: darkgray">{{ item.19 }}-{{ item.20 }}</td>
-                                      <td style="color: darkgray">{% if 'Final' in item.12 %} {{ item.15 }} {% endif %}</td>
-                                      <td style="color: darkgray">{{ item.6 }}</td>
+                                      <td style="color: darkgray">{{ item.match_date }}</td>
+                                      <td style="color: darkgray">{{ item.match_hour }}</td>
+                                      <td style="color: darkgray">{{ item.stage }}</td>
+                                      <td style="color: darkgray">{{ item.match_label }}</td>
+                                      <td style="color: darkgray">{{ item.predicted_score }} {% if 'Final' in item.stage %}({{ item.pred_winner }}) {% endif %}</td>
+                                  <td style="color: darkgray">{{ item.home_score_90_min }}-{{ item.away_score_90_min }}</td>
+                                      <td style="color: darkgray">{{ item.home_score_end_match }}-{{ item.away_score_end_match }}</td>
+                                      <td style="color: darkgray">{% if 'Final' in item.stage %} {{ item.match_winner }} {% endif %}</td>
+                                      <td style="color: darkgray">{{ item.match_status }}</td>
                               {% else %}
-                                      <td>{{ item.1 }}</td>
-                                      <td>{{ item.2 }}</td>
-                                      <td>{{ item.3 }}</td>
-                                      <td>{{ item.4 }} {% if 'Final' in item.12 %}({{ item.14 }}) {% endif %}</td>
-                                  <td>{{ item.17 }}-{{ item.18 }}</td>
-                                      <td>{{ item.19 }}-{{ item.20 }}</td>
-                                      <td>{% if 'Final' in item.12 %} {{ item.15 }} {% endif %}</td>
-                                      <td>{{ item.6 }}</td>
+                                      <td>{{ item.match_date }}</td>
+                                      <td>{{ item.match_hour }}</td>
+                                      <td>{{ item.stage }}</td>
+                                      <td>{{ item.match_label }}</td>
+                                      <td>{{ item.predicted_score }} {% if 'Final' in item.stage %}({{ item.pred_winner }}) {% endif %}</td>
+                                  <td>{{ item.home_score_90_min }}-{{ item.away_score_90_min }}</td>
+                                      <td>{{ item.home_score_end_match }}-{{ item.away_score_end_match }}</td>
+                                      <td>{% if 'Final' in item.stage %} {{ item.match_winner }} {% endif %}</td>
+                                      <td>{{ item.match_status }}</td>
                                   </tr>
                               {% endif %}
                           {% endfor %}
@@ -91,27 +94,25 @@
         <h3>My Players</h3>
         <hr>
               <div>
-              {% for key, val in my_players.items %}
-                  <p>{{ key }}</p>
-                  <hr>
                   <table class="styled-table" style="width: 100%; height: 100%; text-align: center">
                         <thead>
                             <tr style="text-align: center">
                                 <th>Player</th>
                                 <th>Team</th>
-                                <th>Count</th>
+                                <th>Event Type</th>
+                                <th>Event Count</th>
                             </tr>
                         <thead/>
                         <tbody>
-                          {% for item in val %}
+                          {% for item in my_players %}
                               <tr>
-                                  <td>{{ item.0 }}</td>
-                                  <td>{{ item.1 }}</td>
-                                  <td>{{ item.2 }}</td>
+                                  <td>{{ item.player_name }}</td>
+                                  <td>{{ item.team }}</td>
+                                  <td>{{ item.event_type }}</td>
+                                  <td>{{ item.event_count }}</td>
                               </tr>
                           {% endfor %}
                         </tbody>
                   </table>
-              {% endfor %}
                 </div>
 {% endblock %}

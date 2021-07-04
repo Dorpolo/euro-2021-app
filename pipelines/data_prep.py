@@ -246,7 +246,7 @@ class RealScores(object):
         adj_df_df_assists = df_assists.loc[df_assists['event_count'] >= self.get_minimal_count_value(df_assists)]
         return pd.concat([adj_df_scorers, adj_df_df_assists])
 
-    def top_players(self,) -> list:
+    def top_players(self, show_all: bool = False) -> list:
         top_player_list_adjusted = []
         for item in [1, 2]:
             url = f'{self.PREFIX}/topplayers/40&apikey={self.TOKEN}&event_id={str(item)}&limit=1000'
@@ -259,10 +259,13 @@ class RealScores(object):
                 else:
                     top_player_list_adjusted.append(p)
         df = pd.DataFrame(top_player_list_adjusted, columns=['name', 'team', 'event_count', 'event_type']).sort_values(by='event_count', ascending=False)
-        df_adjusted = self.adjust_top_player_table(df)[['name', 'event_type']]
-        df_adjusted['is_countable'] = True
-        df_final = pd.merge(df, df_adjusted, on = ['name', 'event_type'], how = 'inner')
-        return df_final.to_dict(orient='records')
+        if show_all:
+            return df.to_dict(orient='records')
+        else:
+            df_adjusted = self.adjust_top_player_table(df)[['name', 'event_type']]
+            df_adjusted['is_countable'] = True
+            df_final = pd.merge(df, df_adjusted, on=['name', 'event_type'], how='inner')
+            return df_final.to_dict(orient='records')
 
 
 class DataPrepHomePage(UserCreds):
@@ -501,6 +504,21 @@ class UserPoints:
             values2 = [int(sub) for sub in item[6:]]
             adj_df.append(nick + values1 + [f"{item[5]}%"] + values2)
         return adj_df
+
+    def merged_data_players_raw(self) -> dict:
+        user_selection = self.player_selection
+        df_players = pd.DataFrame(self.player_stats).rename(columns={'name': 'player_name'})
+        output = {}
+        for key, val in user_selection.items():
+            df_users = pd.DataFrame(val).rename(columns={'variable_type': 'event_type'})
+            df_users['event_type'] = np.where(df_users['event_type'] == 'top_scorer', 'Top Scorer',
+                                              np.where(df_users['event_type'] == 'top_assist',
+                                                       'Top Assist', None))
+            new_cols = ['user_name_id', 'nickname', 'event_type', 'player_name', 'team', 'event_count']
+            df_merged = pd.merge(df_users, df_players, on=['player_name', 'event_type'], how='inner')[new_cols].\
+                sort_values(by=['event_type', 'nickname', 'event_count'], ascending=False)
+            output[key] = df_merged
+        return output
 
     def merged_data_players(self, excluded_league: list = [24, 19, 31]) -> dict:
         user_selection = self.player_selection

@@ -614,6 +614,39 @@ class CreateLeagueView(CreateView):
     form_class = LeagueForm
     template_name = 'add_league.html'
 
+class AllPredictionsView1(TemplateView):
+    template_name = "score_predictions.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            user_id = request.user.id
+            Base = UserCreds(user_id)
+            profile = Base.get_user_profile()
+            UserPred = UserPrediction(profile)
+            df_games = RealScores().all_matches()
+            player_stats = RealScores().top_players(show_all=True)
+            player_selection = UserPred.top_players_selection()
+            if player_selection:
+                players_selected = True
+            Data = UserPoints(
+                UserPred.prepare_user_prediction(),
+                df_games,
+                player_stats,
+                player_selection
+            )
+            input_data = Data.merged_data_games()
+            df_meta = list(input_data.values())[0]
+            games = df_meta.loc[df_meta.user_name_id == user_id].to_dict(orient='records')
+            players_meta = list(Data.merged_data_players_raw().values())[0]
+            players = players_meta.loc[players_meta.user_name_id == user_id].to_dict(orient='records')
+            context = {
+                'my_predictions': games,
+                'my_players': players if players_selected else None
+            }
+            return render(request, self.template_name, context)
+        else:
+            return render(request, self.template_name, {'data': None})
+
 
 class AllPredictionsView(TemplateView):
     template_name = "score_predictions.html"
@@ -649,58 +682,38 @@ class AllPredictionsView(TemplateView):
         return render(request, self.template_name, context)
 
 
-class MyPredictionsView2(TemplateView):
-    template_name = "my_predictions.html"
-
-    def get(self, request):
-        user_id = request.user.id
-        Base = UserCreds(user_id)
-        profile = Base.get_user_profile()
-        UserPred = UserPrediction(profile)
-        df_games = RealScores().all_matches()
-        player_stats = RealScores().top_players()
-        player_selection = UserPred.top_players_selection()
-        Data = UserPoints(
-                        UserPred.prepare_user_prediction(),
-                        df_games,
-                        player_stats,
-                        player_selection
-                    )
-        input_data = Data.merged_data_games()
-        df_meta = list(input_data.values())[0]
-        games = df_meta.loc[df_meta.user_name_id == user_id].to_dict(orient='records')
-        players = Data.merged_data_players(excluded_league = [])
-            # [item for item in list(player_selection.values())[0] if item['user_name_id'] == user_id]
-        print(players)
-        context = {
-            'my_predictions': games,
-            'my_players': players
-        }
-        return context
-
-
 class MyPredictionsView(TemplateView):
     template_name = "my_predictions.html"
 
     def get(self, request):
         if request.user.is_authenticated:
-            UserPred = UserPredictionBase(request.user.id)
-            get_my_predictions = UserPred.present_my_predictions()
-            for row in get_my_predictions[0]:
-                home, away = row[3].split('-')
-                winner_label = '' if row[6] == 'Fixture' else home if row[15] == 'home' else away if row[15] == 'away' else 'Draw'
-                row[15] = winner_label
-                if 'Final' not in row[12]:
-                    row[17], row[19] = row[9], row[9]
-                    row[18], row[20] = row[10], row[10]
-            get_my_players = UserPred.get_top_players_my_predictions()
+            user_id = request.user.id
+            Base = UserCreds(user_id)
+            profile = Base.get_user_profile()
+            UserPred = UserPrediction(profile)
+            df_games = RealScores().all_matches()
+            player_stats = RealScores().top_players(show_all=True)
+            player_selection = UserPred.top_players_selection()
+            if player_selection:
+                players_selected = True
+            Data = UserPoints(
+                            UserPred.prepare_user_prediction(),
+                            df_games,
+                            player_stats,
+                            player_selection
+                        )
+            input_data = Data.merged_data_games()
+            df_meta = list(input_data.values())[0]
+            games = df_meta.loc[df_meta.user_name_id == user_id].to_dict(orient='records')
+            players_meta = list(Data.merged_data_players_raw().values())[0]
+            players = players_meta.loc[players_meta.user_name_id == user_id].to_dict(orient='records')
+            context = {
+                'my_predictions': games,
+                'my_players': players if players_selected else None
+            }
+            return render(request, self.template_name, context)
         else:
-            get_my_predictions = None
-        context = {
-            'my_predictions': get_my_predictions[0],
-            'my_players': get_my_players
-        }
-        return render(request, self.template_name, context)
+            return render(request, self.template_name, {'data': None})
 
 
 class LeagueTableView(TemplateView):
@@ -718,8 +731,6 @@ class LeagueTableView(TemplateView):
             return render(request, self.template_name, context)
         else:
             return render(request, self.template_name, {'data': None})
-
-
 
 
 class LiveGameView:
