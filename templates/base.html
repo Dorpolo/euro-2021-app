@@ -68,10 +68,12 @@
                 <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href={% url 'my_predictions' %}>Your Predictions</a></li>
                   <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href={% url 'next_match_stats' %}>Next Match</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href={% url 'live_next_match' %}>Live Match</a></li>
-                   <li><hr class="dropdown-divider"></li>
+                  {% if show_result %}
+                    <li><a class="dropdown-item" href={% url 'next_match_stats' %}>Next Match</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href={% url 'live_next_match' %}>Live Match</a></li>
+                       <li><hr class="dropdown-divider"></li>
+                  {% endif %}
                 <li><a class="dropdown-item" href={% url 'top_players' %}>Top Players</a></li>
               </ul>
         </li>
