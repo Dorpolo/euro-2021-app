@@ -18,49 +18,6 @@ environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 
-class HomeView(TemplateView):
-    template_name = "home.html"
-    GetAPIData = GetMatchData()
-
-    def get(self, request):
-        if request.user.is_authenticated:
-            UserPred = UserPredictionBase(request.user.id)
-            onboarding = BaseViewUserControl(request.user.id).onboarding()
-            league_data_output = UserPred.get_league_members()
-            home_page_context = self.GetAPIData.game_router()
-            if league_data_output is not None:
-                context = {
-                    'show_results': False,  # TODO - change to True once bet window ends
-                    'league_members': league_data_output,
-                    'league_signup': onboarding['league'],
-                    'committed_a_bet': onboarding['bet'],
-                    'image_uploaded': onboarding['image'],
-                    'committed_a_bet_16': onboarding['bet_top_16'],
-                    'committed_a_bet_8': onboarding['bet_top_8'],
-                    'committed_a_bet_4': onboarding['bet_top_4'],
-                    'committed_a_bet_2': onboarding['bet_top_2'],
-                    'is_cup_user': UserPred.is_cup_user(),
-                    'prev_match_logos': home_page_context['prev']['logo'],
-                    'next_match_logos': home_page_context['next']['logo'],
-                }
-                if onboarding['bet']:
-                    presented_data = UserPred.home_screen_match_relevant_data(home_page_context)
-                    context['user_game_points'] = presented_data[2]
-                    context['next_match'] = presented_data[1]
-                    context['prev_match'] = presented_data[0]
-                    context['league_member_points'] = UserPred.league_member_points()
-                    context['league_memberships'] = UserPred.get_league_members_data()
-                    context['games_started'] = home_page_context['started_games']
-                    context['bet_id'] = UserPred.user_game_bet_id('group')
-                    context['bet_id_knockout'] = UserPred.user_game_bet_id('top_16')
-                    context['bet_id_knockout_8'] = UserPred.user_game_bet_id('top_8')
-                return render(request, self.template_name, context)
-            else:
-                return render(request, self.template_name, {'data': None})
-        else:
-            return render(request, self.template_name, {'data': None})
-
-
 class PerfectHomeView(TemplateView):
     template_name = "perfect_home.html"
 
@@ -513,14 +470,6 @@ class UpdateBetView(UpdateView):
     template_name = 'update_bets.html'
 
 
-class CupBracket(TemplateView):
-    template_name = 'cup_bracket.html'
-
-    def get(self, request):
-        context = {'data': None}
-        return render(request, self.template_name, context)
-
-
 class UpdateBetViewThirdRound(UpdateView):
     model = Game
     form_class = BetFormUpdate3Round
@@ -614,7 +563,8 @@ class CreateLeagueView(CreateView):
     form_class = LeagueForm
     template_name = 'add_league.html'
 
-class AllPredictionsView1(TemplateView):
+
+class AllPredictionsView(TemplateView):
     template_name = "score_predictions.html"
 
     def get(self, request):
@@ -634,52 +584,17 @@ class AllPredictionsView1(TemplateView):
                 player_stats,
                 player_selection
             )
-            input_data = Data.merged_data_games()
-            df_meta = list(input_data.values())[0]
-            games = df_meta.loc[df_meta.user_name_id == user_id].to_dict(orient='records')
-            players_meta = list(Data.merged_data_players_raw().values())[0]
-            players = players_meta.loc[players_meta.user_name_id == user_id].to_dict(orient='records')
+            games = {key: val.to_dict(orient='records') for key, val in Data.merged_data_games().items()}
+            players = {key: val.sort_values(by=['event_type', 'event_count'], ascending=False).
+                to_dict(orient='records') for key, val in Data.merged_data_players_raw().items()}
             context = {
-                'my_predictions': games,
+                'profile': profile,
+                'predictions': games,
                 'my_players': players if players_selected else None
             }
             return render(request, self.template_name, context)
         else:
             return render(request, self.template_name, {'data': None})
-
-
-class AllPredictionsView(TemplateView):
-    template_name = "score_predictions.html"
-
-    def get(self, request):
-        if request.user.is_authenticated:
-            UserPrediction = UserPredictionBase(request.user.id)
-            get_league_data = UserPrediction.present_predictions()
-            league_data_output = get_league_data[0]
-            for league_data in league_data_output.values():
-                for row in league_data:
-                    home, away = row[3].split('-')
-                    winner_label = '' if row[6] == 'Fixture' else home if row[15] == 'home' else away if row[15] == 'away' else 'Draw'
-                    row[15] = winner_label
-                    if 'Final' not in row[12]:
-                        row[17], row[19] = row[9], row[9]
-                        row[18], row[20] = row[10], row[10]
-            league_table_output = UserPrediction.league_member_points()
-        else:
-            league_data_output = None
-        onboarding = BaseViewUserControl(request.user.id).onboarding()
-        context = {
-            'league_members': league_data_output,
-            'league_signup': onboarding['league'],
-            'committed_a_bet': onboarding['bet'],
-            'image_uploaded': onboarding['image'],
-            'committed_a_bet_16': onboarding['bet_top_16'],
-            'committed_a_bet_8': onboarding['bet_top_8'],
-            'committed_a_bet_4': onboarding['bet_top_4'],
-            'committed_a_bet_2': onboarding['bet_top_2'],
-            'league_member_points': league_table_output
-        }
-        return render(request, self.template_name, context)
 
 
 class MyPredictionsView(TemplateView):
@@ -708,6 +623,7 @@ class MyPredictionsView(TemplateView):
             players_meta = list(Data.merged_data_players_raw().values())[0]
             players = players_meta.loc[players_meta.user_name_id == user_id].to_dict(orient='records')
             context = {
+                'profile': profile,
                 'my_predictions': games,
                 'my_players': players if players_selected else None
             }

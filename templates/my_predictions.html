@@ -45,6 +45,7 @@
     }
 
   </style>
+    {% if profile.permissions.league %}
         <h3>My Predictions</h3>
         <hr>
               <div>
@@ -65,7 +66,7 @@
                         <tbody>
                           {% for item in my_predictions %}
                               <tr>
-                              {% if item.6 == 'Finished' %}
+                              {% if item.1 == '1' %}
                                       <td style="color: darkgray">{{ item.match_date }}</td>
                                       <td style="color: darkgray">{{ item.match_hour }}</td>
                                       <td style="color: darkgray">{{ item.stage }}</td>
@@ -115,4 +116,5 @@
                         </tbody>
                   </table>
                 </div>
+    {% endif %}
 {% endblock %}

@@ -113,3 +113,83 @@
 #             'my_players': get_my_players
 #         }
 #         return render(request, self.template_name, context)
+
+
+
+# class AllPredictionsView1(TemplateView):
+#     template_name = "score_predictions.html"
+#
+#     def get(self, request):
+#         if request.user.is_authenticated:
+#             UserPrediction = UserPredictionBase(request.user.id)
+#             get_league_data = UserPrediction.present_predictions()
+#             league_data_output = get_league_data[0]
+#             for league_data in league_data_output.values():
+#                 for row in league_data:
+#                     home, away = row[3].split('-')
+#                     winner_label = '' if row[6] == 'Fixture' else home if row[15] == 'home' else away if row[15] == 'away' else 'Draw'
+#                     row[15] = winner_label
+#                     if 'Final' not in row[12]:
+#                         row[17], row[19] = row[9], row[9]
+#                         row[18], row[20] = row[10], row[10]
+#             league_table_output = UserPrediction.league_member_points()
+#         else:
+#             league_data_output = None
+#         onboarding = BaseViewUserControl(request.user.id).onboarding()
+#         context = {
+#             'league_members': league_data_output,
+#             'league_signup': onboarding['league'],
+#             'committed_a_bet': onboarding['bet'],
+#             'image_uploaded': onboarding['image'],
+#             'committed_a_bet_16': onboarding['bet_top_16'],
+#             'committed_a_bet_8': onboarding['bet_top_8'],
+#             'committed_a_bet_4': onboarding['bet_top_4'],
+#             'committed_a_bet_2': onboarding['bet_top_2'],
+#             'league_member_points': league_table_output
+#         }
+#         return render(request, self.template_name, context)
+
+
+# class HomeView(TemplateView):
+#     template_name = "home.html"
+#     GetAPIData = GetMatchData()
+#
+#     def get(self, request):
+#         if request.user.is_authenticated:
+#             UserPred = UserPredictionBase(request.user.id)
+#             onboarding = BaseViewUserControl(request.user.id).onboarding()
+#             league_data_output = UserPred.get_league_members()
+#             home_page_context = self.GetAPIData.game_router()
+#             if league_data_output is not None:
+#                 context = {
+#                     'show_results': False,  # TODO - change to True once bet window ends
+#                     'league_members': league_data_output,
+#                     'league_signup': onboarding['league'],
+#                     'committed_a_bet': onboarding['bet'],
+#                     'image_uploaded': onboarding['image'],
+#                     'committed_a_bet_16': onboarding['bet_top_16'],
+#                     'committed_a_bet_8': onboarding['bet_top_8'],
+#                     'committed_a_bet_4': onboarding['bet_top_4'],
+#                     'committed_a_bet_2': onboarding['bet_top_2'],
+#                     'is_cup_user': UserPred.is_cup_user(),
+#                     'prev_match_logos': home_page_context['prev']['logo'],
+#                     'next_match_logos': home_page_context['next']['logo'],
+#                 }
+#                 if onboarding['bet']:
+#                     presented_data = UserPred.home_screen_match_relevant_data(home_page_context)
+#                     context['user_game_points'] = presented_data[2]
+#                     context['next_match'] = presented_data[1]
+#                     context['prev_match'] = presented_data[0]
+#                     context['league_member_points'] = UserPred.league_member_points()
+#                     context['league_memberships'] = UserPred.get_league_members_data()
+#                     context['games_started'] = home_page_context['started_games']
+#                     context['bet_id'] = UserPred.user_game_bet_id('group')
+#                     context['bet_id_knockout'] = UserPred.user_game_bet_id('top_16')
+#                     context['bet_id_knockout_8'] = UserPred.user_game_bet_id('top_8')
+#                 return render(request, self.template_name, context)
+#             else:
+#                 return render(request, self.template_name, {'data': None})
+#         else:
+#             return render(request, self.template_name, {'data': None})
+
+# path('home/', views.HomeView().get, name='better_home'),

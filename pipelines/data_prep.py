@@ -65,7 +65,6 @@ class UserCreds(object):
                         'full_name': f"{item['first_name']} {item['last_name']}"
                     } for item in league_members_init if item['league_name_id'] == league]
                 all_user_ids = [i['uid'] for i in [j[0] for j in list(league_members.values())]]
-                print(list(league_members.values()))
                 image_init = list(UserImage.objects.filter(user_name_id__in=all_user_ids).order_by('created').values())
                 images = {i['user_name_id']: f"{AWS_S3_URL}{i['header_image']}" for i in image_init}
                 default_image = f"{AWS_S3_URL}{DEFAULT_PHOTO}"
@@ -299,7 +298,6 @@ class DataPrepHomePage(UserCreds):
                 item['away_logo'] = teams[item['away_team']]['logo']
                 context['prev'] = [item for item in data if item['match_view_type'] == 'prev'][0] if \
                     'prev' in list(df['match_view_type']) else None
-                print(list(df['match_view_type']))
                 context['next'] = [item for item in data if item['match_view_type'] == 'next'][0] if \
                     'next' in list(df['match_view_type']) else None
             context['games_played'] = int(df.loc[(df.match_started == 1) & (df.user_name_id == self.user_id)].shape[0])
@@ -717,7 +715,6 @@ class PlotBuilder(UserCreds):
         relevant_users = [i for i in list(df[df.user_type != 'Loser']['user_name_id'].unique())]
         images = {j['uid']: j['image'] for j in self.profile['league_context'][league_name] if
                   j['uid'] in relevant_users}
-        print(self.profile['league_context'][league_name])
         output = {
             'Boomers': [[r['nick'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'boomer'].to_dict(orient='records')],
             'Winners': [[r['nick'], r['user_name_id'], images[r['user_name_id']]] for r in df[df.user_type == 'winner'].to_dict(orient='records')],

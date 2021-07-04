@@ -6,7 +6,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('home/', views.HomeView().get, name='better_home'),
     path('', views.PerfectHomeView().get, name='home'),
     path('add-your-prediction-group-stage/', views.AddBetsView.as_view(), name='add_your_bet'),
     path('add-your-prediction-group-stage/edit/<int:pk>', views.UpdateBetView.as_view(), name='update_your_bet'),
@@ -33,7 +32,6 @@ urlpatterns = [
     path('add-your-prediction-semi-finals/edit/<int:pk>', views.UpdateBetViewTop4.as_view(), name='update_bets_semi'),
     path('add-your-prediction-final/edit/<int:pk>', views.UpdateBetViewTop2.as_view(), name='update_bets_final'),
     path('cup/', views.CupView.as_view(), name='the_cup'),
-    path('cup-view/', views.CupBracket.as_view(), name='cup_bracket'),
     path('cup-knockout/', views.CupViewKnockOut.as_view(), name='the_cup_knockout'),
 ]
 
