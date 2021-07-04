@@ -541,9 +541,11 @@ class UserPoints:
                 output[key] = {'data': df_merged, 'points': {i: 0 for i in unique_users}}
             else:
                 df_output = df_merged.groupby(['user_name_id', 'nickname', 'event_type', 'player_name']).first().reset_index()
+                print(df_output)
                 listed_user_players = list(df_output['user_name_id'].values)
                 user_points = {item: listed_user_players.count(item) * 3 if item in list(set(listed_user_players)) else 0
                                for item in unique_users}
+                print(user_points)
                 output[key] = {'data': df_merged, 'points': user_points}
         return output
 
