@@ -643,7 +643,6 @@ class LeagueTableView(TemplateView):
                 'tables': Data.show_league_tables(),
                 'games_played': Data.show_game_cards()['games_played']
             }
-            print(Data.show_game_cards())
             return render(request, self.template_name, context)
         else:
             return render(request, self.template_name, {'data': None})
