@@ -59,14 +59,9 @@
 
   </style>
           <div>
-          <h3>Top Players <span style="font-size:14px;">({{ games_started }}/51)</span></h3>
-          <hr>
-          {% for key, obj in top_players.items %}
-                  {% if key == 'top_scorer' %}
-                      <p>Real Scorers</p>
-                  {% else %}
-                      <p>Real Assists</p>
-                  {% endif %}
+
+          {% for key, table in top_players.items %}
+          <h3>{{ key }}</h3>
               <hr>
               <div>
                   <table class="styled-table" style="width: 100%; height: 100%; text-align: center">
@@ -75,24 +70,24 @@
                                 <th> # </th>
                                 <th>Player</th>
                                 <th>Team</th>
-                                <th>Count</th>
+                                <th>Event Count</th>
                             </tr>
                         <thead/>
                         <tbody>
-                          {% for item in obj %}
+                          {% for val in table %}
                               {% if forloop.counter <= 3 %}
                                     <tr class="active-row">
                                       <th>{{ forloop.counter }}</th>
-                                      <td>{{ item.0 }}</td>
-                                      <td>{{ item.1 }}</td>
-                                      <td>{{ item.2 }}</td>
+                                      <td>{{ val.name }}</td>
+                                      <td>{{ val.team }}</td>
+                                      <td>{{ val.event_count }}</td>
                                   </tr>
                               {% else %}
                                   <tr>
                                       <td>{{ forloop.counter }}</td>
-                                      <td>{{ item.0 }}</td>
-                                      <td>{{ item.1 }}</td>
-                                      <td>{{ item.2 }}</td>
+                                      <td>{{ val.name }}</td>
+                                      <td>{{ val.team }}</td>
+                                      <td>{{ val.event_count }}</td>
                                   </tr>
                               {% endif %}
                           {% endfor %}
@@ -103,41 +98,41 @@
       </div>
       <hr>
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>test</title>
- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-</head>
-    <h3>League Predictions</h3>
-<body>
-     {% for key, plot in plots.items %}
-         <hr class="bold">
-         <center> <p> {{ key }} </p> </center>
-         <hr class="bold">
-            {% for key, plotish in plot.items %}
-            <body>
-                 <style>
-                     .modebar{
-                        display: none !important;
-                     }
-                     hr.bold {
-                          border-top: 2px dashed #DE3163;
-                        }
-                 </style>
-                 {% if key == 'top_scorer' %}
-                     <p>Top Scorers</p>
-                 {% else %}
-                     <p>Top Assists</p>
-                 {% endif %}
-                  {% autoescape off %}
-                    {{ plotish|safe }}
-                  {% endautoescape %}
-                  {% if forloop.counter == 1 %}<hr>{% endif %}
-             </body>
-          {% endfor %}
-        {% endfor %}
-</body>
+{#<head>#}
+{#  <meta charset="utf-8">#}
+{#  <meta name="viewport" content="width=device-width, initial-scale=1">#}
+{#  <title>test</title>#}
+{# <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>#}
+{#</head>#}
+{#    <h3>League Predictions</h3>#}
+{#<body>#}
+{#     {% for key, plot in plots.items %}#}
+{#         <hr class="bold">#}
+{#         <center> <p> {{ key }} </p> </center>#}
+{#         <hr class="bold">#}
+{#            {% for key, plotish in plot.items %}#}
+{#            <body>#}
+{#                 <style>#}
+{#                     .modebar{#}
+{#                        display: none !important;#}
+{#                     }#}
+{#                     hr.bold {#}
+{#                          border-top: 2px dashed #DE3163;#}
+{#                        }#}
+{#                 </style>#}
+{#                 {% if key == 'top_scorer' %}#}
+{#                     <p>Top Scorers</p>#}
+{#                 {% else %}#}
+{#                     <p>Top Assists</p>#}
+{#                 {% endif %}#}
+{#                  {% autoescape off %}#}
+{#                    {{ plotish|safe }}#}
+{#                  {% endautoescape %}#}
+{#                  {% if forloop.counter == 1 %}<hr>{% endif %}#}
+{#             </body>#}
+{#          {% endfor %}#}
+{#        {% endfor %}#}
+{#</body>#}
 
 {% endblock %}
 

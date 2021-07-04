@@ -714,13 +714,11 @@ class GameStatsView:
 
 
 def plot_top_players(request):
-    DataClass = TopPlayerStats(request.user.id)
-    top_players_real = {key: val[0:10] for key, val in
-                        DataClass.top_players_real()[0].items()}
-    predicted_plots = DataClass.top_players_pred_plot()
+    Data = RealScores()
+    df = pd.DataFrame(Data.top_players(show_all=True))
+    top_players = {key: df[df.event_type == key].sort_values(by=['event_count'], ascending=False).\
+        head(10).to_dict(orient='records') for key in ['Top Scorer', 'Top Assist']}
     context = {
-        'top_players': top_players_real,
-        'games_started': DataClass.game_router()['started_games'],
-        'plots': predicted_plots
+        'top_players': top_players
     }
     return render(request, "stats_top_players.html", context)
