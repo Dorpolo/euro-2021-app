@@ -427,7 +427,7 @@ class AddBetsTop4View(TemplateView):
         form = BetFormTop4()
         context = {
             'form': form,
-            'logos': KNOCK_OUT_LOGOS_BETA['1/2 Final']
+            'logos': KNOCK_OUT_LOGOS['1/2 Final']
         }
         return render(request, self.template_name, context)
 
@@ -474,7 +474,7 @@ class AddBetsTop2View(TemplateView):
         form = BetFormTop2()
         context = {
             'form': form,
-            'logos': KNOCK_OUT_LOGOS_BETA['Final']
+            'logos': TEMP_KNOCK_OUT_LOGOS['Final']
         }
         return render(request, self.template_name, context)
 

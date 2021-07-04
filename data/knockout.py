@@ -140,13 +140,14 @@ KNOCKOUT_META = {
     'Final': KNOCK_OUT_MATCHES['Final'] if date_validation('08/07/2021') else KNOCK_OUT_MATCHES_BETA['Final'],
     }
 
-ROUND_STARTED = True
-TEMP_KNOCK_OUT_LOGOS = KNOCK_OUT_LOGOS if ROUND_STARTED else KNOCK_OUT_LOGOS_BETA
-TEMP_KNOCK_OUT_MATCHES_4 = KNOCK_OUT_MATCHES if ROUND_STARTED else KNOCK_OUT_MATCHES_BETA
+round_started = False
+TEMP_KNOCK_OUT_LOGOS = KNOCK_OUT_LOGOS if round_started else KNOCK_OUT_LOGOS_BETA
+TEMP_KNOCK_OUT_MATCHES = KNOCK_OUT_MATCHES if round_started else KNOCK_OUT_MATCHES_BETA
+
 TOP_16 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/8 Final'].values()][0:8])
 TOP_8 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/4 Final'].values()][0:4])
-TOP_4 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in TEMP_KNOCK_OUT_MATCHES_4['1/2 Final'].values()][0:2])
-TOP_2 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['Final'].values()][0:1])
+TOP_4 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/2 Final'].values()][0:2])
+TOP_2 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in TEMP_KNOCK_OUT_MATCHES['Final'].values()][0:1])
 
 cup_meta = GetAPI.get_api_data().values()
 qualification_labels = [item['match_label'] for item in cup_meta if item['match_type'] == '3rd Round']

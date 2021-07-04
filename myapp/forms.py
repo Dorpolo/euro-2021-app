@@ -315,7 +315,7 @@ class BetFormTop4(forms.ModelForm):
         }
 
     def more_data(self):
-        data = TEMP_KNOCK_OUT_LOGOS['1/2 Final']
+        data = KNOCK_OUT_LOGOS['1/2 Final']
         return data
 
 
@@ -335,7 +335,7 @@ class BetFormTop2(forms.ModelForm):
         }
 
     def more_data(self):
-        data = KNOCK_OUT_LOGOS_BETA['Final']
+        data = TEMP_KNOCK_OUT_LOGOS['Final']
         return data
 
 
