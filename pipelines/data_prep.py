@@ -298,7 +298,7 @@ class DataPrepHomePage(UserCreds):
                     'prev' in list(df['match_view_type']) else None
                 context['next'] = [item for item in data if item['match_view_type'] == 'next'][0] if \
                     'next' in list(df['match_view_type']) else None
-            context['games_played'] =  int(df.loc[df.match_started == 1].shape[0] / len(set(list(df.user_name_id))))
+            context['games_played'] = int(df.loc[(df.match_started == 1) & (df.user_name_id == self.user_id)].shape[0])
             return context
         else:
             return {'next': None, 'prev': None, 'games_played': None}

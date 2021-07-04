@@ -67,9 +67,6 @@ class PerfectHomeView(TemplateView):
     def get(self, request):
         if request.user.is_authenticated:
             Data = DataPrepHomePage(request.user.id)
-            print(f"{'-'*100}")
-            print(Data.show_game_cards())
-            print(f"{'-' * 100}")
             context = {
                 'profile': Data.profile,
                 'tables': Data.show_league_tables(),
@@ -681,6 +678,7 @@ class MyPredictionsView2(TemplateView):
         }
         return context
 
+
 class MyPredictionsView(TemplateView):
     template_name = "my_predictions.html"
 
@@ -710,26 +708,16 @@ class LeagueTableView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            class_init = UserPredictionBase(request.user.id)
-            get_league_data = class_init.present_predictions()
-            league_data_output = get_league_data[0]
-            league_table_output = class_init.league_member_points()
+            Data = DataPrepHomePage(request.user.id)
+            context = {
+                'profile': Data.profile,
+                'tables': Data.show_league_tables(),
+                'games_played': Data.show_game_cards()['games_played']
+            }
+            print(Data.show_game_cards())
+            return render(request, self.template_name, context)
         else:
-            league_data_output = None
-        onboarding = BaseViewUserControl(request.user.id).onboarding()
-        context = {
-            'league_members': league_data_output,
-            'league_signup': onboarding['league'],
-            'committed_a_bet': onboarding['bet'],
-            'image_uploaded': onboarding['image'],
-            'committed_a_bet_16': onboarding['bet_top_16'],
-            'committed_a_bet_8': onboarding['bet_top_8'],
-            'committed_a_bet_4': onboarding['bet_top_4'],
-            'committed_a_bet_2': onboarding['bet_top_2'],
-            'league_member_points': league_table_output
-        }
-        return render(request, self.template_name, context)
-
+            return render(request, self.template_name, {'data': None})
 
 
 

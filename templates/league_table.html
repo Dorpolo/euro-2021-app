@@ -51,12 +51,12 @@
 
   </style>
 
-       {% if league_signup %}
-            <h3>League Rank</h3>
+       {% if profile.permissions.league %}
+            <h3>League Table</h3>
         <hr>
-          {% for key, obj in league_member_points.items %}
+          {% for league_name, table in tables.items %}
              <center>
-                <h3>{{ key }}</h3>
+                <h3>{{ league_name }}</h3>
               </center>
               <hr>
               <div>
@@ -71,34 +71,37 @@
                                 <th>Winners</th>
                                 <th>Success</th>
                                 <th>B-Goals</th>
+                                <th>Distance</th>
                                 <th>Extra</th>
                             </tr>
                         <thead/>
                         <tbody>
-                          {% for item in obj %}
+                          {% for item in table %}
                               {% if forloop.counter == 1 %}
                                     <tr class="active-row">
-                                      <th>{{ item.11 }}</th>
-                                      <td>{{ item.0 }}</td>
-                                      <td>{{ item.1 }}</td>
-                                      <td>{{ item.2 }}</td>
-                                      <td>{{ item.3 }}</td>
-                                      <td>{{ item.4 }}</td>
-                                      <td>{{ item.5 }}</td>
-                                      <td>{{ item.6 }}</td>
-                                      <td>{{ item.10 }}</td>
+                                      <th>{{ item.rn }}</th>
+                                      <td>{{ item.nickname }}</td>
+                                      <td>{{ games_played }}</td>
+                                      <td>{{ item.points }}</td>
+                                      <td>{{ item.boom }}</td>
+                                      <td>{{ item.direction }}</td>
+                                      <td>{{ item.success_rate }}</td>
+                                      <td>{{ item.predicted_goals }}</td>
+                                      <td>{{ item.distance }}</td>
+                                      <td>{{ item.extra }}</td>
                                   </tr>
                               {% else %}
                                   <tr>
-                                      <th>{{ item.11 }}</th>
-                                      <td>{{ item.0 }}</td>
-                                      <td>{{ item.1 }}</td>
-                                      <td>{{ item.2 }}</td>
-                                      <td>{{ item.3 }}</td>
-                                      <td>{{ item.4 }}</td>
-                                      <td>{{ item.5 }}</td>
-                                      <td>{{ item.6 }}</td>
-                                      <td>{{ item.10 }}</td>
+                                      <th>{{ item.rn }}</th>
+                                      <td>{{ item.nickname }}</td>
+                                      <td>{{ games_played }}</td>
+                                      <td>{{ item.points }}</td>
+                                      <td>{{ item.boom }}</td>
+                                      <td>{{ item.direction }}</td>
+                                      <td>{{ item.success_rate }}</td>
+                                      <td>{{ item.predicted_goals }}</td>
+                                      <td>{{ item.distance }}</td>
+                                      <td>{{ item.extra }}</td>
                                   </tr>
                               {% endif %}
                           {% endfor %}
