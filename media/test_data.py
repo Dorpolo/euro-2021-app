@@ -43,3 +43,49 @@ def all_matches(self):
               # 'live_ft_score', 'live_match_winner', 'live_90_home_score', 'live_90_away_score', 'is_enriched'
               ]
     return output, fields
+
+
+class LiveGameViewOld:
+    def next(request):
+        is_next = True
+        match_router = GetMatchData().game_router()
+        match = match_router['next']['data'] if is_next else match_router['prev']['data']
+        status = match['match_status']
+        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
+        onboarding = BaseViewUserControl(request.user.id).onboarding()
+        if onboarding['bet']:
+            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match['match_label'])
+        else:
+            LiveOutput = [None, None]
+        context = {
+            'title': match['match_label'],
+            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
+            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
+            'plots': LiveOutput[0],
+            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
+            'entitled_users': LiveOutput[1],
+            'committed_a_bet': onboarding['bet'],
+        }
+        template_name = f"stats_live_game_{'next' if is_next else 'prev'}.html"
+        return render(request, template_name, context)
+
+    def prev(request):
+        is_next = False
+        match_router = GetMatchData().game_router()
+        match = match_router['next']['data'] if is_next else match_router['prev']['data']
+        status = match['match_status']
+        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
+        onboarding = BaseViewUserControl(request.user.id).onboarding()
+        if onboarding['bet']:
+            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match['match_label'])
+        context = {
+            'title': match['match_label'],
+            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
+            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
+            'plots': LiveOutput[0],
+            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
+            'entitled_users': LiveOutput[1],
+            'committed_a_bet': onboarding['bet'],
+        }
+        template_name = f"stats_live_game_{'next' if is_next else 'prev'}.html"
+        return render(request, template_name, context)

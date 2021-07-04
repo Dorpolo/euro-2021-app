@@ -67,11 +67,14 @@ class PerfectHomeView(TemplateView):
     def get(self, request):
         if request.user.is_authenticated:
             Data = DataPrepHomePage(request.user.id)
+            print(f"{'-'*100}")
+            print(Data.show_game_cards())
+            print(f"{'-' * 100}")
             context = {
                 'profile': Data.profile,
                 'tables': Data.show_league_tables(),
                 'cards': Data.show_game_cards(),
-                'show_results': True
+                'show_results': False
             }
             return render(request, self.template_name, context)
         else:
@@ -649,6 +652,35 @@ class AllPredictionsView(TemplateView):
         return render(request, self.template_name, context)
 
 
+class MyPredictionsView2(TemplateView):
+    template_name = "my_predictions.html"
+
+    def get(self, request):
+        user_id = request.user.id
+        Base = UserCreds(user_id)
+        profile = Base.get_user_profile()
+        UserPred = UserPrediction(profile)
+        df_games = RealScores().all_matches()
+        player_stats = RealScores().top_players()
+        player_selection = UserPred.top_players_selection()
+        Data = UserPoints(
+                        UserPred.prepare_user_prediction(),
+                        df_games,
+                        player_stats,
+                        player_selection
+                    )
+        input_data = Data.merged_data_games()
+        df_meta = list(input_data.values())[0]
+        games = df_meta.loc[df_meta.user_name_id == user_id].to_dict(orient='records')
+        players = Data.merged_data_players(excluded_league = [])
+            # [item for item in list(player_selection.values())[0] if item['user_name_id'] == user_id]
+        print(players)
+        context = {
+            'my_predictions': games,
+            'my_players': players
+        }
+        return context
+
 class MyPredictionsView(TemplateView):
     template_name = "my_predictions.html"
 
@@ -699,50 +731,7 @@ class LeagueTableView(TemplateView):
         return render(request, self.template_name, context)
 
 
-class LiveGameViewOld:
-    def next(request):
-        is_next = True
-        match_router = GetMatchData().game_router()
-        match = match_router['next']['data'] if is_next else match_router['prev']['data']
-        status = match['match_status']
-        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
-        onboarding = BaseViewUserControl(request.user.id).onboarding()
-        if onboarding['bet']:
-            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match['match_label'])
-        else:
-            LiveOutput = [None, None]
-        context = {
-            'title': match['match_label'],
-            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
-            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
-            'plots': LiveOutput[0],
-            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
-            'entitled_users': LiveOutput[1],
-            'committed_a_bet': onboarding['bet'],
-        }
-        template_name = f"stats_live_game_{'next' if is_next else 'prev'}.html"
-        return render(request, template_name, context)
 
-    def prev(request):
-        is_next = False
-        match_router = GetMatchData().game_router()
-        match = match_router['next']['data'] if is_next else match_router['prev']['data']
-        status = match['match_status']
-        real_winner = match['away_team'] if match['match_winner'] == 'away' else match['home_team'] if match['match_winner'] == 'home' else 'Draw'
-        onboarding = BaseViewUserControl(request.user.id).onboarding()
-        if onboarding['bet']:
-            LiveOutput = TopPlayerStats(request.user.id).live_game_plot(match_label=match['match_label'])
-        context = {
-            'title': match['match_label'],
-            'real_score': f"{int(match['home_score_90_min'])}-{int(match['away_score_90_min'])} ({real_winner})",
-            'status': 'Fixture' if status == '0' else 'Started' if status == '-1' else 'Finished',
-            'plots': LiveOutput[0],
-            'logos': match_router['next']['logo'] if is_next else match_router['prev']['logo'],
-            'entitled_users': LiveOutput[1],
-            'committed_a_bet': onboarding['bet'],
-        }
-        template_name = f"stats_live_game_{'next' if is_next else 'prev'}.html"
-        return render(request, template_name, context)
 
 
 class LiveGameView:

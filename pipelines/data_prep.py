@@ -65,6 +65,7 @@ class UserCreds(object):
                         'full_name': f"{item['first_name']} {item['last_name']}"
                     } for item in league_members_init if item['league_name_id'] == league]
                 all_user_ids = [i['uid'] for i in [j[0] for j in list(league_members.values())]]
+                print(list(league_members.values()))
                 image_init = list(UserImage.objects.filter(user_name_id__in=all_user_ids).order_by('created').values())
                 images = {i['user_name_id']: f"{AWS_S3_URL}{i['header_image']}" for i in image_init}
                 default_image = f"{AWS_S3_URL}{DEFAULT_PHOTO}"
@@ -283,6 +284,7 @@ class DataPrepHomePage(UserCreds):
 
     def show_game_cards(self):
         if self.profile['permissions']['league']:
+            context = {}
             df = list(self.UserPoints.merged_data_games().values())[0]
             data = df.loc[(df.user_name_id == self.user_id) &
                           (df.match_view_type.isin(['next', 'prev']))][
@@ -292,21 +294,14 @@ class DataPrepHomePage(UserCreds):
             for item in data:
                 item['home_logo'] = teams[item['home_team']]['logo']
                 item['away_logo'] = teams[item['away_team']]['logo']
-            if 'next' in list(df['match_view_type']) and 'prev' in list(df['match_view_type']):
-                context = {
-                    'next': [item for item in data if item['match_view_type'] == 'next'][0],
-                    'prev': [item for item in data if item['match_view_type'] == 'prev'][0],
-                    'games_played': int(df.loc[df.match_started == 1].shape[0]/len(set(list(df.user_name_id))))
-                }
-            else:
-                context = {
-                    'next': None,
-                    'prev': None,
-                    'games_played': int(df.loc[df.match_started == 1].shape[0] / len(set(list(df.user_name_id))))
-                }
+                context['prev'] =  [item for item in data if item['match_view_type'] == 'prev'][0] if \
+                    'prev' in list(df['match_view_type']) else None
+                context['next'] = [item for item in data if item['match_view_type'] == 'next'][0] if \
+                    'next' in list(df['match_view_type']) else None
+            context['games_played'] =  int(df.loc[df.match_started == 1].shape[0] / len(set(list(df.user_name_id))))
+            return context
         else:
-            context = {'next': None, 'prev': None, 'games_played': None}
-        return context
+            return {'next': None, 'prev': None, 'games_played': None}
 
 
 class DataPrepShowPredictions(UserCreds):

@@ -8,7 +8,7 @@
     <hr>
         <center>
       <div>
-          <img src="/media/images/profile/england.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 100%;">
+          <img src="/media/images/profile/denmark.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 100%;">
       </div>
         </center>
             <hr>
@@ -19,11 +19,11 @@
                         img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
                         p.liketext { display:inline }
                     </style>
-                {% if profile.permissions.bets.quarter_final.placed %}
-{#                        <a href= {% url 'update_bets_quarter' profile.permissions.bets.quarter_final.id %}>#}
-{#                            <button type="button" class="btn btn-dark">Edit your Quarter Final predictions</button>#}
-{#                        </a>#}
-{#                        <hr>#}
+                {% if profile.permissions.bets.semi_final.placed %}
+                        <a href= {% url 'update_bets_semi' profile.permissions.bets.semi_final.id %}>
+                            <button type="button" class="btn btn-dark">Edit your Semi Final predictions</button>
+                        </a>
+                        <hr>
                                 <div class="card" style="width: 17rem;">
                                      <div class="card-body">
                                         <h5 class="card-title">
@@ -103,9 +103,49 @@
                                 </div>
                      <hr>
                 {% else %}
-{#                       <a href= {% url 'add_your_bet_quarter' %}>#}
-{#                            <button type="button" class="btn btn-warning">Add your Quarter Final predictions</button>#}
-{#                        </a>#}
+                       <a href= {% url 'add_your_bet_semi' %}>
+                            <button type="button" class="btn btn-warning">Add your Semi Final predictions</button>
+                        </a>
+                    <hr>
+                                <div class="card" style="width: 17rem;">
+                                     <div class="card-body">
+                                        <h5 class="card-title">
+                                             <img class='likeordislike' src='{{ cards.prev.home_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.prev.home_team }}</p>
+                                             <img class='likeordislike' src='{{ cards.prev.away_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.prev.away_team }}</p>
+                                        </h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                             <p style="color:#1C2833;font-size:15px;">
+                                                 {% if cards.prev.match_status == '-1' %}
+                                                     Live
+                                                 {% elif cards.prev.match_status == '1'%}
+                                                     Finished
+                                                 {% else %}
+                                                    Fixture ({{ cards.prev.match_date }}; {{ cards.prev.match_hour }} GMT)
+                                                 {% endif %}
+                                             </p>
+                                        </h6>
+                                             <p class="card-text" style="color:#1C2833;font-size:15px;">
+                                                 {% if cards.prev.match_status == '0' %}
+                                                 {% else %}
+                                                     Score (90 min): {{ cards.prev.home_score_90_min }}-{{ cards.prev.away_score_90_min }}
+                                                      {% if  cards.prev.home_score_90_min == cards.prev.away_score_90_min %}
+                                                          <br>Winning Team:  {{ cards.prev.match_winner }}
+                                                      {% else %}
+                                                      {% endif %}<br>
+                                                 {% endif %}
+                                                      Your Prediction: {{ cards.prev.predicted_score }}  {% if cards.prev.predicted_score.0 == cards.prev.predicted_score.2 %}  ({{ cards.prev.pred_winner }}) {% else %} {% endif %}<br>
+                                              </p>
+                                           <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                                                 <a href="{% url 'my_predictions' %}">
+                                                     <a href="{% url 'prev_match_stats' %}"><button type="button" class="btn btn-warning">Statistics</button></a>
+                                                 </a>
+                                                <a href="{% url 'predictions' %}">
+                                                   <a href="{% url 'live_prev_match' %}"><button type="button" class="btn btn-warning">Live Game</button></a>
+                                                </a>
+                                        </div>
+                                    </div>
+                                </div>
+                     <hr>
                 {% endif %}
     {% endif %}
     </center>
@@ -115,9 +155,9 @@
                     <center>
            <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
                     {% if profile.views.cup %}
-                    <a href="{% url 'the_cup_knockout' %}">
-                         <button type="button" class="btn btn-dark">Cup</button>
-                     </a>
+                        <a href="{% url 'the_cup_knockout' %}">
+                             <button type="button" class="btn btn-dark">Cup</button>
+                         </a>
                     {% endif %}
                      <a href="{% url 'my_predictions' %}">
                          <button type="button" class="btn btn-dark">My Bets</button>

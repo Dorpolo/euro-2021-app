@@ -140,10 +140,12 @@ KNOCKOUT_META = {
     'Final': KNOCK_OUT_MATCHES['Final'] if date_validation('08/07/2021') else KNOCK_OUT_MATCHES_BETA['Final'],
     }
 
-
+ROUND_STARTED = True
+TEMP_KNOCK_OUT_LOGOS = KNOCK_OUT_LOGOS if ROUND_STARTED else KNOCK_OUT_LOGOS_BETA
+TEMP_KNOCK_OUT_MATCHES_4 = KNOCK_OUT_MATCHES if ROUND_STARTED else KNOCK_OUT_MATCHES_BETA
 TOP_16 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/8 Final'].values()][0:8])
 TOP_8 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES['1/4 Final'].values()][0:4])
-TOP_4 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['1/2 Final'].values()][0:2])
+TOP_4 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in TEMP_KNOCK_OUT_MATCHES_4['1/2 Final'].values()][0:2])
 TOP_2 = tuple([((item['home'], item['home']), (item['away'], item['away'])) for item in KNOCK_OUT_MATCHES_BETA['Final'].values()][0:1])
 
 cup_meta = GetAPI.get_api_data().values()
@@ -252,16 +254,25 @@ CUP_DRAW = {
             }
         },
     '1/2 Final': {
-        'status': 'fixture',
+        'status': 'next',
         'data': {
-            'Semi-Final I': None,
-            'Semi-Final II': None,
+            'Match I': {
+                'home': {'user_id': 28},
+                'away': {'user_id': None},
+            },
+            'Match II': {
+                'home': {'user_id': None},
+                'away': {'user_id': 52},
+            },
             }
     },
     'Final': {
         'status': 'fixture',
         'data': {
-                'Final': None,
+             'Match I': {
+                'home': {'user_id': None},
+                'away': {'user_id': None},
             }
+        }
          },
     }
