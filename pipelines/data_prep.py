@@ -2134,7 +2134,7 @@ class CupKnockOut(UserPredictionBase):
 class CupKnockOutNew(UserCreds):
     def __init__(self, user_id, beta: bool = False):
         super().__init__(user_id)
-        self.beta = True
+        self.beta = False
         self.draw_template = CUP_DRAW if not self.beta else CUP_DRAW_BETA
         self.league_id = 9 if not self.beta else 1
         self.profile = self.get_user_profile()
@@ -2155,7 +2155,7 @@ class CupKnockOutNew(UserCreds):
                 'img': u['image']
             } for u in self.profile['league_context']['Beta Coffee']
         }
-        for stage in ['1/8 Final']: #, '1/4 Final'
+        for stage in ['1/8 Final', '1/4 Final', '1/2 Final']:
             output[stage] = {}
             for key, val in self.draw_template[stage]['data'].items():
                 users = [user_data[item['user_id']]['nick'] for item in val.values()]
