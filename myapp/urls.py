@@ -1,15 +1,12 @@
-import django.contrib.auth.urls
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from myapp import views
-from django.conf import settings
-from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.PerfectHomeView().get, name='home'),
     path('add-your-prediction-group-stage/', views.AddBetsView.as_view(), name='add_your_bet'),
     path('add-your-prediction-group-stage/edit/<int:pk>', views.UpdateBetView.as_view(), name='update_your_bet'),
-    path('add-your-prediction-group-stage-3-round/edit/<int:pk>', views.UpdateBetViewThirdRound.as_view(), name='update_your_bet_3_tound'),
+    path('add-your-prediction-group-stage-3-round/edit/<int:pk>', views.UpdateBetViewThirdRound.as_view(),
+         name='update_your_bet_3_tound'),
     path('create-league/', views.CreateLeagueView.as_view(), name='create_league'),
     path('join-a-league/', views.CreateLeagueMemberView.as_view(), name='create_league_member'),
     path('league-terms/', views.TermsView.as_view(), name='terms'),
@@ -34,4 +31,3 @@ urlpatterns = [
     path('cup/', views.CupView.as_view(), name='the_cup'),
     path('cup-knockout/', views.CupViewKnockOut.as_view(), name='the_cup_knockout'),
 ]
-

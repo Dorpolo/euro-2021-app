@@ -1,8 +1,6 @@
 from django import forms
-from django.db import models
 from .models import *
 from pipelines.read_data import EuroApi
-from data.teams import team_game_map
 
 logos = EuroApi().main()
 
@@ -275,7 +273,8 @@ class BetFormTop8(forms.ModelForm):
         )
 
         widgets = {
-            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
+            'user_name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
             'gid_a0_0': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
             'gid_a0_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '-'}),
             'gid_a0_w': forms.Select(attrs={'class': 'form-select'}),

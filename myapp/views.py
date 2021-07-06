@@ -3,10 +3,6 @@ from django.core.mail import send_mail
 from pipelines.data_prep import *
 from django.views.generic import CreateView, UpdateView, TemplateView
 from .forms import *
-from .models import *
-from data.teams import team_game_map
-from data.knockout import KNOCK_OUT_LOGOS
-from django.urls import reverse
 from .filters import *
 from django.shortcuts import render
 from django.conf import settings
@@ -28,7 +24,7 @@ class PerfectHomeView(TemplateView):
                 'profile': Data.profile,
                 'tables': Data.show_league_tables(),
                 'cards': Data.show_game_cards(),
-                'show_results': False
+                'show_results': True
             }
             return render(request, self.template_name, context)
         else:

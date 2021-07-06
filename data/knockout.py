@@ -275,5 +275,5 @@ CUP_DRAW = {
                 'away': {'user_id': None},
             }
         }
-         },
+     },
     }
