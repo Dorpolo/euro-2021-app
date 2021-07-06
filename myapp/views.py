@@ -640,7 +640,7 @@ class LeagueTableView(TemplateView):
             Data = DataPrepHomePage(request.user.id)
             context = {
                 'profile': Data.profile,
-                'tables': Data.show_league_tables(),
+                'tables': Data.show_league_tables_with_groupstage_rank(),
                 'games_played': Data.show_game_cards()['games_played']
             }
             return render(request, self.template_name, context)
