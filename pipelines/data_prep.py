@@ -120,25 +120,26 @@ class RealScores(object):
         data = requests.get(url=self.URL).json()
         output = []
         for item in data['calendar']['matchdays']:
-            for subitem in item['matches']:
-                row = {
-                    'match_day_id': item['matchdayID'],
-                    'match_round': item['matchdayName'],
-                    'match_day_playoff': item['matchdayPlayoff'],
-                    'match_day_type': item['matchdayType'],
-                    'match_id': subitem['matchID'],
-                    'match_status': subitem['matchStatus']['statusID'],
-                    'match_date': subitem['matchDate'],
-                    'match_hour': subitem['matchTime'],
-                    'home_team': subitem['homeParticipant']['participantName'],
-                    'home_team_id': subitem['homeParticipant']['participantID'],
-                    'home_team_score': subitem['homeParticipant']['score'],
-                    'away_team': subitem['awayParticipant']['participantName'],
-                    'away_team_id': subitem['awayParticipant']['participantID'],
-                    'away_team_score': subitem['awayParticipant']['score'],
-                    'match_label': f"{subitem['homeParticipant']['participantName']}-{subitem['awayParticipant']['participantName']}"
-                }
-                output.append(row)
+            if item.get('matches'):
+                for subitem in item.get('matches'):
+                    row = {
+                        'match_day_id': item['matchdayID'],
+                        'match_round': item['matchdayName'],
+                        'match_day_playoff': item['matchdayPlayoff'],
+                        'match_day_type': item['matchdayType'],
+                        'match_id': subitem['matchID'],
+                        'match_status': subitem['matchStatus']['statusID'],
+                        'match_date': subitem['matchDate'],
+                        'match_hour': subitem['matchTime'],
+                        'home_team': subitem['homeParticipant']['participantName'],
+                        'home_team_id': subitem['homeParticipant']['participantID'],
+                        'home_team_score': subitem['homeParticipant']['score'],
+                        'away_team': subitem['awayParticipant']['participantName'],
+                        'away_team_id': subitem['awayParticipant']['participantID'],
+                        'away_team_score': subitem['awayParticipant']['score'],
+                        'match_label': f"{subitem['homeParticipant']['participantName']}-{subitem['awayParticipant']['participantName']}"
+                    }
+                    output.append(row)
         return output
 
     def get_knockout_attributes(self, match_id):
@@ -787,7 +788,7 @@ class UserPredictionBase:
     def get_api_data(self) -> dict:
         metadata = {}
         for item in self.extract_data()['calendar']['matchdays']:
-            matches = item['matches']
+            matches = item.get('matches')
             is_playoff = item['matchdayPlayoff']
             match_type = item['matchdayName']
             for sub_item in matches:
@@ -1617,7 +1618,7 @@ class GetMatchData:
             match_day_type = item['matchdayType']
             match_day_start = item['matchdayStart']
             match_day_end = item['matchdayEnd']
-            for subitem in item['matches']:
+            for subitem in item.get('matches'):
                 match_id = subitem['matchID']
                 match_status = subitem['matchStatus']['statusID']
                 match_date = subitem['matchDate']
@@ -1706,7 +1707,7 @@ class GetMatchData:
             match_day_type = item['matchdayType']
             match_day_start = item['matchdayStart']
             match_day_end = item['matchdayEnd']
-            for subitem in item['matches']:
+            for subitem in item.get('matches'):
                 match_id = subitem['matchID']
                 match_status = subitem['matchStatus']['statusID']
                 match_date = subitem['matchDate']

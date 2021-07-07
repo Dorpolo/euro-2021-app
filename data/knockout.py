@@ -24,38 +24,41 @@ class BuildKnockOutForm:
         else:
             r = requests.get(url=self.URL)
         data = json.loads(r.text)
+        print(self.URL)
         return data
 
     def get_api_data(self, beta_mode: bool = False) -> dict:
         metadata = {}
         data = self.extract_data(beta_mode)
+        i = 0
         for item in data['calendar']['matchdays']:
-            matches = item['matches']
-            is_playoff = item['matchdayPlayoff']
-            match_type = item['matchdayName']
-            for sub_item in matches:
-                game_id = sub_item['matchID']
-                status = sub_item['matchStatus']['statusID']
-                game_status = 'Fixture' if status == '0' else 'Live' if status == '-1' else 'Finished'
-                home_team = sub_item['homeParticipant']['participantName']
-                away_team = sub_item['awayParticipant']['participantName']
-                real_score_home = sub_item['homeParticipant']['score']
-                real_score_away = sub_item['awayParticipant']['score']
-                metadata[game_id] = {
-                    'status': game_status,
-                    'match_label': f"{home_team}-{away_team}",
-                    'real_score_home': real_score_home,
-                    'real_score_away': real_score_away,
-                    'score_label': f"{real_score_home} - {real_score_away}",
-                    'direction': 1 if real_score_home > real_score_away else 2 if real_score_home < real_score_away else 0,
-                    'date': sub_item['matchDate'],
-                    'time': sub_item['matchTime'],
-                    'game_id': game_id,
-                    'is_playoff': is_playoff,
-                    'match_type': match_type,
-                    'home_team': home_team,
-                    'away_team': away_team
-                 }
+            matches = item.get('matches')
+            if matches:
+                is_playoff = item['matchdayPlayoff']
+                match_type = item['matchdayName']
+                for sub_item in matches:
+                    game_id = sub_item['matchID']
+                    status = sub_item['matchStatus']['statusID']
+                    game_status = 'Fixture' if status == '0' else 'Live' if status == '-1' else 'Finished'
+                    home_team = sub_item['homeParticipant']['participantName']
+                    away_team = sub_item['awayParticipant']['participantName']
+                    real_score_home = sub_item['homeParticipant']['score']
+                    real_score_away = sub_item['awayParticipant']['score']
+                    metadata[game_id] = {
+                        'status': game_status,
+                        'match_label': f"{home_team}-{away_team}",
+                        'real_score_home': real_score_home,
+                        'real_score_away': real_score_away,
+                        'score_label': f"{real_score_home} - {real_score_away}",
+                        'direction': 1 if real_score_home > real_score_away else 2 if real_score_home < real_score_away else 0,
+                        'date': sub_item['matchDate'],
+                        'time': sub_item['matchTime'],
+                        'game_id': game_id,
+                        'is_playoff': is_playoff,
+                        'match_type': match_type,
+                        'home_team': home_team,
+                        'away_team': away_team
+                     }
         return metadata
 
     def get_knockout_matches(self, beta_mode: bool = False) -> dict:
@@ -89,21 +92,22 @@ class BuildKnockOutForm:
             if stage != '1/16 Final':
                 output[stage] = {}
                 i = 0
-                stage_length = int(round((len(item['matches'])/divider) + 0.1))
-                for sub_item in item['matches'][0:stage_length]:
-                    output[stage][f"a{i}"] = {
-                                    'home': {
-                                        'name': sub_item['homeParticipant']['participantName'],
-                                        'id': sub_item['homeParticipant']['participantID'],
-                                        'image': team_dict[sub_item['homeParticipant']['participantName']]['logo']
-                                    },
-                                    'away': {
-                                        'name': sub_item['awayParticipant']['participantName'],
-                                        'id': sub_item['awayParticipant']['participantID'],
-                                        'image': team_dict[sub_item['awayParticipant']['participantName']]['logo']
+                if item.get('matches'):
+                    stage_length = int(round((len(item.get('matches'))/divider) + 0.1))
+                    for sub_item in item.get('matches')[0:stage_length]:
+                        output[stage][f"a{i}"] = {
+                                        'home': {
+                                            'name': sub_item['homeParticipant']['participantName'],
+                                            'id': sub_item['homeParticipant']['participantID'],
+                                            'image': team_dict[sub_item['homeParticipant']['participantName']]['logo']
+                                        },
+                                        'away': {
+                                            'name': sub_item['awayParticipant']['participantName'],
+                                            'id': sub_item['awayParticipant']['participantID'],
+                                            'image': team_dict[sub_item['awayParticipant']['participantName']]['logo']
+                                        }
                                     }
-                                }
-                    i += 1
+                        i += 1
         return output
 
     def get_team_game_map(self):
