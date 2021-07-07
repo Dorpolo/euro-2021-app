@@ -195,7 +195,7 @@ CUP_DRAW_BETA = {
     }
 }
 
-CUP_DRAW = {
+CUP_TEMPLATE = {
     '1/8 Final': {
        'status': 'next',
        'data': {
@@ -259,21 +259,23 @@ CUP_DRAW = {
         'data': {
             'Match I': {
                 'home': {'user_id': 28},
-                'away': {'user_id': None},
+                'away': {'user_id': 94},
             },
             'Match II': {
-                'home': {'user_id': None},
+                'home': {'user_id': 133},
                 'away': {'user_id': 52},
             },
             }
     },
-    'Final': {
+    '1/1 Final': {
         'status': 'fixture',
         'data': {
              'Match I': {
                 'home': {'user_id': None},
-                'away': {'user_id': None},
+                'away': {'user_id': 52},
             }
         }
      },
     }
+
+CUP_DRAW = dict(sorted(CUP_TEMPLATE.items(), key=lambda item: item[0]))
