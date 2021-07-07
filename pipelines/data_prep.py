@@ -262,8 +262,11 @@ class RealScores(object):
                     top_player_list_adjusted.append(['K. Benzema', 'France', 4, 'Top Scorer'])
                 if [*p] == ['H. Kane', 'England', 3, 'Top Scorer']:
                     top_player_list_adjusted.append(['H. Kane', 'England', 4, 'Top Scorer'])
+                if [*p] == ['P. Schick', 'Czech Republic', 4, 'Top Scorer']:
+                    top_player_list_adjusted.append(['P. Schick', 'Czech Republic', 5, 'Top Scorer'])
                 else:
                     top_player_list_adjusted.append(p)
+
         df = pd.DataFrame(top_player_list_adjusted,
                           columns=['name', 'team', 'event_count', 'event_type']).sort_values(by=['name', 'event_type', 'event_count'], ascending=False).\
             groupby(['name', 'event_type']).first().reset_index().sort_values(by=['event_count', 'event_count'], ascending=False)
