@@ -260,6 +260,8 @@ class RealScores(object):
                     top_player_list_adjusted.append(['R. Lukaku', 'Belgium', 4, 'Top Scorer'])
                 if [*p] == ['K. Benzema', 'France', 3, 'Top Scorer']:
                     top_player_list_adjusted.append(['K. Benzema', 'France', 4, 'Top Scorer'])
+                if [*p] == ['H. Kane', 'England', 3, 'Top Scorer']:
+                    top_player_list_adjusted.append(['H. Kane', 'England', 4, 'Top Scorer'])
                 else:
                     top_player_list_adjusted.append(p)
         df = pd.DataFrame(top_player_list_adjusted,
