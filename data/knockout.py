@@ -127,19 +127,7 @@ KNOCK_OUT_LOGOS = GetAPI.get_knockout_team(beta_mode=False)
 KNOCK_OUT_LOGOS_BETA = GetAPI.get_knockout_team(beta_mode=True)
 TEAM_GAME_MAP = GetAPI.get_team_game_map()
 
-def date_validation(dt: str) -> bool:
-    past = datetime.strptime(dt, "%d/%m/%Y")
-    present = datetime.now()
-    return past.date() <= present.date()
-
-
-KNOCKOUT_META = {
-    '1/8 Final': KNOCK_OUT_MATCHES['1/8 Final'],
-    '1/4 Final': KNOCK_OUT_MATCHES['1/4 Final'] if date_validation('30/06/2021') else KNOCK_OUT_MATCHES_BETA['1/4 Final'],
-    '1/2 Final': KNOCK_OUT_MATCHES['1/2 Final'] if date_validation('04/07/2021') else KNOCK_OUT_MATCHES_BETA['1/2 Final'],
-    'Final': KNOCK_OUT_MATCHES['Final'] if date_validation('08/07/2021') else KNOCK_OUT_MATCHES_BETA['Final'],
-    }
-
+# TODO - change to True once new round has been started
 round_started = False
 TEMP_KNOCK_OUT_LOGOS = KNOCK_OUT_LOGOS if round_started else KNOCK_OUT_LOGOS_BETA
 TEMP_KNOCK_OUT_MATCHES = KNOCK_OUT_MATCHES if round_started else KNOCK_OUT_MATCHES_BETA
@@ -160,6 +148,7 @@ CUP_GAMES = {
     '1/2 Final': [item['match_label'] for item in cup_meta if item['match_type'] == '1/2 Final'],
     'Final': [item['match_label'] for item in cup_meta if item['match_type'] == 'Final']
 }
+
 users_dict = {
      'Team Grisha': 17,
      'Polo': 15,
@@ -183,17 +172,88 @@ users_dict = {
 }
 
 
-CUP_DRAW_BETA = {
+CUP_TEMPLATE_BETA = {
     '1/8 Final': {
+       'status': 'next',
+       'data': {
+            'Match I': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match II': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match III': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match IV': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match V': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match VI': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match VII': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match VIII': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+        }
+    },
+    '1/4 Final': {
         'status': 'next',
         'data': {
             'Match I': {
                 'home': {'user_id': 1},
                 'away': {'user_id': 2},
+            },
+            'Match II': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match III': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match IV': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            }
+        },
+    '1/2 Final': {
+        'status': 'next',
+        'data': {
+            'Match I': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            'Match II': {
+                'home': {'user_id': 1},
+                'away': {'user_id': 2},
+            },
+            }
+    },
+    'Final': {
+        'status': 'fixture',
+        'data': {
+             'Match I': {
+                 'home': {'user_id': 1},
+                 'away': {'user_id': 2},
             }
         }
+     },
     }
-}
 
 CUP_TEMPLATE = {
     '1/8 Final': {
@@ -267,7 +327,7 @@ CUP_TEMPLATE = {
             },
             }
     },
-    '1/1 Final': {
+    'Final': {
         'status': 'fixture',
         'data': {
              'Match I': {
@@ -279,3 +339,4 @@ CUP_TEMPLATE = {
     }
 
 CUP_DRAW = dict(sorted(CUP_TEMPLATE.items(), key=lambda item: item[0]))
+CUP_DRAW_BETA = dict(sorted(CUP_TEMPLATE_BETA.items(), key=lambda item: item[0]))

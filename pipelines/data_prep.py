@@ -2051,7 +2051,7 @@ class TopPlayerStats(GetMatchData):
 class CupKnockOut(UserPredictionBase):
     def __init__(self, user_id, beta: bool = False):
         super().__init__(user_id)
-        self.beta = beta
+        self.beta = True
         self.draw_template = CUP_DRAW if not self.beta else CUP_DRAW_BETA
         self.league_id = 9 if not self.beta else 1
 
@@ -2084,7 +2084,7 @@ class CupKnockOut(UserPredictionBase):
         df = pd.DataFrame(metadata[0][league_name], columns=col_names)
         user_data = self.get_user_data()
         output = {}
-        for stage in ['1/8 Final', '1/4 Final', '1/2 Final']:
+        for stage in ['1/2 Final', '1/4 Final', '1/8 Final']:
             output[stage] = {}
             for key, val in self.draw_template[stage]['data'].items():
                 users = [user_data[item['user_id']]['nick'] for item in val.values()]
@@ -2143,7 +2143,6 @@ class CupKnockOutNew(UserCreds):
         self.UserPoints = UserPoints(
             self.UserPred.prepare_user_prediction(),
             self.df_games)
-
 
     def prepare_template_data(self):
         metadata = self.UserPoints.merged_data_games()
