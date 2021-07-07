@@ -2051,7 +2051,7 @@ class TopPlayerStats(GetMatchData):
 class CupKnockOut(UserPredictionBase):
     def __init__(self, user_id, beta: bool = False):
         super().__init__(user_id)
-        self.beta = True
+        self.beta = beta
         self.draw_template = CUP_DRAW if not self.beta else CUP_DRAW_BETA
         self.league_id = 9 if not self.beta else 1
 
