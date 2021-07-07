@@ -132,7 +132,7 @@ KNOCK_OUT_LOGOS_BETA = GetAPI.get_knockout_team(beta_mode=True)
 TEAM_GAME_MAP = GetAPI.get_team_game_map()
 
 # TODO - change to True once new round has been started
-round_started = False
+round_started = True
 TEMP_KNOCK_OUT_LOGOS = KNOCK_OUT_LOGOS if round_started else KNOCK_OUT_LOGOS_BETA
 TEMP_KNOCK_OUT_MATCHES = KNOCK_OUT_MATCHES if round_started else KNOCK_OUT_MATCHES_BETA
 
@@ -335,7 +335,7 @@ CUP_TEMPLATE = {
         'status': 'fixture',
         'data': {
              'Match I': {
-                'home': {'user_id': None},
+                'home': {'user_id': 28},
                 'away': {'user_id': 52},
             }
         }

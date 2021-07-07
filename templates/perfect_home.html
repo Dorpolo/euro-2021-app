@@ -19,11 +19,11 @@
                         img.likeordisklike { height: 6px; width: 6px; margin-right: 2px; }
                         p.liketext { display:inline }
                     </style>
-                {% if profile.permissions.bets.semi_final.placed %}
-{#                        <a href= {% url 'update_bets_final' profile.permissions.bets.final.id %}>#}
-{#                            <button type="button" class="btn btn-dark">Edit your Final prediction</button>#}
-{#                        </a>#}
-{#                        <hr>#}
+                {% if profile.permissions.bets.final.placed %}
+                        <a href= {% url 'update_bets_final' profile.permissions.bets.final.id %}>
+                            <button type="button" class="btn btn-dark">Edit your Final prediction</button>
+                        </a>
+                        <hr>
                                 <div class="card" style="width: 17rem;">
                                      <div class="card-body">
                                         <h5 class="card-title">
@@ -105,10 +105,10 @@
                                 </div>
                      <hr>
                 {% else %}
-{#                       <a href= {% url 'add_your_bet_final' %}>#}
-{#                            <button type="button" class="btn btn-warning">Add your Final prediction</button>#}
-{#                        </a>#}
-{#                    <hr>#}
+                       <a href= {% url 'add_your_bet_final' %}>
+                            <button type="button" class="btn btn-warning">Add your Final prediction</button>
+                        </a>
+                    <hr>
                                 <div class="card" style="width: 17rem;">
                                      <div class="card-body">
                                         <h5 class="card-title">
