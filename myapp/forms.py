@@ -371,3 +371,20 @@ class UserImageForm(forms.ModelForm):
         widgets = {
             'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
         }
+
+
+class FeedBackForm(forms.ModelForm):
+    class Meta:
+        model = FeedBack
+        fields = ('user_name', 'league_name', 'comment',)
+        widgets = {
+            'user_name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': '', 'id': 'user-name', 'type': 'hidden'}),
+            'league_name': forms.Select(attrs={'class': 'form-select'}),
+            'comment': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'autofocus': 'autofocus',
+                    'autocomplete': 'off'
+                    })
+        }

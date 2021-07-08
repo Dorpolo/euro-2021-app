@@ -6,6 +6,26 @@
   <body style="background-color: whitesmoke;">
         <h2> {{ user.username }}'s Fan Zone</h2>
     <hr>
+    <div>
+        <h5> Dear {{ user.username }}! </h5>
+        <p> Thank you for your participation in Euro 2020 tournament. See you in World Cup 2022 (:<br>
+            <li> Enjoyed the product? Please feel free to leave a feedback. </li>
+            <li> Want to contribute for covering the project's costs? you're welcome.</li>
+        </p>
+    <hr>
+                        <center>
+           <div class="btn-group-justified" role="group" style="padding-left: 2px; padding-right: 2px;">
+                 <a href="{% url 'feedback' %}">
+                     <button type="button" class="btn btn-dark">Feedback</button>
+                 </a>
+                <a href="https://payboxapp.page.link/cKXj8u55N9DpDywK8">
+                    <button type="button" class="btn btn-dark">Contribute</button>
+                </a>
+
+            </div>
+                    </center>
+            <hr>
+    </div>
         <center>
       <div>
           <img src="/media/images/profile/kane.jpeg" style="min-width: 100px; max-width: 400px; overflow: auto; width: 100%;">

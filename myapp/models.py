@@ -207,6 +207,18 @@ class League(models.Model):
         return self.league_name
 
 
+class FeedBack(models.Model):
+    user_name = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    league_name = models.ForeignKey(League, to_field='league_name', on_delete=models.CASCADE)
+    comment = models.TextField(blank=True, null=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def get_absolute_url():
+        return reverse('home')
+
+
 class LeagueMember(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
     league_name = models.ForeignKey(League, to_field='league_name', on_delete=models.CASCADE)

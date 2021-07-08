@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Add Your Feedback{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+	<h1>Add Your Feedback</h1>
+<hr>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.media }}
+    {{ form.as_p }}
+    <hr>
+<button class="btn btn-warning">Submit</button>
+<form/>
+
+    <script>
+        var name = "{{ user.id }}";
+        document.getElementById('user-name').value = name
+    </script>
+{% else %}
+
+    You're not allowed here, Please register/ sign in
+
+{% endif %}
+
+{% endblock %}

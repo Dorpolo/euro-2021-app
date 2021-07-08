@@ -560,6 +560,12 @@ class CreateLeagueView(CreateView):
     template_name = 'add_league.html'
 
 
+class FeedBack(CreateView):
+    model = FeedBack
+    form_class = FeedBackForm
+    template_name = 'add_feedback.html'
+
+
 class AllPredictionsView(TemplateView):
     template_name = "score_predictions.html"
 
