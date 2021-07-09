@@ -300,7 +300,6 @@ class DataPrepHomePage(UserCreds):
             output[key] = self.UserPoints.build_league_table(val)
         return output
 
-
     def show_league_tables_with_groupstage_rank(self):
         output = {}
         data = self.UserPoints.merged_data_games()
@@ -423,7 +422,7 @@ class UserPrediction:
                         df_main = df_main.append(df_top_4)
                         df_init_top_2 = pd.DataFrame(list(GameTop2.objects.filter(user_name_id__in=ids).values()))
                         if df_init_top_2.shape[0] > 0:
-                            df_top_2 = self.knockout_bets(df_init_top_4)
+                            df_top_2 = self.knockout_bets(df_init_top_2)
                             df_top_2['stage'] = 'Final'
                             df_main = df_main.append(df_top_2)
             nick_names = self.user_profile['league_users'][key]
