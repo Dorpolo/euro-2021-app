@@ -571,8 +571,7 @@ class AllPredictionsView(TemplateView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            user_id = request.user.id
-            Base = UserCreds(user_id)
+            Base = UserCreds(request.user.id)
             profile = Base.get_user_profile()
             UserPred = UserPrediction(profile)
             df_games = RealScores().all_matches()
@@ -580,20 +579,15 @@ class AllPredictionsView(TemplateView):
             player_selection = UserPred.top_players_selection()
             if player_selection:
                 players_selected = True
-            Data = UserPoints(
-                UserPred.prepare_user_prediction(),
-                df_games,
-                player_stats,
-                player_selection
-            )
+            Data = UserPoints(UserPred.prepare_user_prediction(), df_games, player_stats, player_selection)
             games = {key: val.to_dict(orient='records') for key, val in Data.merged_data_games().items()}
-            players = {key: val.sort_values(by=['event_type', 'event_count'], ascending=False).
-                to_dict(orient='records') for key, val in Data.merged_data_players_raw().items()}
             context = {
                 'profile': profile,
                 'predictions': games,
-                'my_players': players if players_selected else None
-            }
+                'my_players': {
+                    key: val.sort_values(by=['event_type', 'event_count'], ascending=False).to_dict(orient='records')
+                    for key, val in Data.merged_data_players_raw().items()} if players_selected else None
+                    }
             return render(request, self.template_name, context)
         else:
             return render(request, self.template_name, {'data': None})

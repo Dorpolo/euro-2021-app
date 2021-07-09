@@ -119,25 +119,25 @@ class RealScores(object):
     def all_matches_phase_1(self) -> list:
         data = requests.get(url=self.URL).json()
         output = []
-        for item in data['calendar']['matchdays']:
+        for item in data.get('calendar').get('matchdays'):
             if item.get('matches'):
                 for subitem in item.get('matches'):
                     row = {
-                        'match_day_id': item['matchdayID'],
-                        'match_round': item['matchdayName'],
-                        'match_day_playoff': item['matchdayPlayoff'],
-                        'match_day_type': item['matchdayType'],
-                        'match_id': subitem['matchID'],
-                        'match_status': subitem['matchStatus']['statusID'],
-                        'match_date': subitem['matchDate'],
-                        'match_hour': subitem['matchTime'],
-                        'home_team': subitem['homeParticipant']['participantName'],
-                        'home_team_id': subitem['homeParticipant']['participantID'],
-                        'home_team_score': subitem['homeParticipant']['score'],
-                        'away_team': subitem['awayParticipant']['participantName'],
-                        'away_team_id': subitem['awayParticipant']['participantID'],
-                        'away_team_score': subitem['awayParticipant']['score'],
-                        'match_label': f"{subitem['homeParticipant']['participantName']}-{subitem['awayParticipant']['participantName']}"
+                        'match_day_id': item.get('matchdayID'),
+                        'match_round': item.get('matchdayName'),
+                        'match_day_playoff': item.get('matchdayPlayoff'),
+                        'match_day_type': item.get('matchdayType'),
+                        'match_id': subitem.get('matchID'),
+                        'match_status': subitem.get('matchStatus').get('statusID'),
+                        'match_date': subitem.get('matchDate'),
+                        'match_hour': subitem.get('matchTime'),
+                        'home_team': subitem.get('homeParticipant').get('participantName'),
+                        'home_team_id': subitem.get('homeParticipant').get('participantID'),
+                        'home_team_score': subitem.get('homeParticipant').get('score'),
+                        'away_team': subitem.get('awayParticipant').get('participantName'),
+                        'away_team_id': subitem.get('awayParticipant').get('participantID'),
+                        'away_team_score': subitem.get('awayParticipant').get('score'),
+                        'match_label': f"{subitem.get('homeParticipant').get('participantName')}-{subitem.get('awayParticipant').get('participantName')}"
                     }
                     output.append(row)
         return output
@@ -145,15 +145,15 @@ class RealScores(object):
     def get_knockout_attributes(self, match_id):
         base_url = f"{self.PREFIX}/matches/{match_id}&apikey={self.TOKEN}"
         data = requests.get(url=base_url).json()
-        score_90_min_home = int(data['match']['homeParticipant']['score']) - int(
-            data['match']['extraTime']['home_score'])
-        score_90_min_away = int(data['match']['awayParticipant']['score']) - int(
-            data['match']['extraTime']['away_score'])
-        extra_time = True if data['match']['extraTime']['is_extra'] == '1' else False
+        score_90_min_home = int(data.get('match').get('homeParticipant').get('score')) - int(
+            data.get('match').get('extraTime').get('home_score'))
+        score_90_min_away = int(data.get('match').get('awayParticipant').get('score')) - int(
+            data.get('match').get('extraTime').get('away_score'))
+        extra_time = True if data.get('match').get('extraTime').get('is_extra') == '1' else False
         penalties = False
         if 'stages' in data.keys():
-            if data['stages']:
-                stage_types = [i[1] for i in [list(item.values()) for item in data['stages']]]
+            if data.get('stages'):
+                stage_types = [i[1] for i in [list(item.values()) for item in data.get('stages')]]
                 if 'Penalty Shootout' in stage_types:
                     loc = stage_types.index('Penalty Shootout')
                     if data['stages'][loc]['home_score'] is not None:
@@ -164,15 +164,17 @@ class RealScores(object):
                 else data['match']['awayParticipant']['participantName'] if int(stage_score['home_score']) < int(stage_score['away_score']) else 'Draw'
         else:
             game_winner = data['match']['homeParticipant']['participantName'] if \
-                int(data['match']['homeParticipant']['score']) > int(data['match']['awayParticipant']['score']) \
+                int(data.get('match').get('homeParticipant').get('score')) > \
+                int(data.get('match').get('awayParticipant').get('score')) \
                 else data['match']['awayParticipant']['participantName'] if \
-                int(data['match']['homeParticipant']['score']) < int(data['match']['awayParticipant']['score']) else 'Draw'
+                int(data.get('match').get('homeParticipant').get('score')) < \
+                int(data.get('match').get('awayParticipant').get('score')) else 'Draw'
         context = {
             'is_extra_time': extra_time,
             'home_score_90_min': score_90_min_home,
             'away_score_90_min': score_90_min_away,
-            'home_score_end_match': data['match']['homeParticipant']['score'],
-            'away_score_end_match': data['match']['awayParticipant']['score'],
+            'home_score_end_match': data.get('match').get('homeParticipant').get('score'),
+            'away_score_end_match': data.get('match').get('awayParticipant').get('score'),
             'match_winner': game_winner
         }
         return context
@@ -180,17 +182,17 @@ class RealScores(object):
     def all_matches(self) -> list:
         data = self.all_matches_phase_1()
         for row in data:
-            if row['match_day_playoff'] == '1':
-                for key, val in self.get_knockout_attributes(row['match_id']).items():
+            if row.get('match_day_playoff') == '1':
+                for key, val in self.get_knockout_attributes(row.get('match_id')).items():
                     row[key] = val
             else:
                 row['is_extra_time'] = False
-                row['home_score_90_min'] = row['home_team_score']
-                row['away_score_90_min'] = row['away_team_score']
-                row['home_score_end_match'] = row['home_team_score']
-                row['away_score_end_match'] = row['away_team_score']
-                row['match_winner'] = row['home_team'] if row['home_team_score'] > row['away_team_score']\
-                                      else row['away_team'] if row['home_team_score'] < row['away_team_score'] \
+                row['home_score_90_min'] = row.get('home_team_score')
+                row['away_score_90_min'] = row.get('away_team_score')
+                row['home_score_end_match'] = row.get('home_team_score')
+                row['away_score_end_match'] = row.get('away_team_score')
+                row['match_winner'] = row.get('home_team') if row.get('home_team_score') > row.get('away_team_score')\
+                                      else row.get('away_team') if row.get('home_team_score') < row.get('away_team_score') \
                                       else 'Draw'
         for item in data:
             item['home_team_score'] = int(item['home_score_90_min']) if 'Final' in item['match_round'] else item['home_team_score']

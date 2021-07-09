@@ -8,9 +8,9 @@
     <hr>
     <div>
         <h5> Dear {{ user.username }}! </h5>
-        <p> Thank you for your participation in Euro 2020 tournament. See you in World Cup 2022 (:<br>
-            <li> Enjoyed the product? Please feel free to leave a feedback. </li>
-            <li> Want to contribute for covering the project's costs? you're welcome.</li>
+        <p> Thank you for your participation in Euro 2020 tournament. See you in <span><img src="/media/images/profile/qatar.jpeg" style="max-width: 50px; overflow: auto; width: 30%;"></span><br>
+            <li> Enjoyed the product? Leave a feedback. </li>
+            <li> Want to contribute for covering the project's costs? You're welcome.</li>
         </p>
     <hr>
                         <center>
@@ -48,6 +48,7 @@
                                      <div class="card-body">
                                         <h5 class="card-title">
                                              <img class='likeordislike' src='{{ cards.next.home_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.next.home_team }}</p>
+                                             -
                                              <img class='likeordislike' src='{{ cards.next.away_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.next.away_team }}</p>
                                         </h5>
                                         <h6 class="card-subtitle mb-2 text-muted">
@@ -89,6 +90,7 @@
                                      <div class="card-body">
                                         <h5 class="card-title">
                                              <img class='likeordislike' src='{{ cards.prev.home_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.prev.home_team }}</p>
+                                             -
                                              <img class='likeordislike' src='{{ cards.prev.away_logo }}' width="20" height="20"/><p class='liketext'>{{ cards.prev.away_team }}</p>
                                         </h5>
                                         <h6 class="card-subtitle mb-2 text-muted">
