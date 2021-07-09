@@ -260,8 +260,10 @@ class RealScores(object):
                     top_player_list_adjusted.append(['R. Lukaku', 'Belgium', 4, 'Top Scorer'])
                 if [*p] == ['K. Benzema', 'France', 3, 'Top Scorer']:
                     top_player_list_adjusted.append(['K. Benzema', 'France', 4, 'Top Scorer'])
-                if [*p] == ['H. Kane', 'England', 3, 'Top Scorer']:
-                    top_player_list_adjusted.append(['H. Kane', 'England', 4, 'Top Scorer'])
+                if [*p] == ['H. Kane', 'England', 4, 'Top Scorer']:
+                    add_kane_goal = True
+                    kane_adj = 5 if add_kane_goal else 4
+                    top_player_list_adjusted.append(['H. Kane', 'England', kane_adj, 'Top Scorer'])
                 if [*p] == ['P. Schick', 'Czech Republic', 4, 'Top Scorer']:
                     top_player_list_adjusted.append(['P. Schick', 'Czech Republic', 5, 'Top Scorer'])
                 else:
