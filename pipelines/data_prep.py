@@ -263,7 +263,7 @@ class RealScores(object):
                 if [*p] == ['K. Benzema', 'France', 3, 'Top Scorer']:
                     top_player_list_adjusted.append(['K. Benzema', 'France', 4, 'Top Scorer'])
                 if [*p] == ['H. Kane', 'England', 4, 'Top Scorer']:
-                    add_kane_goal = False
+                    add_kane_goal = True
                     kane_adj = 5 if add_kane_goal else 4
                     top_player_list_adjusted.append(['H. Kane', 'England', kane_adj, 'Top Scorer'])
                 # if [*p] == ['R. Sterling', 'England', 3, 'Top Scorer']:
