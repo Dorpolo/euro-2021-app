@@ -24,7 +24,7 @@ class PerfectHomeView(TemplateView):
                 'profile': Data.profile,
                 'tables': Data.show_league_tables(),
                 'cards': Data.show_game_cards(),
-                'show_results': False
+                'show_results': True
             }
             return render(request, self.template_name, context)
         else:
