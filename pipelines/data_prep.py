@@ -266,10 +266,6 @@ class RealScores(object):
                     add_kane_goal = False
                     kane_adj = 5 if add_kane_goal else 4
                     top_player_list_adjusted.append(['H. Kane', 'England', kane_adj, 'Top Scorer'])
-                # if [*p] == ['R. Sterling', 'England', 3, 'Top Scorer']:
-                #     sterling_goal = False
-                #     sterling_adj = 3 if sterling_goal else 4
-                #     top_player_list_adjusted.append(['R. Sterling', 'England', sterling_adj, 'Top Scorer'])
                 if [*p] == ['P. Schick', 'Czech Republic', 4, 'Top Scorer']:
                     top_player_list_adjusted.append(['P. Schick', 'Czech Republic', 5, 'Top Scorer'])
                 else:
@@ -2097,7 +2093,7 @@ class CupKnockOut(UserPredictionBase):
         df = pd.DataFrame(metadata[0][league_name], columns=col_names)
         user_data = self.get_user_data()
         output = {}
-        for stage in ['1/2 Final', '1/4 Final', '1/8 Final']:
+        for stage in ['Final', '1/2 Final', '1/4 Final', '1/8 Final']:
             output[stage] = {}
             for key, val in self.draw_template[stage]['data'].items():
                 users = [user_data[item['user_id']]['nick'] for item in val.values()]
@@ -2143,6 +2139,7 @@ class CupKnockOut(UserPredictionBase):
                 'pred_winner', 'knockout_winner_team', 'game_status']
         output = df[cols].values.tolist()
         return self.manipulate_prediction_presentation(output)
+
 
 class CupKnockOutNew(UserCreds):
     def __init__(self, user_id, beta: bool = False):
